@@ -20,5 +20,6 @@ services:
     build: infra/php
     volumes:
       - "./:/var/www/html"
+      - "~/.composer:/root/.composer/"
     networks:
       - traefik

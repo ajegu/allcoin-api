@@ -79,6 +79,7 @@ $app->configure('app');
 |
 */
 
+$app->register(App\Providers\BinanceServiceProvider::class);
 $app->register(App\Providers\AwsServiceProvider::class);
 $app->register(App\Providers\DynamoDbServiceProvider::class);
 $app->register(App\Providers\SerializerServiceProvider::class);
