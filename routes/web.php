@@ -16,3 +16,8 @@
 $router->get('/', function () use ($router) {
     return $router->app->version();
 });
+
+/**
+ * ASSET
+ */
+$router->post('/asset', ['uses' => 'AssetController@create']);
