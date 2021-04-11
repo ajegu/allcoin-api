@@ -79,7 +79,10 @@ $app->configure('app');
 |
 */
 
-// $app->register(App\Providers\AppServiceProvider::class);
+$app->register(App\Providers\AwsServiceProvider::class);
+$app->register(App\Providers\DynamoDbServiceProvider::class);
+$app->register(App\Providers\SerializerServiceProvider::class);
+$app->register(App\Providers\RepositoryServiceProvider::class);
 
 /*
 |--------------------------------------------------------------------------

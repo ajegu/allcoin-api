@@ -14,7 +14,6 @@
     "name": "string",
     "createdAt": "string",
     "updatedAt": "string",
-    "deletedAt": "string",
     "pairs": "array"
 }
 ````
@@ -26,7 +25,6 @@
     "bidPrice": "float",
     "askPrice": "float",
     "createdAt": "string",
-    "updatedAt": "string",
-    "deletedAt": "string"
+    "updatedAt": "string"
 }
 ````
