@@ -22,4 +22,10 @@
             <directory suffix=".php">allcoin</directory>
         </include>
     </coverage>
+    <php>
+        <env name="AWS_ACCESS_KEY_ID" value="test"/>
+        <env name="AWS_SECRET_ACCESS_KEY" value="test"/>
+        <env name="AWS_DEFAULT_REGION" value="test"/>
+        <env name="AWS_DDB_TABLE_NAME" value="test"/>
+    </php>
 </phpunit>
