@@ -18,7 +18,7 @@ class SerializerServiceProvider extends ServiceProvider
     {
         $this->app->singleton(SerializerInterface::class, function () {
             $encoders = [new JsonEncoder()];
-            $normalizers = [new ObjectNormalizer()];
+            $normalizers = [new DateTimeNormalizer(), new ObjectNormalizer()];
 
             return new Serializer($normalizers, $encoders);
         });

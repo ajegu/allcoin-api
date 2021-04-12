@@ -23,15 +23,6 @@ abstract class AbstractDataMapper
 
     /**
      * @param \AllCoin\Model\ModelInterface $model
-     * @return array
-     */
-    public function convertModelToArray(ModelInterface $model): array
-    {
-        return $this->serializerService->normalizeModel($model);
-    }
-
-    /**
-     * @param \AllCoin\Model\ModelInterface $model
      * @param string $responseDtoClass
      * @return \AllCoin\Dto\ResponseDtoInterface
      */

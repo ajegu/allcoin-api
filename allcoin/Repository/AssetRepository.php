@@ -5,13 +5,24 @@ namespace AllCoin\Repository;
 
 
 use AllCoin\Model\Asset;
+use AllCoin\Model\ClassMappingEnum;
 use BadMethodCallException;
 
 class AssetRepository extends AbstractRepository implements AssetRepositoryInterface
 {
+    /**
+     * @return Asset[]
+     * @throws \AllCoin\Database\DynamoDb\Exception\ReadException
+     */
     public function findAll(): array
     {
-        throw new BadMethodCallException();
+        $items = $this->itemManager->fetchAll(
+            ClassMappingEnum::CLASS_MAPPING[Asset::class]
+        );
+
+        return array_map(function (array $item) {
+            return $this->serializerService->deserializeToModel($item, Asset::class);
+        }, $items);
     }
 
     public function findOneById(string $assetId): Asset
@@ -29,7 +40,7 @@ class AssetRepository extends AbstractRepository implements AssetRepositoryInter
 
         $this->itemManager->save(
             data: $item,
-            partitionKey: $asset->getName(),
+            partitionKey: ClassMappingEnum::CLASS_MAPPING[Asset::class],
             sortKey: $asset->getName()
         );
     }

@@ -35,7 +35,7 @@ class AssetRepositoryTest extends TestCase
     {
         $asset = $this->createMock(Asset::class);
         $assetName = 'foo';
-        $asset->expects($this->exactly(2))->method('getName')->willReturn($assetName);
+        $asset->expects($this->once())->method('getName')->willReturn($assetName);
 
         $item = [];
         $this->serializerService->expects($this->once())
@@ -45,8 +45,27 @@ class AssetRepositoryTest extends TestCase
 
         $this->itemManager->expects($this->once())
             ->method('save')
-            ->with($item, $assetName, $assetName);
+            ->with($item, 'asset', $assetName);
 
         $this->assetRepository->save($asset);
+    }
+
+    public function testFindAllShouldBeOK(): void
+    {
+        $item = [];
+        $items = [
+            $item
+        ];
+        $this->itemManager->expects($this->once())
+            ->method('fetchAll')
+            ->willReturn($items);
+
+        $this->serializerService->expects($this->once())
+            ->method('deserializeToModel')
+            ->with($item, Asset::class)
+            ->willReturn($this->createMock(Asset::class));
+
+        $this->assetRepository->findAll();
+
     }
 }

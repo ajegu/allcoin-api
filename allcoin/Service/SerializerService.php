@@ -69,6 +69,24 @@ class SerializerService
     }
 
     /**
+     * @param array $payload
+     * @param string $className
+     * @return \AllCoin\Model\ModelInterface
+     */
+    public function deserializeToModel(array $payload, string $className): ModelInterface
+    {
+        try {
+            return $this->serializer->deserialize(json_encode($payload), $className, self::DEFAULT_FORMAT);
+        } catch (RuntimeException $exception) {
+            $this->logger->error('Cannot deserialize payload to model', [
+                'payload' => $payload,
+                'exception' => $exception->getMessage()
+            ]);
+            throw new SerializerException();
+        }
+    }
+
+    /**
      * @param \AllCoin\Dto\ResponseDtoInterface $responseDto
      * @return array
      */
