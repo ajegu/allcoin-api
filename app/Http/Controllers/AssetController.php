@@ -6,6 +6,7 @@ namespace App\Http\Controllers;
 
 use AllCoin\Dto\AssetRequestDto;
 use AllCoin\Process\Asset\AssetCreateProcess;
+use AllCoin\Process\Asset\AssetListProcess;
 use AllCoin\Service\SerializerService;
 use AllCoin\Validation\AssetValidation;
 use Illuminate\Http\JsonResponse;
@@ -15,9 +16,10 @@ use Illuminate\Http\Response;
 final class AssetController extends Controller
 {
     public function __construct(
+        private SerializerService $serializerService,
         private AssetValidation $assetValidation,
         private AssetCreateProcess $assetCreateProcess,
-        private SerializerService $serializerService
+        private AssetListProcess $assetListProcess
     )
     {
     }
@@ -38,6 +40,19 @@ final class AssetController extends Controller
         return new JsonResponse(
             $this->serializerService->normalizeResponseDto($responseDto),
             Response::HTTP_CREATED
+        );
+    }
+
+    /**
+     * @return \Illuminate\Http\JsonResponse
+     * @throws \AllCoin\Exception\Asset\AssetListException
+     */
+    public function list(): JsonResponse
+    {
+        return new JsonResponse(
+            $this->serializerService->normalizeResponseDto(
+                $this->assetListProcess->handle()
+            )
         );
     }
 }

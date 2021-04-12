@@ -29,7 +29,7 @@ class MarshalerServiceTest extends TestCase
         );
     }
 
-    public function testMarshalItemWithUnexpectedValueExceptionShouldThrowException(): void
+    public function testMarshalItemWithErrorShouldThrowException(): void
     {
         $item = [];
 
@@ -63,5 +63,77 @@ class MarshalerServiceTest extends TestCase
             ->method('error');
 
         $this->marshalerService->marshalItem($item);
+    }
+
+    public function testMarshalValueWithErrorShouldThrowException(): void
+    {
+        $value = 'foo';
+
+        $this->marshaler->expects($this->once())
+            ->method('marshalValue')
+            ->with($value)
+            ->willThrowException($this->createMock(UnexpectedValueException::class));
+
+        $this->logger->expects($this->once())
+            ->method('error');
+
+        $this->expectException(MarshalerException::class);
+
+        $this->marshalerService->marshalValue($value);
+    }
+
+    /**
+     * @throws \AllCoin\Database\DynamoDb\Exception\MarshalerException
+     */
+    public function testMarshalValueShouldBeOK(): void
+    {
+        $value = 'foo';
+
+        $valueMarshaled = ['foo' => 'bar'];
+        $this->marshaler->expects($this->once())
+            ->method('marshalValue')
+            ->with($value)
+            ->willReturn($valueMarshaled);
+
+        $this->logger->expects($this->never())
+            ->method('error');
+
+        $this->marshalerService->marshalValue($value);
+    }
+
+    public function testUnmarshalItemWithErrorShouldThrowException(): void
+    {
+        $item = [];
+
+        $this->marshaler->expects($this->once())
+            ->method('unmarshalItem')
+            ->with($item)
+            ->willThrowException($this->createMock(UnexpectedValueException::class));
+
+        $this->logger->expects($this->once())
+            ->method('error');
+
+        $this->expectException(MarshalerException::class);
+
+        $this->marshalerService->unmarshalItem($item);
+    }
+
+    /**
+     * @throws \AllCoin\Database\DynamoDb\Exception\MarshalerException
+     */
+    public function testUnmarshalItemShouldBeOK(): void
+    {
+        $item = [];
+
+        $itemMarshaled = [];
+        $this->marshaler->expects($this->once())
+            ->method('unmarshalItem')
+            ->with($item)
+            ->willReturn($itemMarshaled);
+
+        $this->logger->expects($this->never())
+            ->method('error');
+
+        $this->marshalerService->unmarshalItem($item);
     }
 }

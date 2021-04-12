@@ -107,6 +107,41 @@ class SerializerServiceTest extends TestCase
         $this->assertInstanceOf(ResponseDtoInterface::class, $dto);
     }
 
+    public function testDeserializeToModelWithSerializerErrorShouldThrowException(): void
+    {
+        $payload = [];
+        $className = 'foo';
+
+        $this->serializer->expects($this->once())
+            ->method('deserialize')
+            ->with(json_encode($payload), $className, SerializerService::DEFAULT_FORMAT)
+            ->willThrowException($this->createMock(RuntimeException::class));
+
+        $this->logger->expects($this->once())->method('error');
+
+        $this->expectException(SerializerException::class);
+
+        $this->serializerService->deserializeToModel($payload, $className);
+    }
+
+    public function testDeserializeToModelShouldBeOK(): void
+    {
+        $payload = [];
+        $className = 'foo';
+
+        $dto = $this->createMock(ModelInterface::class);
+        $this->serializer->expects($this->once())
+            ->method('deserialize')
+            ->with(json_encode($payload), $className, SerializerService::DEFAULT_FORMAT)
+            ->willReturn($dto);
+
+        $this->logger->expects($this->never())->method('error');
+
+        $dto = $this->serializerService->deserializeToModel($payload, $className);
+
+        $this->assertInstanceOf(ModelInterface::class, $dto);
+    }
+
     public function testNormalizeResponseDtoWithNormalizerErrorShouldThrowException(): void
     {
         $responseDto = $this->createMock(ResponseDtoInterface::class);

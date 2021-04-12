@@ -21,3 +21,4 @@ $router->get('/', function () use ($router) {
  * ASSET
  */
 $router->post('/asset', ['uses' => 'AssetController@create']);
+$router->get('/asset', ['uses' => 'AssetController@list']);

@@ -10,6 +10,7 @@ interface AssetRepositoryInterface
 {
     /**
      * @return Asset[]
+     * @throws \AllCoin\Database\DynamoDb\Exception\ReadException
      */
     public function findAll(): array;
 

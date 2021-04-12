@@ -6,10 +6,12 @@ namespace Test\AllCoin\Database\DynamoDb;
 
 use AllCoin\Database\DynamoDb\Exception\MarshalerException;
 use AllCoin\Database\DynamoDb\Exception\PersistenceException;
+use AllCoin\Database\DynamoDb\Exception\ReadException;
 use AllCoin\Database\DynamoDb\ItemManager;
 use AllCoin\Database\DynamoDb\MarshalerService;
 use Aws\DynamoDb\DynamoDbClient;
 use Aws\DynamoDb\Exception\DynamoDbException;
+use Aws\Result;
 use Psr\Log\LoggerInterface;
 use Test\TestCase;
 
@@ -147,5 +149,140 @@ class ItemManagerTest extends TestCase
             ->method('error');
 
         $this->itemManager->save($data, $partitionKey, $sortKey);
+    }
+
+    public function testFetchAllWithMarshalValueErrorShouldThrowException(): void
+    {
+        $partitionKeyName = 'foo';
+
+        $this->marshalerService->expects($this->once())
+            ->method('marshalValue')
+            ->with($partitionKeyName)
+            ->willThrowException($this->createMock(MarshalerException::class));
+
+        $this->logger->expects($this->once())
+            ->method('error');
+
+        $this->expectException(ReadException::class);
+
+        $this->dynamoDbClient->expects($this->never())
+            ->method('__call');
+        $this->marshalerService->expects($this->never())->method('unmarshalItem');
+
+        $this->itemManager->fetchAll($partitionKeyName);
+    }
+
+    public function testFetchAllWithDynamoDdQueryErrorShouldThrowException(): void
+    {
+        $partitionKeyName = 'foo';
+
+        $marshaledPartitionKey = ['foo' => 'bar'];
+        $this->marshalerService->expects($this->once())
+            ->method('marshalValue')
+            ->with($partitionKeyName)
+            ->willReturn($marshaledPartitionKey);
+
+        $query = [
+            'TableName' => $this->tableName,
+            'KeyConditionExpression' => ItemManager::PARTITION_KEY_NAME . " = :value",
+            'ExpressionAttributeValues' => [':value' => $marshaledPartitionKey]
+        ];
+
+        $this->dynamoDbClient->expects($this->once())
+            ->method('__call')
+            ->with('query', [$query])
+            ->willThrowException($this->createMock(DynamoDbException::class));
+
+        $this->logger->expects($this->once())
+            ->method('error');
+
+        $this->expectException(ReadException::class);
+
+        $this->marshalerService->expects($this->never())->method('unmarshalItem');
+
+        $this->itemManager->fetchAll($partitionKeyName);
+    }
+
+    public function testFetchAllWithMarshalItemErrorShouldThrowException(): void
+    {
+        $partitionKeyName = 'foo';
+
+        $marshaledPartitionKey = ['foo' => 'bar'];
+        $this->marshalerService->expects($this->once())
+            ->method('marshalValue')
+            ->with($partitionKeyName)
+            ->willReturn($marshaledPartitionKey);
+
+        $query = [
+            'TableName' => $this->tableName,
+            'KeyConditionExpression' => ItemManager::PARTITION_KEY_NAME . " = :value",
+            'ExpressionAttributeValues' => [':value' => $marshaledPartitionKey]
+        ];
+
+        $item = ['foo' => ''];
+        $result = $this->createMock(Result::class);
+        $result->expects($this->once())
+            ->method('get')
+            ->with('Items')
+            ->willReturn([$item]);
+        $this->dynamoDbClient->expects($this->once())
+            ->method('__call')
+            ->with('query', [$query])
+            ->willReturn($result);
+
+        $this->marshalerService->expects($this->once())
+            ->method('unmarshalItem')
+            ->with($item)
+            ->willThrowException($this->createMock(MarshalerException::class));
+
+        $this->expectException(ReadException::class);
+        $this->logger->expects($this->once())->method('error');
+
+        $this->itemManager->fetchAll($partitionKeyName);
+    }
+
+    /**
+     * @throws \AllCoin\Database\DynamoDb\Exception\ReadException
+     */
+    public function testFetchAllShouldBeOK(): void
+    {
+        $partitionKeyName = 'foo';
+
+        $marshaledPartitionKey = ['foo' => 'bar'];
+        $this->marshalerService->expects($this->once())
+            ->method('marshalValue')
+            ->with($partitionKeyName)
+            ->willReturn($marshaledPartitionKey);
+
+        $query = [
+            'TableName' => $this->tableName,
+            'KeyConditionExpression' => ItemManager::PARTITION_KEY_NAME . " = :value",
+            'ExpressionAttributeValues' => [':value' => $marshaledPartitionKey]
+        ];
+
+        $item = ['foo' => ''];
+        $result = $this->createMock(Result::class);
+        $result->expects($this->once())
+            ->method('get')
+            ->with('Items')
+            ->willReturn([$item]);
+        $this->dynamoDbClient->expects($this->once())
+            ->method('__call')
+            ->with('query', [$query])
+            ->willReturn($result);
+
+        $this->marshalerService->expects($this->once())
+            ->method('unmarshalItem')
+            ->with($item)
+            ->willReturn($item);
+
+        $this->logger->expects($this->never())->method('error');
+
+        $itemsExpected = [
+            ['foo' => null]
+        ];
+        $items = $this->itemManager->fetchAll($partitionKeyName);
+
+        $this->assertEquals($itemsExpected, $items);
     }
 }
