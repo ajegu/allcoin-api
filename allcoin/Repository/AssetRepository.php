@@ -25,9 +25,19 @@ class AssetRepository extends AbstractRepository implements AssetRepositoryInter
         }, $items);
     }
 
+    /**
+     * @param string $assetId
+     * @return \AllCoin\Model\Asset
+     * @throws \AllCoin\Database\DynamoDb\Exception\ReadException
+     */
     public function findOneById(string $assetId): Asset
     {
-        throw new BadMethodCallException();
+        $item = $this->itemManager->fetchOne(
+            ClassMappingEnum::CLASS_MAPPING[Asset::class],
+            $assetId
+        );
+
+        return $this->serializerService->deserializeToModel($item, Asset::class);
     }
 
     /**
