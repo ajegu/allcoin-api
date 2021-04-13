@@ -27,5 +27,9 @@ interface AssetRepositoryInterface
      */
     public function save(Asset $asset): void;
 
+    /**
+     * @param string $assetId
+     * @throws \AllCoin\Database\DynamoDb\Exception\DeleteException
+     */
     public function delete(string $assetId);
 }

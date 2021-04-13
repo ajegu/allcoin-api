@@ -28,4 +28,11 @@ interface ItemManagerInterface
      * @throws \AllCoin\Database\DynamoDb\Exception\ReadException
      */
     public function fetchOne(string $partitionKey, string $sortKey): array;
+
+    /**
+     * @param string $partitionKey
+     * @param string $sortKey
+     * @throws \AllCoin\Database\DynamoDb\Exception\DeleteException
+     */
+    public function delete(string $partitionKey, string $sortKey): void;
 }

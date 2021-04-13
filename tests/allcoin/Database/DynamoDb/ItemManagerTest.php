@@ -4,6 +4,7 @@
 namespace Test\AllCoin\Database\DynamoDb;
 
 
+use AllCoin\Database\DynamoDb\Exception\DeleteException;
 use AllCoin\Database\DynamoDb\Exception\MarshalerException;
 use AllCoin\Database\DynamoDb\Exception\PersistenceException;
 use AllCoin\Database\DynamoDb\Exception\ReadException;
@@ -475,5 +476,89 @@ class ItemManagerTest extends TestCase
             ->method('error');
 
         $this->itemManager->fetchOne($partitionKey, $sortKey);
+    }
+
+    public function testDeleteWithMarshalValueErrorShouldThrowException(): void
+    {
+        $partitionKey = 'foo';
+        $sortKey = 'foo';
+
+        $this->marshalerService->expects($this->once())
+            ->method('marshalValue')
+            ->with($partitionKey)
+            ->willThrowException($this->createMock(MarshalerException::class));
+
+        $this->logger->expects($this->once())
+            ->method('error');
+
+        $this->expectException(DeleteException::class);
+
+        $this->dynamoDbClient->expects($this->never())
+            ->method('__call');
+
+        $this->itemManager->delete($partitionKey, $sortKey);
+    }
+
+    public function testDeleteWithDynamoDdQueryErrorShouldThrowException(): void
+    {
+        $partitionKey = 'foo';
+        $sortKey = 'bar';
+
+        $marshaledPartitionKey = ['foo' => 'bar'];
+        $marshaledSortKey = ['bar' => 'foo'];
+        $this->marshalerService->expects($this->exactly(2))
+            ->method('marshalValue')
+            ->withConsecutive([$partitionKey], [$sortKey])
+            ->willReturn($marshaledPartitionKey, $marshaledSortKey);
+
+        $query = [
+            'TableName' => $this->tableName,
+            'Key' => [
+                ItemManager::PARTITION_KEY_NAME => $marshaledPartitionKey,
+                ItemManager::SORT_KEY_NAME => $marshaledSortKey,
+            ]
+        ];
+
+        $this->dynamoDbClient->expects($this->once())
+            ->method('__call')
+            ->with('deleteItem', [$query])
+            ->willThrowException($this->createMock(DynamoDbException::class));
+
+        $this->logger->expects($this->once())
+            ->method('error');
+
+        $this->expectException(DeleteException::class);
+
+        $this->itemManager->delete($partitionKey, $sortKey);
+    }
+
+    public function testDeleteShouldBeOK(): void
+    {
+        $partitionKey = 'foo';
+        $sortKey = 'bar';
+
+        $marshaledPartitionKey = ['foo' => 'bar'];
+        $marshaledSortKey = ['bar' => 'foo'];
+        $this->marshalerService->expects($this->exactly(2))
+            ->method('marshalValue')
+            ->withConsecutive([$partitionKey], [$sortKey])
+            ->willReturn($marshaledPartitionKey, $marshaledSortKey);
+
+        $query = [
+            'TableName' => $this->tableName,
+            'Key' => [
+                ItemManager::PARTITION_KEY_NAME => $marshaledPartitionKey,
+                ItemManager::SORT_KEY_NAME => $marshaledSortKey,
+            ]
+        ];
+
+        $this->dynamoDbClient->expects($this->once())
+            ->method('__call')
+            ->with('deleteItem', [$query]);
+
+        $this->logger->expects($this->never())
+            ->method('error');
+
+        $this->itemManager->delete($partitionKey, $sortKey);
     }
 }
