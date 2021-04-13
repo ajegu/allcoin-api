@@ -21,6 +21,16 @@
             <directory suffix=".php">app</directory>
             <directory suffix=".php">allcoin</directory>
         </include>
+        <exclude>
+            <!-- App -->
+            <directory suffix=".php">app/Console</directory>
+            <directory suffix=".php">app/Exceptions</directory>
+            <directory suffix=".php">app/Providers</directory>
+            <!-- AllCoin -->
+            <directory suffix=".php">allcoin/Dto</directory>
+            <directory suffix=".php">allcoin/Model</directory>
+            <directory suffix=".php">allcoin/Exception</directory>
+        </exclude>
     </coverage>
     <php>
         <env name="AWS_ACCESS_KEY_ID" value="test"/>

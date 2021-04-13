@@ -15,9 +15,17 @@ interface ItemManagerInterface
     public function save(array $data, string $partitionKey, string $sortKey): void;
 
     /**
-     * @param string $partitionKeyName
+     * @param string $partitionKey
      * @return array
      * @throws \AllCoin\Database\DynamoDb\Exception\ReadException
      */
-    public function fetchAll(string $partitionKeyName): array;
+    public function fetchAll(string $partitionKey): array;
+
+    /**
+     * @param string $partitionKey
+     * @param string $sortKey
+     * @return array
+     * @throws \AllCoin\Database\DynamoDb\Exception\ReadException
+     */
+    public function fetchOne(string $partitionKey, string $sortKey): array;
 }

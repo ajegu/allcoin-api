@@ -51,4 +51,36 @@ class AssetValidationTest extends TestCase
 
         $this->assertTrue($validator->fails());
     }
+
+    public function testPutRulesShouldBeOK(): void
+    {
+        $rules = $this->assetValidation->getPutRules();
+
+        $data = [
+            'name' => 'foo'
+        ];
+
+        $validator = new Validator(
+            $this->app->make(Translator::class),
+            $data,
+            $rules
+        );
+
+        $this->assertFalse($validator->fails());
+    }
+
+    public function testPutRulesShouldFails(): void
+    {
+        $rules = $this->assetValidation->getPutRules();
+
+        $data = [];
+
+        $validator = new Validator(
+            $this->app->make(Translator::class),
+            $data,
+            $rules
+        );
+
+        $this->assertTrue($validator->fails());
+    }
 }

@@ -9,6 +9,7 @@ use AllCoin\Database\DynamoDb\Exception\PersistenceException;
 use AllCoin\Database\DynamoDb\Exception\ReadException;
 use Aws\DynamoDb\DynamoDbClient;
 use Aws\DynamoDb\Exception\DynamoDbException;
+use Aws\Result;
 use Psr\Log\LoggerInterface;
 
 class ItemManager implements ItemManagerInterface
@@ -74,38 +75,21 @@ class ItemManager implements ItemManagerInterface
     }
 
     /**
-     * @param string $partitionKeyName
+     * @param string $partitionKey
      * @return array
      * @throws \AllCoin\Database\DynamoDb\Exception\ReadException
      */
-    public function fetchAll(string $partitionKeyName): array
+    public function fetchAll(string $partitionKey): array
     {
-        try {
-            $value = $this->marshalerService->marshalValue($partitionKeyName);
-        } catch (MarshalerException $exception) {
-            $message = 'Cannot marshal the data to item.';
-            $this->logger->error($message, [
-                'exception' => $exception->getMessage(),
-                'value' => $partitionKeyName
-            ]);
-            throw new ReadException($message);
-        }
+        $value = $this->marshalValueForReadOperation($partitionKey);
+
         $query = [
             'TableName' => $this->tableName,
             'KeyConditionExpression' => self::PARTITION_KEY_NAME . " = :value",
             'ExpressionAttributeValues' => [':value' => $value]
         ];
 
-        try {
-            $result = $this->dynamoDbClient->query($query);
-        } catch (DynamoDbException $exception) {
-            $message = 'Cannot execute the query.';
-            $this->logger->error($message, [
-                'exception' => $exception->getMessage(),
-                'query' => $query
-            ]);
-            throw new ReadException($message);
-        }
+        $result = $this->queryForReadOperation($query);
 
         return array_map(function (array $item) {
             try {
@@ -120,6 +104,52 @@ class ItemManager implements ItemManagerInterface
                 throw new ReadException($message);
             }
         }, $result->get('Items'));
+    }
+
+    /**
+     * @param string $partitionKey
+     * @param string $sortKey
+     * @return array
+     * @throws \AllCoin\Database\DynamoDb\Exception\ReadException
+     */
+    public function fetchOne(string $partitionKey, string $sortKey): array
+    {
+        $partitionKeyValue = $this->marshalValueForReadOperation($partitionKey);
+        $sortKeyValue = $this->marshalValueForReadOperation($sortKey);
+
+        $query = [
+            'TableName' => $this->tableName,
+            'KeyConditionExpression' => self::PARTITION_KEY_NAME . ' = :partitionKeyValue and ' . self::SORT_KEY_NAME . ' = :sortKeyValue',
+            'ExpressionAttributeValues' => [
+                ':partitionKeyValue' => $partitionKeyValue,
+                ':sortKeyValue' => $sortKeyValue
+            ]
+        ];
+
+        $result = $this->queryForReadOperation($query);
+
+        $items = $result->get('Items');
+        if (count($items) <> 1) {
+            $message = 'The method fetchOne cannot read the result output';
+            $this->logger->error($message, [
+                'items' => $items
+            ]);
+            throw new ReadException($message);
+        }
+
+        $rawItem = $items[0];
+        try {
+            $item = $this->marshalerService->unmarshalItem($rawItem);
+        } catch (MarshalerException $exception) {
+            $message = 'Cannot unmarshal the item.';
+            $this->logger->error($message, [
+                'exception' => $exception->getMessage(),
+                'item' => $rawItem
+            ]);
+            throw new ReadException($message);
+        }
+
+        return $this->denormalize($item);
     }
 
     /**
@@ -151,5 +181,43 @@ class ItemManager implements ItemManagerInterface
         }
 
         return $item;
+    }
+
+    /**
+     * @param mixed $value
+     * @return array
+     * @throws \AllCoin\Database\DynamoDb\Exception\ReadException
+     */
+    private function marshalValueForReadOperation(mixed $value): array
+    {
+        try {
+            return $this->marshalerService->marshalValue($value);
+        } catch (MarshalerException $exception) {
+            $message = 'Cannot marshal the data to item.';
+            $this->logger->error($message, [
+                'exception' => $exception->getMessage(),
+                'value' => $value
+            ]);
+            throw new ReadException($message);
+        }
+    }
+
+    /**
+     * @param array $query
+     * @return \Aws\Result
+     * @throws \AllCoin\Database\DynamoDb\Exception\ReadException
+     */
+    public function queryForReadOperation(array $query): Result
+    {
+        try {
+            return $this->dynamoDbClient->query($query);
+        } catch (DynamoDbException $exception) {
+            $message = 'Cannot execute the query.';
+            $this->logger->error($message, [
+                'exception' => $exception->getMessage(),
+                'query' => $query
+            ]);
+            throw new ReadException($message);
+        }
     }
 }

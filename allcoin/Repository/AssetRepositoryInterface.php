@@ -14,6 +14,11 @@ interface AssetRepositoryInterface
      */
     public function findAll(): array;
 
+    /**
+     * @param string $assetId
+     * @return \AllCoin\Model\Asset
+     * @throws \AllCoin\Database\DynamoDb\Exception\ReadException
+     */
     public function findOneById(string $assetId): Asset;
 
     /**

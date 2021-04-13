@@ -5,8 +5,8 @@ namespace AllCoin\Validation;
 
 
 use AllCoin\Dto\AssetRequestDto;
-use BadMethodCallException;
 use JetBrains\PhpStorm\ArrayShape;
+use JetBrains\PhpStorm\Pure;
 
 class AssetValidation
 {
@@ -18,8 +18,9 @@ class AssetValidation
         ];
     }
 
+    #[Pure] #[ArrayShape([AssetRequestDto::NAME => "string"])]
     public function getPutRules(): array
     {
-        throw new BadMethodCallException();
+        return $this->getPostRules();
     }
 }

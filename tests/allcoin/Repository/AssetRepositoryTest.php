@@ -6,6 +6,7 @@ namespace Test\AllCoin\Repository;
 
 use AllCoin\Database\DynamoDb\ItemManagerInterface;
 use AllCoin\Model\Asset;
+use AllCoin\Model\ClassMappingEnum;
 use AllCoin\Repository\AssetRepository;
 use AllCoin\Service\SerializerService;
 use Test\TestCase;
@@ -50,6 +51,9 @@ class AssetRepositoryTest extends TestCase
         $this->assetRepository->save($asset);
     }
 
+    /**
+     * @throws \AllCoin\Database\DynamoDb\Exception\ReadException
+     */
     public function testFindAllShouldBeOK(): void
     {
         $item = [];
@@ -66,6 +70,30 @@ class AssetRepositoryTest extends TestCase
             ->willReturn($this->createMock(Asset::class));
 
         $this->assetRepository->findAll();
+
+    }
+
+    /**
+     * @throws \AllCoin\Database\DynamoDb\Exception\ReadException
+     */
+    public function testFindOneShouldBeOK(): void
+    {
+        $assetId = 'foo';
+        $item = [];
+        $this->itemManager->expects($this->once())
+            ->method('fetchOne')
+            ->with(
+                ClassMappingEnum::CLASS_MAPPING[Asset::class],
+                $assetId
+            )
+            ->willReturn($item);
+
+        $this->serializerService->expects($this->once())
+            ->method('deserializeToModel')
+            ->with($item, Asset::class)
+            ->willReturn($this->createMock(Asset::class));
+
+        $this->assetRepository->findOneById($assetId);
 
     }
 }
