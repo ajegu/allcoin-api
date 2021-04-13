@@ -9,5 +9,5 @@ use AllCoin\Dto\ResponseDtoInterface;
 
 interface ProcessInterface
 {
-    public function handle(RequestDtoInterface $dto = null, array $params = []): ResponseDtoInterface;
+    public function handle(RequestDtoInterface $dto = null, array $params = []): ?ResponseDtoInterface;
 }

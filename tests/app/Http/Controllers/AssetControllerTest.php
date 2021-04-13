@@ -8,6 +8,7 @@ use AllCoin\Dto\AssetRequestDto;
 use AllCoin\Dto\AssetResponseDto;
 use AllCoin\Dto\ResponseDtoInterface;
 use AllCoin\Process\Asset\AssetCreateProcess;
+use AllCoin\Process\Asset\AssetDeleteProcess;
 use AllCoin\Process\Asset\AssetListProcess;
 use AllCoin\Process\Asset\AssetUpdateProcess;
 use AllCoin\Service\SerializerService;
@@ -25,6 +26,7 @@ class AssetControllerTest extends TestCase
     private SerializerService $serializerService;
     private AssetListProcess $assetListProcess;
     private AssetUpdateProcess $assetUpdateProcess;
+    private AssetDeleteProcess $assetDeleteProcess;
 
     public function setUp(): void
     {
@@ -33,6 +35,7 @@ class AssetControllerTest extends TestCase
         $this->serializerService = $this->createMock(SerializerService::class);
         $this->assetListProcess = $this->createMock(AssetListProcess::class);
         $this->assetUpdateProcess = $this->createMock(AssetUpdateProcess::class);
+        $this->assetDeleteProcess = $this->createMock(AssetDeleteProcess::class);
 
         $this->assetController = new AssetController(
             $this->serializerService,
@@ -40,6 +43,7 @@ class AssetControllerTest extends TestCase
             $this->assetCreateProcess,
             $this->assetListProcess,
             $this->assetUpdateProcess,
+            $this->assetDeleteProcess
         );
 
         parent::setUp();
@@ -106,7 +110,7 @@ class AssetControllerTest extends TestCase
      */
     public function testUpdateShouldBeOK(): void
     {
-        $assetId = 'foo';
+        $id = 'foo';
         $request = $this->createMock(Request::class);
         $payload = [];
         $request->expects($this->once())->method('all')->willReturn($payload);
@@ -125,7 +129,7 @@ class AssetControllerTest extends TestCase
         $responseDto = $this->createMock(AssetResponseDto::class);
         $this->assetUpdateProcess->expects($this->once())
             ->method('handle')
-            ->with($requestDto, ['id' => $assetId])
+            ->with($requestDto, ['id' => $id])
             ->willReturn($responseDto);
 
         $this->serializerService->expects($this->once())
@@ -133,9 +137,26 @@ class AssetControllerTest extends TestCase
             ->with($responseDto)
             ->willReturn([]);
 
-        $response = $this->assetController->update($request, $assetId);
+        $response = $this->assetController->update($request, $id);
 
         $this->assertJson($response->getContent());
         $this->assertEquals(Response::HTTP_OK, $response->getStatusCode());
+    }
+
+    /**
+     * @throws \AllCoin\Exception\Asset\AssetDeleteException
+     */
+    public function testDeleteShouldBeOk(): void
+    {
+        $id = 'foo';
+
+        $this->assetDeleteProcess->expects($this->once())
+            ->method('handle')
+            ->with(null, ['id' => $id]);
+
+        $response = $this->assetController->delete($id);
+
+        $this->assertJson($response->getContent());
+        $this->assertEquals(Response::HTTP_NO_CONTENT, $response->getStatusCode());
     }
 }

@@ -4,6 +4,7 @@
 namespace AllCoin\Database\DynamoDb;
 
 
+use AllCoin\Database\DynamoDb\Exception\DeleteException;
 use AllCoin\Database\DynamoDb\Exception\MarshalerException;
 use AllCoin\Database\DynamoDb\Exception\PersistenceException;
 use AllCoin\Database\DynamoDb\Exception\ReadException;
@@ -153,6 +154,36 @@ class ItemManager implements ItemManagerInterface
     }
 
     /**
+     * @param string $partitionKey
+     * @param string $sortKey
+     * @throws \AllCoin\Database\DynamoDb\Exception\DeleteException
+     */
+    public function delete(string $partitionKey, string $sortKey): void
+    {
+        $partitionKeyValue = $this->marshalValueForDeleteOperation($partitionKey);
+        $sortKeyValue = $this->marshalValueForDeleteOperation($sortKey);
+
+        $query = [
+            'TableName' => $this->tableName,
+            'Key' => [
+                self::PARTITION_KEY_NAME => $partitionKeyValue,
+                self::SORT_KEY_NAME => $sortKeyValue,
+            ]
+        ];
+
+        try {
+            $this->dynamoDbClient->deleteItem($query);
+        } catch (DynamoDbException $exception) {
+            $message = 'Cannot delete the item.';
+            $this->logger->error($message, [
+                'exception' => $exception->getMessage(),
+                'query' => $query
+            ]);
+            throw new DeleteException($message);
+        }
+    }
+
+    /**
      * @param array $data
      * @return array
      */
@@ -218,6 +249,25 @@ class ItemManager implements ItemManagerInterface
                 'query' => $query
             ]);
             throw new ReadException($message);
+        }
+    }
+
+    /**
+     * @param mixed $value
+     * @return array
+     * @throws \AllCoin\Database\DynamoDb\Exception\DeleteException
+     */
+    private function marshalValueForDeleteOperation(mixed $value): array
+    {
+        try {
+            return $this->marshalerService->marshalValue($value);
+        } catch (MarshalerException $exception) {
+            $message = 'Cannot marshal the data to item.';
+            $this->logger->error($message, [
+                'exception' => $exception->getMessage(),
+                'value' => $value
+            ]);
+            throw new DeleteException($message);
         }
     }
 }

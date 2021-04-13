@@ -96,4 +96,21 @@ class AssetRepositoryTest extends TestCase
         $this->assetRepository->findOneById($assetId);
 
     }
+
+    /**
+     * @throws \AllCoin\Database\DynamoDb\Exception\DeleteException
+     */
+    public function testDeleteShouldBeOK(): void
+    {
+        $assetId = 'foo';
+
+        $this->itemManager->expects($this->once())
+            ->method('delete')
+            ->with(
+                ClassMappingEnum::CLASS_MAPPING[Asset::class],
+                $assetId
+            );
+
+        $this->assetRepository->delete($assetId);
+    }
 }

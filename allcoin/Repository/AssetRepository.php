@@ -6,7 +6,6 @@ namespace AllCoin\Repository;
 
 use AllCoin\Model\Asset;
 use AllCoin\Model\ClassMappingEnum;
-use BadMethodCallException;
 
 class AssetRepository extends AbstractRepository implements AssetRepositoryInterface
 {
@@ -55,9 +54,16 @@ class AssetRepository extends AbstractRepository implements AssetRepositoryInter
         );
     }
 
+    /**
+     * @param string $assetId
+     * @throws \AllCoin\Database\DynamoDb\Exception\DeleteException
+     */
     public function delete(string $assetId)
     {
-        throw new BadMethodCallException();
+        $this->itemManager->delete(
+            ClassMappingEnum::CLASS_MAPPING[Asset::class],
+            $assetId
+        );
     }
 
 }

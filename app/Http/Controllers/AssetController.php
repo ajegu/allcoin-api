@@ -6,6 +6,7 @@ namespace App\Http\Controllers;
 
 use AllCoin\Dto\AssetRequestDto;
 use AllCoin\Process\Asset\AssetCreateProcess;
+use AllCoin\Process\Asset\AssetDeleteProcess;
 use AllCoin\Process\Asset\AssetListProcess;
 use AllCoin\Process\Asset\AssetUpdateProcess;
 use AllCoin\Service\SerializerService;
@@ -21,7 +22,8 @@ final class AssetController extends Controller
         private AssetValidation $assetValidation,
         private AssetCreateProcess $assetCreateProcess,
         private AssetListProcess $assetListProcess,
-        private AssetUpdateProcess $assetUpdateProcess
+        private AssetUpdateProcess $assetUpdateProcess,
+        private AssetDeleteProcess $assetDeleteProcess
     )
     {
     }
@@ -76,5 +78,17 @@ final class AssetController extends Controller
             $this->serializerService->normalizeResponseDto($responseDto),
             Response::HTTP_OK
         );
+    }
+
+    /**
+     * @param string $id
+     * @return \Illuminate\Http\JsonResponse
+     * @throws \AllCoin\Exception\Asset\AssetDeleteException
+     */
+    public function delete(string $id): JsonResponse
+    {
+        $this->assetDeleteProcess->handle(null, ['id' => $id]);
+
+        return new JsonResponse(null, Response::HTTP_NO_CONTENT);
     }
 }

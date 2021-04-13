@@ -68,6 +68,8 @@ class AssetUpdateProcessTest extends TestCase
             ->with($assetId)
             ->willThrowException($this->createMock(ReadException::class));
 
+        $this->logger->expects($this->once())->method('error');
+
         $this->expectException(AssetUpdateException::class);
 
         $this->dateTimeService->expects($this->never())->method('now');
@@ -109,6 +111,8 @@ class AssetUpdateProcessTest extends TestCase
             ->method('save')
             ->with($asset)
             ->willThrowException($this->createMock(PersistenceException::class));
+
+        $this->logger->expects($this->once())->method('error');
 
         $this->expectException(AssetUpdateException::class);
 
