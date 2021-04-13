@@ -9,11 +9,28 @@ use DateTime;
 class Asset implements ModelInterface
 {
     public function __construct(
+        private string $id,
         private string $name,
         private DateTime $createdAt,
         private ?DateTime $updatedAt = null,
     )
     {
+    }
+
+    /**
+     * @return string
+     */
+    public function getId(): string
+    {
+        return $this->id;
+    }
+
+    /**
+     * @param string $id
+     */
+    public function setId(string $id): void
+    {
+        $this->id = $id;
     }
 
     /**
