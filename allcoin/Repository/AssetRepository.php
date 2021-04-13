@@ -41,7 +41,7 @@ class AssetRepository extends AbstractRepository implements AssetRepositoryInter
         $this->itemManager->save(
             data: $item,
             partitionKey: ClassMappingEnum::CLASS_MAPPING[Asset::class],
-            sortKey: $asset->getName()
+            sortKey: $asset->getId()
         );
     }
 

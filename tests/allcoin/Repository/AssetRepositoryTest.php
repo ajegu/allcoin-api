@@ -34,8 +34,8 @@ class AssetRepositoryTest extends TestCase
     public function testSaveShouldBeOK(): void
     {
         $asset = $this->createMock(Asset::class);
-        $assetName = 'foo';
-        $asset->expects($this->once())->method('getName')->willReturn($assetName);
+        $assetId = 'foo';
+        $asset->expects($this->once())->method('getId')->willReturn($assetId);
 
         $item = [];
         $this->serializerService->expects($this->once())
@@ -45,7 +45,7 @@ class AssetRepositoryTest extends TestCase
 
         $this->itemManager->expects($this->once())
             ->method('save')
-            ->with($item, 'asset', $assetName);
+            ->with($item, 'asset', $assetId);
 
         $this->assetRepository->save($asset);
     }

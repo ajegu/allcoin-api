@@ -13,6 +13,7 @@ use AllCoin\Model\Asset;
 use AllCoin\Process\ProcessInterface;
 use AllCoin\Repository\AssetRepositoryInterface;
 use AllCoin\Service\DateTimeService;
+use AllCoin\Service\UuidService;
 use Psr\Log\LoggerInterface;
 
 class AssetCreateProcess implements ProcessInterface
@@ -21,7 +22,8 @@ class AssetCreateProcess implements ProcessInterface
         private AssetRepositoryInterface $assetRepository,
         private LoggerInterface $logger,
         private AssetMapper $assetMapper,
-        private DateTimeService $dateTimeService
+        private DateTimeService $dateTimeService,
+        private UuidService $uuidService
     )
     {
     }
@@ -35,6 +37,7 @@ class AssetCreateProcess implements ProcessInterface
     public function handle(RequestDtoInterface $dto = null, array $params = []): ResponseDtoInterface
     {
         $asset = new Asset(
+            id: $this->uuidService->generateUuid(),
             name: $dto->getName(),
             createdAt: $this->dateTimeService->now()
         );

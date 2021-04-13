@@ -12,6 +12,7 @@ use AllCoin\Model\Asset;
 use AllCoin\Process\Asset\AssetCreateProcess;
 use AllCoin\Repository\AssetRepositoryInterface;
 use AllCoin\Service\DateTimeService;
+use AllCoin\Service\UuidService;
 use DateTime;
 use Psr\Log\LoggerInterface;
 use Test\TestCase;
@@ -24,6 +25,7 @@ class AssetCreateProcessTest extends TestCase
     private LoggerInterface $logger;
     private AssetMapper $assetMapper;
     private DateTimeService $dateTimeService;
+    private UuidService $uuidService;
 
     public function setUp(): void
     {
@@ -31,12 +33,14 @@ class AssetCreateProcessTest extends TestCase
         $this->logger = $this->createMock(LoggerInterface::class);
         $this->assetMapper = $this->createMock(AssetMapper::class);
         $this->dateTimeService = $this->createMock(DateTimeService::class);
+        $this->uuidService = $this->createMock(UuidService::class);
 
         $this->assetCreateProcess = new AssetCreateProcess(
             $this->assetRepository,
             $this->logger,
             $this->assetMapper,
             $this->dateTimeService,
+            $this->uuidService,
         );
     }
 
@@ -49,7 +53,11 @@ class AssetCreateProcessTest extends TestCase
         $now = new DateTime();
         $this->dateTimeService->expects($this->once())->method('now')->willReturn($now);
 
+        $uuid = 'foo';
+        $this->uuidService->expects($this->once())->method('generateUuid')->willReturn($uuid);
+
         $asset = new Asset(
+            id: $uuid,
             name: $dtoName,
             createdAt: $now
         );
@@ -78,7 +86,11 @@ class AssetCreateProcessTest extends TestCase
         $now = new DateTime();
         $this->dateTimeService->expects($this->once())->method('now')->willReturn($now);
 
+        $uuid = 'foo';
+        $this->uuidService->expects($this->once())->method('generateUuid')->willReturn($uuid);
+
         $asset = new Asset(
+            id: $uuid,
             name: $dtoName,
             createdAt: $now
         );
