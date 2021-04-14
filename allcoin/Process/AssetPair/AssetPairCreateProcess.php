@@ -4,7 +4,6 @@
 namespace AllCoin\Process\AssetPair;
 
 
-use AllCoin\Database\DynamoDb\Exception\ItemReadException;
 use AllCoin\Database\DynamoDb\Exception\ItemSaveException;
 use AllCoin\DataMapper\AssetPairMapper;
 use AllCoin\Dto\AssetPairRequestDto;
@@ -18,19 +17,26 @@ use AllCoin\Repository\AssetPairRepositoryInterface;
 use AllCoin\Repository\AssetRepositoryInterface;
 use AllCoin\Service\DateTimeService;
 use AllCoin\Service\UuidService;
+use JetBrains\PhpStorm\Pure;
 use Psr\Log\LoggerInterface;
 
-class AssetPairCreateProcess implements ProcessInterface
+class AssetPairCreateProcess extends AbstractAssetPairProcess implements ProcessInterface
 {
-    public function __construct(
-        private AssetRepositoryInterface $assetRepository,
-        private AssetPairRepositoryInterface $assetPairRepository,
-        private LoggerInterface $logger,
+    #[Pure] public function __construct(
+        protected AssetRepositoryInterface $assetRepository,
+        protected AssetPairRepositoryInterface $assetPairRepository,
+        protected LoggerInterface $logger,
         private UuidService $uuidService,
         private DateTimeService $dateTimeService,
-        private AssetPairMapper $assetPairMapper
+        protected AssetPairMapper $assetPairMapper
     )
     {
+        parent::__construct(
+            $assetRepository,
+            $assetPairRepository,
+            $logger,
+            $assetPairMapper,
+        );
     }
 
     /**
@@ -41,28 +47,15 @@ class AssetPairCreateProcess implements ProcessInterface
      */
     public function handle(RequestDtoInterface $dto = null, array $params = []): ?ResponseDtoInterface
     {
-        $assetId = $params['assetId'] ?? false;
-        if (!$assetId) {
-            throw new AssetPairCreateException('The asset ID must be defined in $params');
-        }
-
-        try {
-            $asset = $this->assetRepository->findOneById($assetId);
-        } catch (ItemReadException $exception) {
-            $message = 'The asset cannot be found!';
-            $this->logger->error($message, [
-                'id' => $assetId,
-                'exception' => $exception->getMessage()
-            ]);
-            throw new AssetPairCreateException($message);
-        }
+        $assetId = $this->getAssetId($params, AssetPairCreateException::class);
+        $asset = $this->getAsset($assetId, AssetPairCreateException::class);
 
         $assetPair = new AssetPair(
-            asset: $asset,
             id: $this->uuidService->generateUuid(),
             name: $dto->getName(),
             createdAt: $this->dateTimeService->now()
         );
+        $assetPair->setAsset($asset);
 
         try {
             $this->assetPairRepository->save($assetPair);

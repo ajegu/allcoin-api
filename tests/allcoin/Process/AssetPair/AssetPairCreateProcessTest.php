@@ -117,11 +117,11 @@ class AssetPairCreateProcessTest extends TestCase
             ->willReturn($now);
 
         $assetPair = new AssetPair(
-            asset: $asset,
             id: $uuid,
             name: $name,
             createdAt: $now
         );
+        $assetPair->setAsset($asset);
 
         $this->assetPairRepository->expects($this->once())
             ->method('save')
@@ -167,11 +167,11 @@ class AssetPairCreateProcessTest extends TestCase
             ->willReturn($now);
 
         $assetPair = new AssetPair(
-            asset: $asset,
             id: $uuid,
             name: $name,
             createdAt: $now
         );
+        $assetPair->setAsset($asset);
 
         $this->assetPairRepository->expects($this->once())
             ->method('save')

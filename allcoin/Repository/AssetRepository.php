@@ -9,6 +9,7 @@ use AllCoin\Database\DynamoDb\Exception\ItemReadException;
 use AllCoin\Database\DynamoDb\Exception\ItemSaveException;
 use AllCoin\Model\Asset;
 use AllCoin\Model\ClassMappingEnum;
+use AllCoin\Model\ModelInterface;
 
 class AssetRepository extends AbstractRepository implements AssetRepositoryInterface
 {
@@ -29,10 +30,10 @@ class AssetRepository extends AbstractRepository implements AssetRepositoryInter
 
     /**
      * @param string $assetId
-     * @return Asset
+     * @return Asset|ModelInterface
      * @throws ItemReadException
      */
-    public function findOneById(string $assetId): Asset
+    public function findOneById(string $assetId): Asset|ModelInterface
     {
         $item = $this->itemManager->fetchOne(
             ClassMappingEnum::CLASS_MAPPING[Asset::class],

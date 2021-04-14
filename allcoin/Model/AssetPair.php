@@ -8,8 +8,9 @@ use DateTime;
 
 class AssetPair implements ModelInterface
 {
+    private Asset $asset;
+
     public function __construct(
-        private Asset $asset,
         private string $id,
         private string $name,
         private DateTime $createdAt,
@@ -19,9 +20,9 @@ class AssetPair implements ModelInterface
     }
 
     /**
-     * @return Asset
+     * @return Asset|null
      */
-    public function getAsset(): Asset
+    public function getAsset(): Asset|null
     {
         return $this->asset;
     }

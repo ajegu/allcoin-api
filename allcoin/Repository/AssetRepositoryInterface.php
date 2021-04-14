@@ -8,6 +8,7 @@ use AllCoin\Database\DynamoDb\Exception\ItemDeleteException;
 use AllCoin\Database\DynamoDb\Exception\ItemReadException;
 use AllCoin\Database\DynamoDb\Exception\ItemSaveException;
 use AllCoin\Model\Asset;
+use AllCoin\Model\ModelInterface;
 
 interface AssetRepositoryInterface
 {
@@ -19,10 +20,10 @@ interface AssetRepositoryInterface
 
     /**
      * @param string $assetId
-     * @return Asset
+     * @return Asset|ModelInterface
      * @throws ItemReadException
      */
-    public function findOneById(string $assetId): Asset;
+    public function findOneById(string $assetId): Asset|ModelInterface;
 
     /**
      * @param Asset $asset

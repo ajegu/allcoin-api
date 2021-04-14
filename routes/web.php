@@ -32,3 +32,4 @@ $router->get('/asset/{id}', ['uses' => 'AssetController@get']);
  * ASSET PAIR
  */
 $router->post('/asset/{assetId}/pair', ['uses' => 'AssetPairController@create']);
+$router->get('/asset/{assetId}/pair/{id}', ['uses' => 'AssetPairController@get']);

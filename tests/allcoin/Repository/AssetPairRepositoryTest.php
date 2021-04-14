@@ -4,6 +4,7 @@
 namespace Test\AllCoin\Repository;
 
 
+use AllCoin\Database\DynamoDb\Exception\ItemReadException;
 use AllCoin\Database\DynamoDb\Exception\ItemSaveException;
 use AllCoin\Database\DynamoDb\ItemManager;
 use AllCoin\Database\DynamoDb\ItemManagerInterface;
@@ -32,6 +33,21 @@ class AssetPairRepositoryTest extends TestCase
         );
     }
 
+    public function testSaveWithNoAssetShouldBeThrowException(): void
+    {
+        $assetPair = $this->createMock(AssetPair::class);
+        $assetPair->expects($this->once())
+            ->method('getAsset')
+            ->willReturn(null);
+
+        $this->expectException(ItemSaveException::class);
+
+        $this->serializerService->expects($this->never())->method('normalizeModel');
+        $this->itemManager->expects($this->never())->method('save');
+
+        $this->assetPairRepository->save($assetPair);
+    }
+
     /**
      * @throws ItemSaveException
      */
@@ -42,7 +58,7 @@ class AssetPairRepositoryTest extends TestCase
         $asset->expects($this->once())->method('getId')->willReturn($assetId);
 
         $assetPair = $this->createMock(AssetPair::class);
-        $assetPair->expects($this->once())->method('getAsset')->willReturn($asset);
+        $assetPair->expects($this->exactly(2))->method('getAsset')->willReturn($asset);
         $assetPairId = 'foo';
         $assetPair->expects($this->once())->method('getId')->willReturn($assetPairId);
 
@@ -63,5 +79,32 @@ class AssetPairRepositoryTest extends TestCase
             ->with($itemExpected, ClassMappingEnum::CLASS_MAPPING[AssetPair::class], $assetPairId);
 
         $this->assetPairRepository->save($assetPair);
+    }
+
+    /**
+     * @throws ItemReadException
+     */
+    public function testFindOneByIdShouldBeOK(): void
+    {
+        $assetPairId = 'foo';
+
+        $item = [];
+        $this->itemManager->expects($this->once())
+            ->method('fetchOne')
+            ->with(
+                ClassMappingEnum::CLASS_MAPPING[AssetPair::class],
+                $assetPairId
+            )
+            ->willReturn($item);
+
+        $this->serializerService->expects($this->once())
+            ->method('deserializeToModel')
+            ->with(
+                $item,
+                AssetPair::class
+            )
+            ->willReturn($this->createMock(AssetPair::class));
+
+        $this->assetPairRepository->findOneById($assetPairId);
     }
 }
