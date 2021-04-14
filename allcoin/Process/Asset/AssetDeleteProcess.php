@@ -4,7 +4,7 @@
 namespace AllCoin\Process\Asset;
 
 
-use AllCoin\Database\DynamoDb\Exception\DeleteException;
+use AllCoin\Database\DynamoDb\Exception\ItemDeleteException;
 use AllCoin\Dto\RequestDtoInterface;
 use AllCoin\Dto\ResponseDtoInterface;
 use AllCoin\Exception\Asset\AssetDeleteException;
@@ -22,10 +22,10 @@ class AssetDeleteProcess implements ProcessInterface
     }
 
     /**
-     * @param \AllCoin\Dto\RequestDtoInterface|null $dto
+     * @param RequestDtoInterface|null $dto
      * @param array $params
-     * @return \AllCoin\Dto\ResponseDtoInterface|null
-     * @throws \AllCoin\Exception\Asset\AssetDeleteException
+     * @return ResponseDtoInterface|null
+     * @throws AssetDeleteException
      */
     public function handle(RequestDtoInterface $dto = null, array $params = []): ?ResponseDtoInterface
     {
@@ -36,7 +36,7 @@ class AssetDeleteProcess implements ProcessInterface
 
         try {
             $this->assetRepository->delete($assetId);
-        } catch (DeleteException $exception) {
+        } catch (ItemDeleteException $exception) {
             $message = 'The asset cannot be delete!';
             $this->logger->error($message, [
                 'id' => $assetId,

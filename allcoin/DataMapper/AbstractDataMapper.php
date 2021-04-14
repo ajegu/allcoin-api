@@ -13,7 +13,7 @@ abstract class AbstractDataMapper
 
     /**
      * AbstractDataMapper constructor.
-     * @param \AllCoin\Service\SerializerService $serializerService
+     * @param SerializerService $serializerService
      */
     public function __construct(
         protected SerializerService $serializerService
@@ -22,9 +22,9 @@ abstract class AbstractDataMapper
     }
 
     /**
-     * @param \AllCoin\Model\ModelInterface $model
+     * @param ModelInterface $model
      * @param string $responseDtoClass
-     * @return \AllCoin\Dto\ResponseDtoInterface
+     * @return ResponseDtoInterface
      */
     public function convertModelToResponseDto(ModelInterface $model, string $responseDtoClass): ResponseDtoInterface
     {

@@ -21,7 +21,7 @@ class MarshalerService
     /**
      * @param array $item
      * @return array
-     * @throws \AllCoin\Database\DynamoDb\Exception\MarshalerException
+     * @throws MarshalerException
      */
     public function marshalItem(array $item): array
     {
@@ -40,7 +40,7 @@ class MarshalerService
     /**
      * @param mixed $value
      * @return array|null
-     * @throws \AllCoin\Database\DynamoDb\Exception\MarshalerException
+     * @throws MarshalerException
      */
     public function marshalValue(mixed $value): ?array
     {
@@ -59,7 +59,7 @@ class MarshalerService
     /**
      * @param array $item
      * @return array
-     * @throws \AllCoin\Database\DynamoDb\Exception\MarshalerException
+     * @throws MarshalerException
      */
     public function unmarshalItem(array $item): array
     {

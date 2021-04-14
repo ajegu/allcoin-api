@@ -8,7 +8,7 @@ class ListResponseDto implements ResponseDtoInterface
 {
     /**
      * ListResponseDto constructor.
-     * @param \AllCoin\Dto\ResponseDtoInterface[] $data
+     * @param ResponseDtoInterface[] $data
      */
     public function __construct(
         private array $data
@@ -17,7 +17,7 @@ class ListResponseDto implements ResponseDtoInterface
     }
 
     /**
-     * @return \AllCoin\Dto\ResponseDtoInterface[]
+     * @return ResponseDtoInterface[]
      */
     public function getData(): array
     {
@@ -25,7 +25,7 @@ class ListResponseDto implements ResponseDtoInterface
     }
 
     /**
-     * @param \AllCoin\Dto\ResponseDtoInterface[] $data
+     * @param ResponseDtoInterface[] $data
      */
     public function setData(array $data): void
     {

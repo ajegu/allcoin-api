@@ -4,6 +4,9 @@
 namespace Test\AllCoin\Repository;
 
 
+use AllCoin\Database\DynamoDb\Exception\ItemDeleteException;
+use AllCoin\Database\DynamoDb\Exception\ItemReadException;
+use AllCoin\Database\DynamoDb\Exception\ItemSaveException;
 use AllCoin\Database\DynamoDb\ItemManagerInterface;
 use AllCoin\Model\Asset;
 use AllCoin\Model\ClassMappingEnum;
@@ -30,7 +33,7 @@ class AssetRepositoryTest extends TestCase
     }
 
     /**
-     * @throws \AllCoin\Database\DynamoDb\Exception\PersistenceException
+     * @throws ItemSaveException
      */
     public function testSaveShouldBeOK(): void
     {
@@ -52,7 +55,7 @@ class AssetRepositoryTest extends TestCase
     }
 
     /**
-     * @throws \AllCoin\Database\DynamoDb\Exception\ReadException
+     * @throws ItemReadException
      */
     public function testFindAllShouldBeOK(): void
     {
@@ -74,7 +77,7 @@ class AssetRepositoryTest extends TestCase
     }
 
     /**
-     * @throws \AllCoin\Database\DynamoDb\Exception\ReadException
+     * @throws ItemReadException
      */
     public function testFindOneShouldBeOK(): void
     {
@@ -98,7 +101,7 @@ class AssetRepositoryTest extends TestCase
     }
 
     /**
-     * @throws \AllCoin\Database\DynamoDb\Exception\DeleteException
+     * @throws ItemDeleteException
      */
     public function testDeleteShouldBeOK(): void
     {

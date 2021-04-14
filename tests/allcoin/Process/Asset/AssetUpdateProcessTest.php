@@ -4,8 +4,8 @@
 namespace Test\AllCoin\Process\Asset;
 
 
-use AllCoin\Database\DynamoDb\Exception\PersistenceException;
-use AllCoin\Database\DynamoDb\Exception\ReadException;
+use AllCoin\Database\DynamoDb\Exception\ItemReadException;
+use AllCoin\Database\DynamoDb\Exception\ItemSaveException;
 use AllCoin\DataMapper\AssetMapper;
 use AllCoin\Dto\AssetRequestDto;
 use AllCoin\Dto\AssetResponseDto;
@@ -66,7 +66,7 @@ class AssetUpdateProcessTest extends TestCase
         $this->assetRepository->expects($this->once())
             ->method('findOneById')
             ->with($assetId)
-            ->willThrowException($this->createMock(ReadException::class));
+            ->willThrowException($this->createMock(ItemReadException::class));
 
         $this->logger->expects($this->once())->method('error');
 
@@ -110,7 +110,7 @@ class AssetUpdateProcessTest extends TestCase
         $this->assetRepository->expects($this->once())
             ->method('save')
             ->with($asset)
-            ->willThrowException($this->createMock(PersistenceException::class));
+            ->willThrowException($this->createMock(ItemSaveException::class));
 
         $this->logger->expects($this->once())->method('error');
 
@@ -122,7 +122,7 @@ class AssetUpdateProcessTest extends TestCase
     }
 
     /**
-     * @throws \AllCoin\Exception\Asset\AssetUpdateException
+     * @throws AssetUpdateException
      */
     public function testHandleShouldBeOK(): void
     {

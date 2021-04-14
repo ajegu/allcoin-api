@@ -12,7 +12,7 @@ use Illuminate\Support\ServiceProvider;
 class DynamoDbServiceProvider extends ServiceProvider
 {
     /**
-     * @throws \App\Exceptions\ServiceProviderException
+     * @throws ServiceProviderException
      */
     public function register(): void
     {
@@ -20,7 +20,7 @@ class DynamoDbServiceProvider extends ServiceProvider
     }
 
     /**
-     * @throws \App\Exceptions\ServiceProviderException
+     * @throws ServiceProviderException
      */
     private function registerItemManagerInterface(): void
     {
@@ -30,7 +30,7 @@ class DynamoDbServiceProvider extends ServiceProvider
     }
 
     /**
-     * @throws \App\Exceptions\ServiceProviderException
+     * @throws ServiceProviderException
      */
     private function setDynamoDbTableName(): void
     {

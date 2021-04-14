@@ -4,9 +4,10 @@
 namespace AllCoin\Process\Asset;
 
 
-use AllCoin\Database\DynamoDb\Exception\PersistenceException;
-use AllCoin\Database\DynamoDb\Exception\ReadException;
+use AllCoin\Database\DynamoDb\Exception\ItemReadException;
+use AllCoin\Database\DynamoDb\Exception\ItemSaveException;
 use AllCoin\DataMapper\AssetMapper;
+use AllCoin\Dto\AssetRequestDto;
 use AllCoin\Dto\RequestDtoInterface;
 use AllCoin\Dto\ResponseDtoInterface;
 use AllCoin\Exception\Asset\AssetUpdateException;
@@ -27,10 +28,10 @@ class AssetUpdateProcess implements ProcessInterface
     }
 
     /**
-     * @param \AllCoin\Dto\AssetRequestDto|null $dto
+     * @param AssetRequestDto|null $dto
      * @param array $params
-     * @return \AllCoin\Dto\ResponseDtoInterface
-     * @throws \AllCoin\Exception\Asset\AssetUpdateException
+     * @return ResponseDtoInterface
+     * @throws AssetUpdateException
      */
     public function handle(RequestDtoInterface $dto = null, array $params = []): ResponseDtoInterface
     {
@@ -41,7 +42,7 @@ class AssetUpdateProcess implements ProcessInterface
 
         try {
             $asset = $this->assetRepository->findOneById($assetId);
-        } catch (ReadException $exception) {
+        } catch (ItemReadException $exception) {
             $message = 'The asset cannot be found!';
             $this->logger->error($message, [
                 'id' => $assetId,
@@ -55,7 +56,7 @@ class AssetUpdateProcess implements ProcessInterface
 
         try {
             $this->assetRepository->save($asset);
-        } catch (PersistenceException $exception) {
+        } catch (ItemSaveException $exception) {
             $message = 'Cannot save the asset.';
             $this->logger->error($message, [
                 'name' => $asset->getName(),

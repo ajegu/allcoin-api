@@ -4,7 +4,7 @@
 namespace Test\AllCoin\Process\Asset;
 
 
-use AllCoin\Database\DynamoDb\Exception\DeleteException;
+use AllCoin\Database\DynamoDb\Exception\ItemDeleteException;
 use AllCoin\Exception\Asset\AssetDeleteException;
 use AllCoin\Process\Asset\AssetDeleteProcess;
 use AllCoin\Repository\AssetRepositoryInterface;
@@ -48,7 +48,7 @@ class AssetDeleteProcessTest extends TestCase
         $this->assetRepository->expects($this->once())
             ->method('delete')
             ->with($assetId)
-            ->willThrowException($this->createMock(DeleteException::class));
+            ->willThrowException($this->createMock(ItemDeleteException::class));
 
         $this->logger->expects($this->once())->method('error');
 
@@ -58,7 +58,7 @@ class AssetDeleteProcessTest extends TestCase
     }
 
     /**
-     * @throws \AllCoin\Exception\Asset\AssetDeleteException
+     * @throws AssetDeleteException
      */
     public function testHandleShouldBeOK(): void
     {

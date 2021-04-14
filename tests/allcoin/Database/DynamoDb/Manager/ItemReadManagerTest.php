@@ -1,13 +1,11 @@
 <?php
 
 
-namespace Test\AllCoin\Database\DynamoDb;
+namespace Test\AllCoin\Database\DynamoDb\Manager;
 
 
-use AllCoin\Database\DynamoDb\Exception\DeleteException;
+use AllCoin\Database\DynamoDb\Exception\ItemReadException;
 use AllCoin\Database\DynamoDb\Exception\MarshalerException;
-use AllCoin\Database\DynamoDb\Exception\PersistenceException;
-use AllCoin\Database\DynamoDb\Exception\ReadException;
 use AllCoin\Database\DynamoDb\ItemManager;
 use AllCoin\Database\DynamoDb\MarshalerService;
 use Aws\DynamoDb\DynamoDbClient;
@@ -16,7 +14,7 @@ use Aws\Result;
 use Psr\Log\LoggerInterface;
 use Test\TestCase;
 
-class ItemManagerTest extends TestCase
+class ItemReadManagerTest extends TestCase
 {
     private ItemManager $itemManager;
 
@@ -39,119 +37,6 @@ class ItemManagerTest extends TestCase
         );
     }
 
-    /**
-     * @throws \AllCoin\Database\DynamoDb\Exception\PersistenceException
-     */
-    public function testSaveWithMarshalerErrorShouldThrowException(): void
-    {
-        $data = [
-            'nullValue' => null
-        ];
-        $partitionKey = 'foo';
-        $sortKey = 'bar';
-
-        $dataExpected = [
-            'nullValue' => '',
-            ItemManager::PARTITION_KEY_NAME => $partitionKey,
-            ItemManager::SORT_KEY_NAME => $sortKey
-        ];
-
-        $this->marshalerService->expects($this->once())
-            ->method('marshalItem')
-            ->with($dataExpected)
-            ->willThrowException($this->createMock(MarshalerException::class));
-
-        $this->logger->expects($this->once())
-            ->method('error');
-
-        $this->expectException(PersistenceException::class);
-
-        $this->dynamoDbClient->expects($this->never())
-            ->method('__call')
-            ->with('putItem');
-
-        $this->itemManager->save($data, $partitionKey, $sortKey);
-    }
-
-    /**
-     * @throws \AllCoin\Database\DynamoDb\Exception\PersistenceException
-     */
-    public function testSaveWithDynamoDbClientErrorShouldThrowException(): void
-    {
-        $data = [
-            'nullValue' => null
-        ];
-        $partitionKey = 'foo';
-        $sortKey = 'bar';
-
-        $dataExpected = [
-            'nullValue' => '',
-            ItemManager::PARTITION_KEY_NAME => $partitionKey,
-            ItemManager::SORT_KEY_NAME => $sortKey
-        ];
-
-        $item = [];
-        $this->marshalerService->expects($this->once())
-            ->method('marshalItem')
-            ->with($dataExpected)
-            ->willReturn($item);
-
-        $query = [
-            'TableName' => $this->tableName,
-            'Item' => $item
-        ];
-
-        $this->dynamoDbClient->expects($this->once())
-            ->method('__call')
-            ->with('putItem', [$query])
-            ->willThrowException($this->createMock(DynamoDbException::class));
-
-        $this->logger->expects($this->once())
-            ->method('error');
-
-        $this->expectException(PersistenceException::class);
-
-        $this->itemManager->save($data, $partitionKey, $sortKey);
-    }
-
-    /**
-     * @throws \AllCoin\Database\DynamoDb\Exception\PersistenceException
-     */
-    public function testSaveShouldBeOK(): void
-    {
-        $data = [
-            'nullValue' => null
-        ];
-        $partitionKey = 'foo';
-        $sortKey = 'bar';
-
-        $dataExpected = [
-            'nullValue' => '',
-            ItemManager::PARTITION_KEY_NAME => $partitionKey,
-            ItemManager::SORT_KEY_NAME => $sortKey
-        ];
-
-        $item = [];
-        $this->marshalerService->expects($this->once())
-            ->method('marshalItem')
-            ->with($dataExpected)
-            ->willReturn($item);
-
-        $query = [
-            'TableName' => $this->tableName,
-            'Item' => $item
-        ];
-
-        $this->dynamoDbClient->expects($this->once())
-            ->method('__call')
-            ->with('putItem', [$query]);
-
-        $this->logger->expects($this->never())
-            ->method('error');
-
-        $this->itemManager->save($data, $partitionKey, $sortKey);
-    }
-
     public function testFetchAllWithMarshalValueErrorShouldThrowException(): void
     {
         $partitionKey = 'foo';
@@ -164,7 +49,7 @@ class ItemManagerTest extends TestCase
         $this->logger->expects($this->once())
             ->method('error');
 
-        $this->expectException(ReadException::class);
+        $this->expectException(ItemReadException::class);
 
         $this->dynamoDbClient->expects($this->never())
             ->method('__call');
@@ -197,7 +82,7 @@ class ItemManagerTest extends TestCase
         $this->logger->expects($this->once())
             ->method('error');
 
-        $this->expectException(ReadException::class);
+        $this->expectException(ItemReadException::class);
 
         $this->marshalerService->expects($this->never())->method('unmarshalItem');
 
@@ -236,14 +121,14 @@ class ItemManagerTest extends TestCase
             ->with($item)
             ->willThrowException($this->createMock(MarshalerException::class));
 
-        $this->expectException(ReadException::class);
+        $this->expectException(ItemReadException::class);
         $this->logger->expects($this->once())->method('error');
 
         $this->itemManager->fetchAll($partitionKey);
     }
 
     /**
-     * @throws \AllCoin\Database\DynamoDb\Exception\ReadException
+     * @throws ItemReadException
      */
     public function testFetchAllShouldBeOK(): void
     {
@@ -300,7 +185,7 @@ class ItemManagerTest extends TestCase
         $this->logger->expects($this->once())
             ->method('error');
 
-        $this->expectException(ReadException::class);
+        $this->expectException(ItemReadException::class);
 
         $this->dynamoDbClient->expects($this->never())
             ->method('__call');
@@ -338,7 +223,7 @@ class ItemManagerTest extends TestCase
         $this->logger->expects($this->once())
             ->method('error');
 
-        $this->expectException(ReadException::class);
+        $this->expectException(ItemReadException::class);
 
         $this->marshalerService->expects($this->never())->method('unmarshalItem');
 
@@ -380,7 +265,7 @@ class ItemManagerTest extends TestCase
         $this->logger->expects($this->once())
             ->method('error');
 
-        $this->expectException(ReadException::class);
+        $this->expectException(ItemReadException::class);
 
         $this->marshalerService->expects($this->never())->method('unmarshalItem');
 
@@ -427,13 +312,13 @@ class ItemManagerTest extends TestCase
         $this->logger->expects($this->once())
             ->method('error');
 
-        $this->expectException(ReadException::class);
+        $this->expectException(ItemReadException::class);
 
         $this->itemManager->fetchOne($partitionKey, $sortKey);
     }
 
     /**
-     * @throws \AllCoin\Database\DynamoDb\Exception\ReadException
+     * @throws ItemReadException
      */
     public function testFetchOneShouldBeOK(): void
     {
@@ -476,89 +361,5 @@ class ItemManagerTest extends TestCase
             ->method('error');
 
         $this->itemManager->fetchOne($partitionKey, $sortKey);
-    }
-
-    public function testDeleteWithMarshalValueErrorShouldThrowException(): void
-    {
-        $partitionKey = 'foo';
-        $sortKey = 'foo';
-
-        $this->marshalerService->expects($this->once())
-            ->method('marshalValue')
-            ->with($partitionKey)
-            ->willThrowException($this->createMock(MarshalerException::class));
-
-        $this->logger->expects($this->once())
-            ->method('error');
-
-        $this->expectException(DeleteException::class);
-
-        $this->dynamoDbClient->expects($this->never())
-            ->method('__call');
-
-        $this->itemManager->delete($partitionKey, $sortKey);
-    }
-
-    public function testDeleteWithDynamoDdQueryErrorShouldThrowException(): void
-    {
-        $partitionKey = 'foo';
-        $sortKey = 'bar';
-
-        $marshaledPartitionKey = ['foo' => 'bar'];
-        $marshaledSortKey = ['bar' => 'foo'];
-        $this->marshalerService->expects($this->exactly(2))
-            ->method('marshalValue')
-            ->withConsecutive([$partitionKey], [$sortKey])
-            ->willReturn($marshaledPartitionKey, $marshaledSortKey);
-
-        $query = [
-            'TableName' => $this->tableName,
-            'Key' => [
-                ItemManager::PARTITION_KEY_NAME => $marshaledPartitionKey,
-                ItemManager::SORT_KEY_NAME => $marshaledSortKey,
-            ]
-        ];
-
-        $this->dynamoDbClient->expects($this->once())
-            ->method('__call')
-            ->with('deleteItem', [$query])
-            ->willThrowException($this->createMock(DynamoDbException::class));
-
-        $this->logger->expects($this->once())
-            ->method('error');
-
-        $this->expectException(DeleteException::class);
-
-        $this->itemManager->delete($partitionKey, $sortKey);
-    }
-
-    public function testDeleteShouldBeOK(): void
-    {
-        $partitionKey = 'foo';
-        $sortKey = 'bar';
-
-        $marshaledPartitionKey = ['foo' => 'bar'];
-        $marshaledSortKey = ['bar' => 'foo'];
-        $this->marshalerService->expects($this->exactly(2))
-            ->method('marshalValue')
-            ->withConsecutive([$partitionKey], [$sortKey])
-            ->willReturn($marshaledPartitionKey, $marshaledSortKey);
-
-        $query = [
-            'TableName' => $this->tableName,
-            'Key' => [
-                ItemManager::PARTITION_KEY_NAME => $marshaledPartitionKey,
-                ItemManager::SORT_KEY_NAME => $marshaledSortKey,
-            ]
-        ];
-
-        $this->dynamoDbClient->expects($this->once())
-            ->method('__call')
-            ->with('deleteItem', [$query]);
-
-        $this->logger->expects($this->never())
-            ->method('error');
-
-        $this->itemManager->delete($partitionKey, $sortKey);
     }
 }

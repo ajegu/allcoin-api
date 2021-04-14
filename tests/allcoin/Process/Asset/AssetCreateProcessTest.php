@@ -4,7 +4,7 @@
 namespace Test\AllCoin\Process\Asset;
 
 
-use AllCoin\Database\DynamoDb\Exception\PersistenceException;
+use AllCoin\Database\DynamoDb\Exception\ItemSaveException;
 use AllCoin\DataMapper\AssetMapper;
 use AllCoin\Dto\AssetRequestDto;
 use AllCoin\Exception\Asset\AssetCreateException;
@@ -65,7 +65,7 @@ class AssetCreateProcessTest extends TestCase
         $this->assetRepository->expects($this->once())
             ->method('save')
             ->with($asset)
-            ->willThrowException($this->createMock(PersistenceException::class));
+            ->willThrowException($this->createMock(ItemSaveException::class));
 
         $this->logger->expects($this->once())->method('error');
 
@@ -75,7 +75,7 @@ class AssetCreateProcessTest extends TestCase
     }
 
     /**
-     * @throws \AllCoin\Exception\Asset\AssetCreateException
+     * @throws AssetCreateException
      */
     public function testHandleShouldBeOK(): void
     {
