@@ -18,6 +18,8 @@ class ItemManager implements ItemManagerInterface
     const PARTITION_KEY_NAME = 'pk';
     const SORT_KEY_NAME = 'sk';
 
+    const LSI_1 = 'lsi1';
+
     /**
      * ItemManager constructor.
      * @param DynamoDbClient $dynamoDbClient
