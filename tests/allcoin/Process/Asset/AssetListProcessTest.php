@@ -4,7 +4,7 @@
 namespace Test\AllCoin\Process\Asset;
 
 
-use AllCoin\Database\DynamoDb\Exception\ReadException;
+use AllCoin\Database\DynamoDb\Exception\ItemReadException;
 use AllCoin\DataMapper\AssetMapper;
 use AllCoin\Dto\ResponseDtoInterface;
 use AllCoin\Exception\Asset\AssetListException;
@@ -39,7 +39,7 @@ class AssetListProcessTest extends TestCase
     {
         $this->assetRepository->expects($this->once())
             ->method('findAll')
-            ->willThrowException($this->createMock(ReadException::class));
+            ->willThrowException($this->createMock(ItemReadException::class));
 
         $this->logger->expects($this->once())->method('error');
 
@@ -51,7 +51,7 @@ class AssetListProcessTest extends TestCase
     }
 
     /**
-     * @throws \AllCoin\Exception\Asset\AssetListException
+     * @throws AssetListException
      */
     public function testHandleShouldBeOK(): void
     {

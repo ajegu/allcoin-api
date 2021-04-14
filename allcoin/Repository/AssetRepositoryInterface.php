@@ -4,32 +4,35 @@
 namespace AllCoin\Repository;
 
 
+use AllCoin\Database\DynamoDb\Exception\ItemDeleteException;
+use AllCoin\Database\DynamoDb\Exception\ItemReadException;
+use AllCoin\Database\DynamoDb\Exception\ItemSaveException;
 use AllCoin\Model\Asset;
 
 interface AssetRepositoryInterface
 {
     /**
      * @return Asset[]
-     * @throws \AllCoin\Database\DynamoDb\Exception\ReadException
+     * @throws ItemReadException
      */
     public function findAll(): array;
 
     /**
      * @param string $assetId
-     * @return \AllCoin\Model\Asset
-     * @throws \AllCoin\Database\DynamoDb\Exception\ReadException
+     * @return Asset
+     * @throws ItemReadException
      */
     public function findOneById(string $assetId): Asset;
 
     /**
-     * @param \AllCoin\Model\Asset $asset
-     * @throws \AllCoin\Database\DynamoDb\Exception\PersistenceException
+     * @param Asset $asset
+     * @throws ItemSaveException
      */
     public function save(Asset $asset): void;
 
     /**
      * @param string $assetId
-     * @throws \AllCoin\Database\DynamoDb\Exception\DeleteException
+     * @throws ItemDeleteException
      */
     public function delete(string $assetId);
 }

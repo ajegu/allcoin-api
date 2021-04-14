@@ -47,7 +47,7 @@ class MarshalerServiceTest extends TestCase
     }
 
     /**
-     * @throws \AllCoin\Database\DynamoDb\Exception\MarshalerException
+     * @throws MarshalerException
      */
     public function testMarshalItemShouldBeOK(): void
     {
@@ -83,7 +83,7 @@ class MarshalerServiceTest extends TestCase
     }
 
     /**
-     * @throws \AllCoin\Database\DynamoDb\Exception\MarshalerException
+     * @throws MarshalerException
      */
     public function testMarshalValueShouldBeOK(): void
     {
@@ -119,7 +119,7 @@ class MarshalerServiceTest extends TestCase
     }
 
     /**
-     * @throws \AllCoin\Database\DynamoDb\Exception\MarshalerException
+     * @throws MarshalerException
      */
     public function testUnmarshalItemShouldBeOK(): void
     {

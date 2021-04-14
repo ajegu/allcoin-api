@@ -11,7 +11,7 @@ use Illuminate\Support\ServiceProvider;
 class AwsServiceProvider extends ServiceProvider
 {
     /**
-     * @throws \App\Exceptions\ServiceProviderException
+     * @throws ServiceProviderException
      */
     public function register(): void
     {

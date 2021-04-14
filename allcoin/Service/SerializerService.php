@@ -20,9 +20,9 @@ class SerializerService
 
     /**
      * SerializerService constructor.
-     * @param \Symfony\Component\Serializer\SerializerInterface $serializer
-     * @param \Symfony\Component\Serializer\Normalizer\NormalizerInterface $normalizer
-     * @param \Psr\Log\LoggerInterface $logger
+     * @param SerializerInterface $serializer
+     * @param NormalizerInterface $normalizer
+     * @param LoggerInterface $logger
      */
     public function __construct(
         private SerializerInterface $serializer,
@@ -35,7 +35,7 @@ class SerializerService
     /**
      * @param array $payload
      * @param string $className
-     * @return \AllCoin\Dto\RequestDtoInterface
+     * @return RequestDtoInterface
      */
     public function deserializeToRequest(array $payload, string $className): RequestDtoInterface
     {
@@ -53,7 +53,7 @@ class SerializerService
     /**
      * @param array $payload
      * @param string $className
-     * @return \AllCoin\Dto\ResponseDtoInterface
+     * @return ResponseDtoInterface
      */
     public function deserializeToResponse(array $payload, string $className): ResponseDtoInterface
     {
@@ -71,7 +71,7 @@ class SerializerService
     /**
      * @param array $payload
      * @param string $className
-     * @return \AllCoin\Model\ModelInterface
+     * @return ModelInterface
      */
     public function deserializeToModel(array $payload, string $className): ModelInterface
     {
@@ -87,7 +87,7 @@ class SerializerService
     }
 
     /**
-     * @param \AllCoin\Dto\ResponseDtoInterface $responseDto
+     * @param ResponseDtoInterface $responseDto
      * @return array
      */
     public function normalizeResponseDto(ResponseDtoInterface $responseDto): array
@@ -104,7 +104,7 @@ class SerializerService
     }
 
     /**
-     * @param \AllCoin\Model\ModelInterface $object
+     * @param ModelInterface $object
      * @return array
      */
     public function normalizeModel(ModelInterface $object): array

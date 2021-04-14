@@ -50,7 +50,7 @@ class Asset implements ModelInterface
     }
 
     /**
-     * @return \DateTime
+     * @return DateTime
      */
     public function getCreatedAt(): DateTime
     {
@@ -58,7 +58,7 @@ class Asset implements ModelInterface
     }
 
     /**
-     * @param \DateTime $createdAt
+     * @param DateTime $createdAt
      */
     public function setCreatedAt(DateTime $createdAt): void
     {
@@ -66,7 +66,7 @@ class Asset implements ModelInterface
     }
 
     /**
-     * @return \DateTime|null
+     * @return DateTime|null
      */
     public function getUpdatedAt(): ?DateTime
     {
@@ -74,7 +74,7 @@ class Asset implements ModelInterface
     }
 
     /**
-     * @param \DateTime|null $updatedAt
+     * @param DateTime|null $updatedAt
      */
     public function setUpdatedAt(?DateTime $updatedAt): void
     {

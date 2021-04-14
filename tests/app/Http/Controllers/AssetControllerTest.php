@@ -7,6 +7,9 @@ namespace Test\App\Http\Controllers;
 use AllCoin\Dto\AssetRequestDto;
 use AllCoin\Dto\AssetResponseDto;
 use AllCoin\Dto\ResponseDtoInterface;
+use AllCoin\Exception\Asset\AssetCreateException;
+use AllCoin\Exception\Asset\AssetDeleteException;
+use AllCoin\Exception\Asset\AssetUpdateException;
 use AllCoin\Process\Asset\AssetCreateProcess;
 use AllCoin\Process\Asset\AssetDeleteProcess;
 use AllCoin\Process\Asset\AssetListProcess;
@@ -16,6 +19,7 @@ use AllCoin\Validation\AssetValidation;
 use App\Http\Controllers\AssetController;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
+use Illuminate\Validation\ValidationException;
 use Test\TestCase;
 
 class AssetControllerTest extends TestCase
@@ -50,8 +54,8 @@ class AssetControllerTest extends TestCase
     }
 
     /**
-     * @throws \AllCoin\Exception\Asset\AssetCreateException
-     * @throws \Illuminate\Validation\ValidationException
+     * @throws AssetCreateException
+     * @throws ValidationException
      */
     public function testCreateShouldBeOK(): void
     {
@@ -105,8 +109,8 @@ class AssetControllerTest extends TestCase
     }
 
     /**
-     * @throws \AllCoin\Exception\Asset\AssetUpdateException
-     * @throws \Illuminate\Validation\ValidationException
+     * @throws AssetUpdateException
+     * @throws ValidationException
      */
     public function testUpdateShouldBeOK(): void
     {
@@ -144,7 +148,7 @@ class AssetControllerTest extends TestCase
     }
 
     /**
-     * @throws \AllCoin\Exception\Asset\AssetDeleteException
+     * @throws AssetDeleteException
      */
     public function testDeleteShouldBeOk(): void
     {
