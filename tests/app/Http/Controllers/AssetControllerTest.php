@@ -9,9 +9,11 @@ use AllCoin\Dto\AssetResponseDto;
 use AllCoin\Dto\ResponseDtoInterface;
 use AllCoin\Exception\Asset\AssetCreateException;
 use AllCoin\Exception\Asset\AssetDeleteException;
+use AllCoin\Exception\Asset\AssetGetException;
 use AllCoin\Exception\Asset\AssetUpdateException;
 use AllCoin\Process\Asset\AssetCreateProcess;
 use AllCoin\Process\Asset\AssetDeleteProcess;
+use AllCoin\Process\Asset\AssetGetProcess;
 use AllCoin\Process\Asset\AssetListProcess;
 use AllCoin\Process\Asset\AssetUpdateProcess;
 use AllCoin\Service\SerializerService;
@@ -31,6 +33,7 @@ class AssetControllerTest extends TestCase
     private AssetListProcess $assetListProcess;
     private AssetUpdateProcess $assetUpdateProcess;
     private AssetDeleteProcess $assetDeleteProcess;
+    private AssetGetProcess $assetGetProcess;
 
     public function setUp(): void
     {
@@ -40,6 +43,7 @@ class AssetControllerTest extends TestCase
         $this->assetListProcess = $this->createMock(AssetListProcess::class);
         $this->assetUpdateProcess = $this->createMock(AssetUpdateProcess::class);
         $this->assetDeleteProcess = $this->createMock(AssetDeleteProcess::class);
+        $this->assetGetProcess = $this->createMock(AssetGetProcess::class);
 
         $this->assetController = new AssetController(
             $this->serializerService,
@@ -47,7 +51,8 @@ class AssetControllerTest extends TestCase
             $this->assetCreateProcess,
             $this->assetListProcess,
             $this->assetUpdateProcess,
-            $this->assetDeleteProcess
+            $this->assetDeleteProcess,
+            $this->assetGetProcess,
         );
 
         parent::setUp();
@@ -162,5 +167,29 @@ class AssetControllerTest extends TestCase
 
         $this->assertJson($response->getContent());
         $this->assertEquals(Response::HTTP_NO_CONTENT, $response->getStatusCode());
+    }
+
+    /**
+     * @throws AssetGetException
+     */
+    public function testGetShouldBeOK(): void
+    {
+        $id = 'foo';
+
+        $responseDto = $this->createMock(AssetResponseDto::class);
+        $this->assetGetProcess->expects($this->once())
+            ->method('handle')
+            ->with(null, ['id' => $id])
+            ->willReturn($responseDto);
+
+        $this->serializerService->expects($this->once())
+            ->method('normalizeResponseDto')
+            ->with($responseDto)
+            ->willReturn([]);
+
+        $response = $this->assetController->get($id);
+
+        $this->assertJson($response->getContent());
+        $this->assertEquals(Response::HTTP_OK, $response->getStatusCode());
     }
 }
