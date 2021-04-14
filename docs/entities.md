@@ -11,6 +11,7 @@
 ### Asset
 ````json
 {
+    "id": "string",
     "name": "string",
     "createdAt": "string",
     "updatedAt": "string",
@@ -19,9 +20,23 @@
 ````
 
 ### AssetPair
+
 ````json
 {
+    "id": "string",
     "name": "string",
+    "bidPrice": "float",
+    "askPrice": "float",
+    "createdAt": "string",
+    "updatedAt": "string"
+}
+````
+
+### AssetPairPrice
+
+````json
+{
+    "assetPairId": "string",
     "bidPrice": "float",
     "askPrice": "float",
     "createdAt": "string",
