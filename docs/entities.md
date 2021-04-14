@@ -4,7 +4,7 @@
 | Name  | Usage     |
 | ---   | ---       |
 | Asset | financial product |
-| Pair  | like BTC/USD      |
+| AssetPair  | like BTC/USD      |
 
 ## Structure
 
@@ -18,7 +18,7 @@
 }
 ````
 
-### Pair
+### AssetPair
 ````json
 {
     "name": "string",
