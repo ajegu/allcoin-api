@@ -7,10 +7,12 @@ namespace App\Http\Controllers;
 use AllCoin\Dto\AssetRequestDto;
 use AllCoin\Exception\Asset\AssetCreateException;
 use AllCoin\Exception\Asset\AssetDeleteException;
+use AllCoin\Exception\Asset\AssetGetException;
 use AllCoin\Exception\Asset\AssetListException;
 use AllCoin\Exception\Asset\AssetUpdateException;
 use AllCoin\Process\Asset\AssetCreateProcess;
 use AllCoin\Process\Asset\AssetDeleteProcess;
+use AllCoin\Process\Asset\AssetGetProcess;
 use AllCoin\Process\Asset\AssetListProcess;
 use AllCoin\Process\Asset\AssetUpdateProcess;
 use AllCoin\Service\SerializerService;
@@ -28,7 +30,8 @@ final class AssetController extends Controller
         private AssetCreateProcess $assetCreateProcess,
         private AssetListProcess $assetListProcess,
         private AssetUpdateProcess $assetUpdateProcess,
-        private AssetDeleteProcess $assetDeleteProcess
+        private AssetDeleteProcess $assetDeleteProcess,
+        private AssetGetProcess $assetGetProcess
     )
     {
     }
@@ -95,5 +98,20 @@ final class AssetController extends Controller
         $this->assetDeleteProcess->handle(null, ['id' => $id]);
 
         return new JsonResponse(null, Response::HTTP_NO_CONTENT);
+    }
+
+    /**
+     * @param string $id
+     * @return JsonResponse
+     * @throws AssetGetException
+     */
+    public function get(string $id): JsonResponse
+    {
+        $responseDto = $this->assetGetProcess->handle(null, ['id' => $id]);
+
+        return new JsonResponse(
+            $this->serializerService->normalizeResponseDto($responseDto),
+            Response::HTTP_OK
+        );
     }
 }

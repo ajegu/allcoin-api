@@ -26,3 +26,4 @@ $router->post('/asset', ['uses' => 'AssetController@create']);
 $router->get('/asset', ['uses' => 'AssetController@list']);
 $router->put('/asset/{id}', ['uses' => 'AssetController@update']);
 $router->delete('/asset/{id}', ['uses' => 'AssetController@delete']);
+$router->get('/asset/{id}', ['uses' => 'AssetController@get']);
