@@ -7,8 +7,10 @@ namespace App\Http\Controllers;
 use AllCoin\Dto\AssetPairRequestDto;
 use AllCoin\Exception\AssetPair\AssetPairCreateException;
 use AllCoin\Exception\AssetPair\AssetPairGetException;
+use AllCoin\Exception\AssetPair\AssetPairUpdateException;
 use AllCoin\Process\AssetPair\AssetPairCreateProcess;
 use AllCoin\Process\AssetPair\AssetPairGetProcess;
+use AllCoin\Process\AssetPair\AssetPairUpdateProcess;
 use AllCoin\Service\SerializerService;
 use AllCoin\Validation\AssetPairValidation;
 use Illuminate\Http\JsonResponse;
@@ -22,7 +24,8 @@ class AssetPairController extends Controller
         private AssetPairValidation $assetPairValidation,
         private SerializerService $serializerService,
         private AssetPairCreateProcess $assetPairCreateProcess,
-        private AssetPairGetProcess $assetPairGetProcess
+        private AssetPairGetProcess $assetPairGetProcess,
+        private AssetPairUpdateProcess $assetPairUpdateProcess
     )
     {
     }
@@ -71,6 +74,37 @@ class AssetPairController extends Controller
                 'assetId' => $assetId,
                 'id' => $id
             ]
+        );
+
+        return new JsonResponse(
+            $this->serializerService->normalizeResponseDto($responseDto),
+            Response::HTTP_OK
+        );
+    }
+
+    /**
+     * @param Request $request
+     * @param string $assetId
+     * @param string $id
+     * @return JsonResponse
+     * @throws ValidationException
+     * @throws AssetPairUpdateException
+     */
+    public function update(Request $request, string $assetId, string $id): JsonResponse
+    {
+        $payload = $this->validate(
+            $request,
+            $this->assetPairValidation->getPutRules()
+        );
+
+        $requestDto = $this->serializerService->deserializeToRequest(
+            $payload,
+            AssetPairRequestDto::class
+        );
+
+        $responseDto = $this->assetPairUpdateProcess->handle(
+            $requestDto,
+            ['assetId' => $assetId, 'id' => $id]
         );
 
         return new JsonResponse(
