@@ -39,4 +39,13 @@ interface ItemManagerInterface
      * @throws ItemDeleteException
      */
     public function delete(string $partitionKey, string $sortKey): void;
+
+    /**
+     * @param string $partitionKey
+     * @param string $lsiKeyName
+     * @param string $lsiKey
+     * @return array
+     * @throws ItemReadException
+     */
+    public function fetchAllOnLSI(string $partitionKey, string $lsiKeyName, string $lsiKey): array;
 }

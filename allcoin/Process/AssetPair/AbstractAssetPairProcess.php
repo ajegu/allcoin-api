@@ -7,6 +7,7 @@ namespace AllCoin\Process\AssetPair;
 use AllCoin\Database\DynamoDb\Exception\ItemReadException;
 use AllCoin\DataMapper\AssetPairMapper;
 use AllCoin\Model\Asset;
+use AllCoin\Model\AssetPair;
 use AllCoin\Repository\AssetPairRepositoryInterface;
 use AllCoin\Repository\AssetRepositoryInterface;
 use Psr\Log\LoggerInterface;
@@ -69,5 +70,24 @@ abstract class AbstractAssetPairProcess
         }
 
         return $assetPairId;
+    }
+
+    /**
+     * @param string $assetPairId
+     * @param string $exceptionClass
+     * @return AssetPair
+     */
+    protected function getAssetPair(string $assetPairId, string $exceptionClass): AssetPair
+    {
+        try {
+            return $this->assetPairRepository->findOneById($assetPairId);
+        } catch (ItemReadException $exception) {
+            $message = 'The asset pair cannot be found!';
+            $this->logger->error($message, [
+                'id' => $assetPairId,
+                'exception' => $exception->getMessage()
+            ]);
+            throw new $exceptionClass($message);
+        }
     }
 }

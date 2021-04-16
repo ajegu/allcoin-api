@@ -20,6 +20,10 @@ class ItemManager implements ItemManagerInterface
 
     const LSI_1 = 'lsi1';
 
+    const LSI_INDEXES = [
+        self::LSI_1 => 'pk-lsi1-index'
+    ];
+
     /**
      * ItemManager constructor.
      * @param DynamoDbClient $dynamoDbClient
@@ -104,5 +108,24 @@ class ItemManager implements ItemManagerInterface
         );
         $itemManager->delete($partitionKey, $sortKey);
 
+    }
+
+    /**
+     * @param string $partitionKey
+     * @param string $lsiKeyName
+     * @param string $lsiKey
+     * @return array
+     * @throws ItemReadException
+     */
+    public function fetchAllOnLSI(string $partitionKey, string $lsiKeyName, string $lsiKey): array
+    {
+        $itemManager = new ItemReadManager(
+            $this->dynamoDbClient,
+            $this->marshalerService,
+            $this->logger,
+            $this->tableName
+        );
+
+        return $itemManager->fetchAllOnLSI($partitionKey, $lsiKeyName, $lsiKey);
     }
 }
