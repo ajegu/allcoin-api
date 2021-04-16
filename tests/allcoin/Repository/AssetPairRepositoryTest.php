@@ -4,6 +4,7 @@
 namespace Test\AllCoin\Repository;
 
 
+use AllCoin\Database\DynamoDb\Exception\ItemDeleteException;
 use AllCoin\Database\DynamoDb\Exception\ItemReadException;
 use AllCoin\Database\DynamoDb\Exception\ItemSaveException;
 use AllCoin\Database\DynamoDb\ItemManager;
@@ -106,5 +107,48 @@ class AssetPairRepositoryTest extends TestCase
             ->willReturn($this->createMock(AssetPair::class));
 
         $this->assetPairRepository->findOneById($assetPairId);
+    }
+
+    /**
+     * @throws ItemDeleteException
+     */
+    public function testDeleteShouldBeOK(): void
+    {
+        $assetPairId = 'foo';
+
+        $this->itemManager->expects($this->once())
+            ->method('delete')
+            ->with(
+                ClassMappingEnum::CLASS_MAPPING[AssetPair::class],
+                $assetPairId
+            );
+
+        $this->assetPairRepository->delete($assetPairId);
+    }
+
+    /**
+     * @throws ItemReadException
+     */
+    public function testFindAllByAssetIdShouldBeOK(): void
+    {
+        $assetId = 'foo';
+
+        $item = [];
+        $items = [$item];
+        $this->itemManager->expects($this->once())
+            ->method('fetchAllOnLSI')
+            ->with(
+                partitionKey: ClassMappingEnum::CLASS_MAPPING[AssetPair::class],
+                lsiKeyName: ItemManager::LSI_1,
+                lsiKey: $assetId,
+            )
+            ->willReturn($items);
+
+        $this->serializerService->expects($this->once())
+            ->method('deserializeToModel')
+            ->with($item, AssetPair::class)
+            ->willReturn($this->createMock(AssetPair::class));
+
+        $this->assetPairRepository->findAllByAssetId($assetId);
     }
 }

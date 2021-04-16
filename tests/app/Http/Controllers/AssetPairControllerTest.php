@@ -8,9 +8,12 @@ use AllCoin\Dto\AssetPairRequestDto;
 use AllCoin\Dto\AssetPairResponseDto;
 use AllCoin\Dto\ListResponseDto;
 use AllCoin\Exception\AssetPair\AssetPairCreateException;
+use AllCoin\Exception\AssetPair\AssetPairDeleteException;
 use AllCoin\Exception\AssetPair\AssetPairGetException;
+use AllCoin\Exception\AssetPair\AssetPairListException;
 use AllCoin\Exception\AssetPair\AssetPairUpdateException;
 use AllCoin\Process\AssetPair\AssetPairCreateProcess;
+use AllCoin\Process\AssetPair\AssetPairDeleteProcess;
 use AllCoin\Process\AssetPair\AssetPairGetProcess;
 use AllCoin\Process\AssetPair\AssetPairListProcess;
 use AllCoin\Process\AssetPair\AssetPairUpdateProcess;
@@ -32,6 +35,7 @@ class AssetPairControllerTest extends TestCase
     private AssetPairGetProcess $assetPairGetProcess;
     private AssetPairUpdateProcess $assetPairUpdateProcess;
     private AssetPairListProcess $assetPairListProcess;
+    private AssetPairDeleteProcess $assetPairDeleteProcess;
 
     public function setUp(): void
     {
@@ -41,6 +45,7 @@ class AssetPairControllerTest extends TestCase
         $this->assetPairGetProcess = $this->createMock(AssetPairGetProcess::class);
         $this->assetPairUpdateProcess = $this->createMock(AssetPairUpdateProcess::class);
         $this->assetPairListProcess = $this->createMock(AssetPairListProcess::class);
+        $this->assetPairDeleteProcess = $this->createMock(AssetPairDeleteProcess::class);
 
         $this->assetPairController = new AssetPairController(
             $this->assetPairValidation,
@@ -49,6 +54,7 @@ class AssetPairControllerTest extends TestCase
             $this->assetPairGetProcess,
             $this->assetPairUpdateProcess,
             $this->assetPairListProcess,
+            $this->assetPairDeleteProcess,
         );
 
         parent::setUp();
@@ -161,6 +167,9 @@ class AssetPairControllerTest extends TestCase
         $this->assertEquals(Response::HTTP_OK, $response->getStatusCode());
     }
 
+    /**
+     * @throws AssetPairListException
+     */
     public function testListShouldBeOK(): void
     {
         $assetId = 'foo';
@@ -179,5 +188,26 @@ class AssetPairControllerTest extends TestCase
 
         $this->assertJson($response->getContent());
         $this->assertEquals(Response::HTTP_OK, $response->getStatusCode());
+    }
+
+    /**
+     * @throws AssetPairDeleteException
+     */
+    public function testDeleteShouldBeOK(): void
+    {
+        $assetId = 'foo';
+        $id = 'bar';
+
+        $this->assetPairDeleteProcess->expects($this->once())
+            ->method('handle')
+            ->with(
+                null,
+                ['assetId' => $assetId, 'id' => $id]
+            );
+
+        $response = $this->assetPairController->delete($assetId, $id);
+
+        $this->assertJson($response->getContent());
+        $this->assertEquals(Response::HTTP_NO_CONTENT, $response->getStatusCode());
     }
 }

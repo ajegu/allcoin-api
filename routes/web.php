@@ -35,3 +35,4 @@ $router->post('/asset/{assetId}/pair', ['uses' => 'AssetPairController@create'])
 $router->put('/asset/{assetId}/pair/{id}', ['uses' => 'AssetPairController@update']);
 $router->get('/asset/{assetId}/pair/{id}', ['uses' => 'AssetPairController@get']);
 $router->get('/asset/{assetId}/pair', ['uses' => 'AssetPairController@list']);
+$router->delete('/asset/{assetId}/pair/{id}', ['uses' => 'AssetPairController@delete']);

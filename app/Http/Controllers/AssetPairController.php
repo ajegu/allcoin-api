@@ -6,10 +6,12 @@ namespace App\Http\Controllers;
 
 use AllCoin\Dto\AssetPairRequestDto;
 use AllCoin\Exception\AssetPair\AssetPairCreateException;
+use AllCoin\Exception\AssetPair\AssetPairDeleteException;
 use AllCoin\Exception\AssetPair\AssetPairGetException;
 use AllCoin\Exception\AssetPair\AssetPairListException;
 use AllCoin\Exception\AssetPair\AssetPairUpdateException;
 use AllCoin\Process\AssetPair\AssetPairCreateProcess;
+use AllCoin\Process\AssetPair\AssetPairDeleteProcess;
 use AllCoin\Process\AssetPair\AssetPairGetProcess;
 use AllCoin\Process\AssetPair\AssetPairListProcess;
 use AllCoin\Process\AssetPair\AssetPairUpdateProcess;
@@ -29,6 +31,7 @@ class AssetPairController extends Controller
         private AssetPairGetProcess $assetPairGetProcess,
         private AssetPairUpdateProcess $assetPairUpdateProcess,
         private AssetPairListProcess $assetPairListProcess,
+        private AssetPairDeleteProcess $assetPairDeleteProcess
     )
     {
     }
@@ -132,5 +135,21 @@ class AssetPairController extends Controller
             $this->serializerService->normalizeResponseDto($responseDto),
             Response::HTTP_OK
         );
+    }
+
+    /**
+     * @param string $assetId
+     * @param string $id
+     * @return JsonResponse
+     * @throws AssetPairDeleteException
+     */
+    public function delete(string $assetId, string $id): JsonResponse
+    {
+        $this->assetPairDeleteProcess->handle(
+            null,
+            ['assetId' => $assetId, 'id' => $id]
+        );
+
+        return new JsonResponse(null, Response::HTTP_NO_CONTENT);
     }
 }

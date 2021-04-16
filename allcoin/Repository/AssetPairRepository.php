@@ -4,6 +4,7 @@
 namespace AllCoin\Repository;
 
 
+use AllCoin\Database\DynamoDb\Exception\ItemDeleteException;
 use AllCoin\Database\DynamoDb\Exception\ItemReadException;
 use AllCoin\Database\DynamoDb\Exception\ItemSaveException;
 use AllCoin\Database\DynamoDb\ItemManager;
@@ -71,5 +72,17 @@ class AssetPairRepository extends AbstractRepository implements AssetPairReposit
                 AssetPair::class
             );
         }, $items);
+    }
+
+    /**
+     * @param string $assetPairId
+     * @throws ItemDeleteException
+     */
+    public function delete(string $assetPairId): void
+    {
+        $this->itemManager->delete(
+            partitionKey: ClassMappingEnum::CLASS_MAPPING[AssetPair::class],
+            sortKey: $assetPairId
+        );
     }
 }

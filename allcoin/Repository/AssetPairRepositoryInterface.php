@@ -4,6 +4,7 @@
 namespace AllCoin\Repository;
 
 
+use AllCoin\Database\DynamoDb\Exception\ItemDeleteException;
 use AllCoin\Database\DynamoDb\Exception\ItemReadException;
 use AllCoin\Database\DynamoDb\Exception\ItemSaveException;
 use AllCoin\Model\AssetPair;
@@ -30,4 +31,10 @@ interface AssetPairRepositoryInterface
      * @throws ItemReadException
      */
     public function findAllByAssetId(string $assetId): array;
+
+    /**
+     * @param string $assetPairId
+     * @throws ItemDeleteException
+     */
+    public function delete(string $assetPairId): void;
 }
