@@ -51,4 +51,25 @@ class AssetPairRepository extends AbstractRepository implements AssetPairReposit
             AssetPair::class
         );
     }
+
+    /**
+     * @param string $assetId
+     * @return AssetPair[]
+     * @throws ItemReadException
+     */
+    public function findAllByAssetId(string $assetId): array
+    {
+        $items = $this->itemManager->fetchAllOnLSI(
+            partitionKey: ClassMappingEnum::CLASS_MAPPING[AssetPair::class],
+            lsiKeyName: ItemManager::LSI_1,
+            lsiKey: $assetId,
+        );
+
+        return array_map(function ($item) {
+            return $this->serializerService->deserializeToModel(
+                $item,
+                AssetPair::class
+            );
+        }, $items);
+    }
 }

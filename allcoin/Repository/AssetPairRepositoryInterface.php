@@ -23,4 +23,11 @@ interface AssetPairRepositoryInterface
      * @throws ItemReadException
      */
     public function findOneById(string $assetPairId): AssetPair|ModelInterface;
+
+    /**
+     * @param string $assetId
+     * @return AssetPair[]
+     * @throws ItemReadException
+     */
+    public function findAllByAssetId(string $assetId): array;
 }

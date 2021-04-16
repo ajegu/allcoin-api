@@ -39,74 +39,8 @@ class ItemReadManager
             'ExpressionAttributeValues' => [':value' => $value]
         ];
 
-        $result = $this->queryForReadOperation($query);
+        return $this->executeFetchAllQuery($query);
 
-        return array_map(function (array $item) {
-            try {
-                $item = $this->marshalerService->unmarshalItem($item);
-                return $this->denormalize($item);
-            } catch (MarshalerException $exception) {
-                $message = 'Cannot unmarshal the item.';
-                $this->logger->error($message, [
-                    'exception' => $exception->getMessage(),
-                    'item' => $item
-                ]);
-                throw new ItemReadException($message);
-            }
-        }, $result->get('Items'));
-    }
-
-    /**
-     * @param mixed $value
-     * @return array
-     * @throws ItemReadException
-     */
-    private function marshalValueForReadOperation(mixed $value): array
-    {
-        try {
-            return $this->marshalerService->marshalValue($value);
-        } catch (MarshalerException $exception) {
-            $message = 'Cannot marshal the data to item.';
-            $this->logger->error($message, [
-                'exception' => $exception->getMessage(),
-                'value' => $value
-            ]);
-            throw new ItemReadException($message);
-        }
-    }
-
-    /**
-     * @param array $query
-     * @return Result
-     * @throws ItemReadException
-     */
-    private function queryForReadOperation(array $query): Result
-    {
-        try {
-            return $this->dynamoDbClient->query($query);
-        } catch (DynamoDbException $exception) {
-            $message = 'Cannot execute the query.';
-            $this->logger->error($message, [
-                'exception' => $exception->getMessage(),
-                'query' => $query
-            ]);
-            throw new ItemReadException($message);
-        }
-    }
-
-    /**
-     * @param array $item
-     * @return array
-     */
-    private function denormalize(array $item): array
-    {
-        foreach ($item as $key => $value) {
-            if ('' === $value) {
-                $item[$key] = null;
-            }
-        }
-
-        return $item;
     }
 
     /**
@@ -153,5 +87,107 @@ class ItemReadManager
         }
 
         return $this->denormalize($item);
+    }
+
+    /**
+     * @param string $partitionKey
+     * @param string $lsi
+     * @param string $value
+     * @return array
+     * @throws ItemReadException
+     */
+    public function fetchAllOnLSI(string $partitionKey, string $lsiKeyName, string $lsiKey): array
+    {
+        $partitionKeyValue = $this->marshalValueForReadOperation($partitionKey);
+        $lsiKeyValue = $this->marshalValueForReadOperation($lsiKey);
+
+        $query = [
+            'TableName' => $this->tableName,
+            'IndexName' => ItemManager::LSI_INDEXES[$lsiKeyName],
+            'KeyConditionExpression' => ItemManager::PARTITION_KEY_NAME . ' = :partitionKeyValue and ' . $lsiKeyName . ' = :lsiKeyValue',
+            'ExpressionAttributeValues' => [
+                ':partitionKeyValue' => $partitionKeyValue,
+                ':lsiKeyValue' => $lsiKeyValue
+            ]
+        ];
+
+        return $this->executeFetchAllQuery($query);
+    }
+
+    /**
+     * @param array $query
+     * @return Result
+     * @throws ItemReadException
+     */
+    private function queryForReadOperation(array $query): Result
+    {
+        try {
+            return $this->dynamoDbClient->query($query);
+        } catch (DynamoDbException $exception) {
+            $message = 'Cannot execute the query.';
+            $this->logger->error($message, [
+                'exception' => $exception->getMessage(),
+                'query' => $query
+            ]);
+            throw new ItemReadException($message);
+        }
+    }
+
+    /**
+     * @param array $item
+     * @return array
+     */
+    private function denormalize(array $item): array
+    {
+        foreach ($item as $key => $value) {
+            if ('' === $value) {
+                $item[$key] = null;
+            }
+        }
+
+        return $item;
+    }
+
+    /**
+     * @param array $query
+     * @return array
+     * @throws ItemReadException
+     */
+    private function executeFetchAllQuery(array $query): array
+    {
+        $result = $this->queryForReadOperation($query);
+
+        return array_map(function (array $item) {
+            try {
+                $item = $this->marshalerService->unmarshalItem($item);
+                return $this->denormalize($item);
+            } catch (MarshalerException $exception) {
+                $message = 'Cannot unmarshal the item.';
+                $this->logger->error($message, [
+                    'exception' => $exception->getMessage(),
+                    'item' => $item
+                ]);
+                throw new ItemReadException($message);
+            }
+        }, $result->get('Items'));
+    }
+
+    /**
+     * @param mixed $value
+     * @return array
+     * @throws ItemReadException
+     */
+    private function marshalValueForReadOperation(mixed $value): array
+    {
+        try {
+            return $this->marshalerService->marshalValue($value);
+        } catch (MarshalerException $exception) {
+            $message = 'Cannot marshal the data to item.';
+            $this->logger->error($message, [
+                'exception' => $exception->getMessage(),
+                'value' => $value
+            ]);
+            throw new ItemReadException($message);
+        }
     }
 }

@@ -7,9 +7,11 @@ namespace App\Http\Controllers;
 use AllCoin\Dto\AssetPairRequestDto;
 use AllCoin\Exception\AssetPair\AssetPairCreateException;
 use AllCoin\Exception\AssetPair\AssetPairGetException;
+use AllCoin\Exception\AssetPair\AssetPairListException;
 use AllCoin\Exception\AssetPair\AssetPairUpdateException;
 use AllCoin\Process\AssetPair\AssetPairCreateProcess;
 use AllCoin\Process\AssetPair\AssetPairGetProcess;
+use AllCoin\Process\AssetPair\AssetPairListProcess;
 use AllCoin\Process\AssetPair\AssetPairUpdateProcess;
 use AllCoin\Service\SerializerService;
 use AllCoin\Validation\AssetPairValidation;
@@ -25,7 +27,8 @@ class AssetPairController extends Controller
         private SerializerService $serializerService,
         private AssetPairCreateProcess $assetPairCreateProcess,
         private AssetPairGetProcess $assetPairGetProcess,
-        private AssetPairUpdateProcess $assetPairUpdateProcess
+        private AssetPairUpdateProcess $assetPairUpdateProcess,
+        private AssetPairListProcess $assetPairListProcess,
     )
     {
     }
@@ -105,6 +108,24 @@ class AssetPairController extends Controller
         $responseDto = $this->assetPairUpdateProcess->handle(
             $requestDto,
             ['assetId' => $assetId, 'id' => $id]
+        );
+
+        return new JsonResponse(
+            $this->serializerService->normalizeResponseDto($responseDto),
+            Response::HTTP_OK
+        );
+    }
+
+    /**
+     * @param string $assetId
+     * @return JsonResponse
+     * @throws AssetPairListException
+     */
+    public function list(string $assetId): JsonResponse
+    {
+        $responseDto = $this->assetPairListProcess->handle(
+            null,
+            ['assetId' => $assetId]
         );
 
         return new JsonResponse(

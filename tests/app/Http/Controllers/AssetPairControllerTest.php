@@ -6,11 +6,13 @@ namespace Test\App\Http\Controllers;
 
 use AllCoin\Dto\AssetPairRequestDto;
 use AllCoin\Dto\AssetPairResponseDto;
+use AllCoin\Dto\ListResponseDto;
 use AllCoin\Exception\AssetPair\AssetPairCreateException;
 use AllCoin\Exception\AssetPair\AssetPairGetException;
 use AllCoin\Exception\AssetPair\AssetPairUpdateException;
 use AllCoin\Process\AssetPair\AssetPairCreateProcess;
 use AllCoin\Process\AssetPair\AssetPairGetProcess;
+use AllCoin\Process\AssetPair\AssetPairListProcess;
 use AllCoin\Process\AssetPair\AssetPairUpdateProcess;
 use AllCoin\Service\SerializerService;
 use AllCoin\Validation\AssetPairValidation;
@@ -29,6 +31,7 @@ class AssetPairControllerTest extends TestCase
     private AssetPairCreateProcess $assetPairCreateProcess;
     private AssetPairGetProcess $assetPairGetProcess;
     private AssetPairUpdateProcess $assetPairUpdateProcess;
+    private AssetPairListProcess $assetPairListProcess;
 
     public function setUp(): void
     {
@@ -37,6 +40,7 @@ class AssetPairControllerTest extends TestCase
         $this->assetPairCreateProcess = $this->createMock(AssetPairCreateProcess::class);
         $this->assetPairGetProcess = $this->createMock(AssetPairGetProcess::class);
         $this->assetPairUpdateProcess = $this->createMock(AssetPairUpdateProcess::class);
+        $this->assetPairListProcess = $this->createMock(AssetPairListProcess::class);
 
         $this->assetPairController = new AssetPairController(
             $this->assetPairValidation,
@@ -44,6 +48,7 @@ class AssetPairControllerTest extends TestCase
             $this->assetPairCreateProcess,
             $this->assetPairGetProcess,
             $this->assetPairUpdateProcess,
+            $this->assetPairListProcess,
         );
 
         parent::setUp();
@@ -151,6 +156,26 @@ class AssetPairControllerTest extends TestCase
             ->willReturn([]);
 
         $response = $this->assetPairController->update($request, $assetId, $id);
+
+        $this->assertJson($response->getContent());
+        $this->assertEquals(Response::HTTP_OK, $response->getStatusCode());
+    }
+
+    public function testListShouldBeOK(): void
+    {
+        $assetId = 'foo';
+
+        $responseDto = $this->createMock(ListResponseDto::class);
+        $this->assetPairListProcess->expects($this->once())
+            ->method('handle')
+            ->with(null, ['assetId' => $assetId])
+            ->willReturn($responseDto);
+
+        $this->serializerService->expects($this->once())
+            ->method('normalizeResponseDto')
+            ->with($responseDto);
+
+        $response = $this->assetPairController->list($assetId);
 
         $this->assertJson($response->getContent());
         $this->assertEquals(Response::HTTP_OK, $response->getStatusCode());

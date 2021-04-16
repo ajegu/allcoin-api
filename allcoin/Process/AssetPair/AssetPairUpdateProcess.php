@@ -4,7 +4,6 @@
 namespace AllCoin\Process\AssetPair;
 
 
-use AllCoin\Database\DynamoDb\Exception\ItemReadException;
 use AllCoin\Database\DynamoDb\Exception\ItemSaveException;
 use AllCoin\DataMapper\AssetPairMapper;
 use AllCoin\Dto\RequestDtoInterface;
@@ -47,17 +46,7 @@ class AssetPairUpdateProcess extends AbstractAssetPairProcess implements Process
         $assetPairId = $this->getAssetPairId($params, AssetPairUpdateException::class);
 
         $asset = $this->getAsset($assetId, AssetPairUpdateException::class);
-
-        try {
-            $assetPair = $this->assetPairRepository->findOneById($assetPairId);
-        } catch (ItemReadException $exception) {
-            $message = 'The asset pair cannot be found!';
-            $this->logger->error($message, [
-                'id' => $assetPairId,
-                'exception' => $exception->getMessage()
-            ]);
-            throw new AssetPairUpdateException($message);
-        }
+        $assetPair = $this->getAssetPair($assetPairId, AssetPairUpdateException::class);
 
         $assetPair->setAsset($asset);
         $assetPair->setName($dto->getName());
