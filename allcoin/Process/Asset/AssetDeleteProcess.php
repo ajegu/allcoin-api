@@ -37,7 +37,7 @@ class AssetDeleteProcess implements ProcessInterface
         try {
             $this->assetRepository->delete($assetId);
         } catch (ItemDeleteException $exception) {
-            $message = 'The asset cannot be delete!';
+            $message = 'The asset cannot be deleted!';
             $this->logger->error($message, [
                 'id' => $assetId,
                 'exception' => $exception->getMessage()

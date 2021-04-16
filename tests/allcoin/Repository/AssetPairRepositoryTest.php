@@ -4,6 +4,7 @@
 namespace Test\AllCoin\Repository;
 
 
+use AllCoin\Database\DynamoDb\Exception\ItemDeleteException;
 use AllCoin\Database\DynamoDb\Exception\ItemReadException;
 use AllCoin\Database\DynamoDb\Exception\ItemSaveException;
 use AllCoin\Database\DynamoDb\ItemManager;
@@ -106,5 +107,22 @@ class AssetPairRepositoryTest extends TestCase
             ->willReturn($this->createMock(AssetPair::class));
 
         $this->assetPairRepository->findOneById($assetPairId);
+    }
+
+    /**
+     * @throws ItemDeleteException
+     */
+    public function testDeleteShouldBeOK(): void
+    {
+        $assetPairId = 'foo';
+
+        $this->itemManager->expects($this->once())
+            ->method('delete')
+            ->with(
+                ClassMappingEnum::CLASS_MAPPING[AssetPair::class],
+                $assetPairId
+            );
+
+        $this->assetPairRepository->delete($assetPairId);
     }
 }
