@@ -119,4 +119,21 @@ class SerializerService
             throw new SerializerException();
         }
     }
+
+    /**
+     * @param object $object
+     * @return string
+     */
+    public function serializeObject(object $object): string
+    {
+        try {
+            return $this->serializer->serialize($object, 'json');
+        } catch (RuntimeException $exception) {
+            $this->logger->error('Cannot serialize object', [
+                'class' => get_class($object),
+                'exception' => $exception->getMessage()
+            ]);
+            throw new SerializerException();
+        }
+    }
 }
