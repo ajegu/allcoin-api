@@ -8,6 +8,7 @@
         "php": "^8.0",
         "ajegu/binance-sdk": "^1",
         "aws/aws-sdk-php": "^3.178",
+        "bref/bref": "^1.2",
         "laravel/lumen-framework": "^8.0",
         "nyholm/psr7": "^1.4",
         "php-http/guzzle7-adapter": "^1.0",

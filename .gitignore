@@ -5,3 +5,6 @@ Homestead.yaml
 .env
 .phpunit.result.cache
 /.phpunit.cache/
+/infra/aws/.terraform/
+/infra/aws/.terraform.tfstate.lock.info
+/infra/aws/terraform.tfvars
