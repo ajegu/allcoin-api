@@ -7,7 +7,7 @@ networks:
 
 services:
   nginx:
-    build: infra/nginx
+    build: infra/docker/nginx
     links:
       - php
     volumes:
@@ -17,7 +17,7 @@ services:
     networks:
       - traefik
   php:
-    build: infra/php
+    build: infra/docker/php
     volumes:
       - "./:/var/www/html"
       - "~/.composer:/root/.composer/"

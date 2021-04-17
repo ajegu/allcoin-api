@@ -1,0 +1,28 @@
+version: 0.2
+
+env:
+  variables:
+    COMPOSER_CACHE_DIR: .composer/
+
+phases:
+  install:
+    commands:
+      - mkdir -p .composer/
+  build:
+    commands:
+      - composer install --prefer-dist --no-progress --optimize-autoloader
+
+artifacts:
+  files:
+    - allcoin/**/*
+    - app/**/*
+    - bootstrap/**/*
+    - lambda/**/*
+    - public/**/*
+    - routes/**/*
+    - vendor/**/*
+  name: allcoin-api.zip
+
+cache:
+  paths:
+    - .composer/**/*
