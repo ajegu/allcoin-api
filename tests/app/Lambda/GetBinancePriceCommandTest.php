@@ -1,16 +1,17 @@
 <?php
 
 
-namespace Test\App\Console\Commands;
+namespace Test\App\Lambda;
 
 
+use AllCoin\Exception\AssetPairPrice\AssetPairPriceBinanceCreateException;
 use AllCoin\Process\AssetPairPrice\AssetPairPriceBinanceCreateProcess;
-use App\Console\Commands\GetBinancePriceCommand;
+use App\Lambda\GetBinancePriceLambda;
 use Test\TestCase;
 
 class GetBinancePriceCommandTest extends TestCase
 {
-    private GetBinancePriceCommand $getBinancePriceCommand;
+    private GetBinancePriceLambda $getBinancePriceCommand;
 
     private AssetPairPriceBinanceCreateProcess $assetPairPriceBinanceCreateProcess;
 
@@ -18,16 +19,19 @@ class GetBinancePriceCommandTest extends TestCase
     {
         $this->assetPairPriceBinanceCreateProcess = $this->createMock(AssetPairPriceBinanceCreateProcess::class);
 
-        $this->getBinancePriceCommand = new GetBinancePriceCommand(
+        $this->getBinancePriceCommand = new GetBinancePriceLambda(
             $this->assetPairPriceBinanceCreateProcess
         );
     }
 
-    public function testHandleShouldBeOK(): void
+    /**
+     * @throws AssetPairPriceBinanceCreateException
+     */
+    public function testInvokeShouldBeOK(): void
     {
         $this->assetPairPriceBinanceCreateProcess->expects($this->once())
             ->method('handle');
 
-        $this->getBinancePriceCommand->handle();
+        $this->getBinancePriceCommand->__invoke([]);
     }
 }

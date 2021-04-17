@@ -1,27 +1,25 @@
 <?php
 
 
-namespace App\Console\Commands;
+namespace App\Lambda;
+
 
 use AllCoin\Exception\AssetPairPrice\AssetPairPriceBinanceCreateException;
 use AllCoin\Process\AssetPairPrice\AssetPairPriceBinanceCreateProcess;
-use Illuminate\Console\Command;
 
-class GetBinancePriceCommand extends Command
+class GetBinancePriceLambda
 {
-    protected $signature = 'price:binance';
-
     public function __construct(
         private AssetPairPriceBinanceCreateProcess $assetPairPriceBinanceCreateProcess
     )
     {
-        parent::__construct();
     }
 
     /**
+     * @param array $event
      * @throws AssetPairPriceBinanceCreateException
      */
-    public function handle(): void
+    public function __invoke(array $event): void
     {
         $this->assetPairPriceBinanceCreateProcess->handle();
     }
