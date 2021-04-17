@@ -10,6 +10,7 @@ use AllCoin\Exception\SerializerException;
 use AllCoin\Model\ModelInterface;
 use AllCoin\Service\SerializerService;
 use Psr\Log\LoggerInterface;
+use stdClass;
 use Symfony\Component\Serializer\Exception\ExceptionInterface;
 use Symfony\Component\Serializer\Exception\RuntimeException;
 use Symfony\Component\Serializer\Normalizer\NormalizerInterface;
@@ -202,5 +203,38 @@ class SerializerServiceTest extends TestCase
         $this->logger->expects($this->never())->method('error');
 
         $this->serializerService->normalizeModel($responseDto);
+    }
+
+    public function testSerializeObjectWithErrorShouldThrowException(): void
+    {
+        $object = new stdClass();
+
+        $this->serializer->expects($this->once())
+            ->method('serialize')
+            ->with($object)
+            ->willThrowException($this->createMock(RuntimeException::class));
+
+        $this->logger->expects($this->once())->method('error');
+
+        $this->expectException(SerializerException::class);
+
+        $this->serializerService->serializeObject($object);
+    }
+
+
+    public function testSerializeObjectShouldBeOK(): void
+    {
+        $object = new stdClass();
+
+        $data = '';
+        $this->serializer->expects($this->once())
+            ->method('serialize')
+            ->with($object)
+            ->willReturn($data);
+
+        $this->logger->expects($this->never())->method('error');
+
+        $result = $this->serializerService->serializeObject($object);
+        $this->assertEquals($data, $result);
     }
 }

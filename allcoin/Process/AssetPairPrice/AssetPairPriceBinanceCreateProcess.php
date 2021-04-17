@@ -79,7 +79,7 @@ class AssetPairPriceBinanceCreateProcess implements ProcessInterface
      * @return AssetPair[]
      * @throws AssetPairPriceBinanceCreateException
      */
-    public function getAssetPairs(string $assetId): array
+    private function getAssetPairs(string $assetId): array
     {
         try {
             return $this->assetPairRepository->findAllByAssetId($assetId);

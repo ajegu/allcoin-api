@@ -128,4 +128,23 @@ class ItemManager implements ItemManagerInterface
 
         return $itemManager->fetchAllOnLSI($partitionKey, $lsiKeyName, $lsiKey);
     }
+
+    /**
+     * @param string $partitionKey
+     * @param string $start
+     * @param string $end
+     * @return array
+     * @throws ItemReadException
+     */
+    public function fetchAllBetween(string $partitionKey, string $start, string $end): array
+    {
+        $itemManager = new ItemReadManager(
+            $this->dynamoDbClient,
+            $this->marshalerService,
+            $this->logger,
+            $this->tableName
+        );
+
+        return $itemManager->fetchAllBetween($partitionKey, $start, $end);
+    }
 }

@@ -30,6 +30,7 @@
             <directory suffix=".php">allcoin/Dto</directory>
             <directory suffix=".php">allcoin/Model</directory>
             <directory suffix=".php">allcoin/Exception</directory>
+            <directory suffix=".php">allcoin/Notification/Event</directory>
         </exclude>
     </coverage>
     <php>
@@ -37,5 +38,6 @@
         <env name="AWS_SECRET_ACCESS_KEY" value="test"/>
         <env name="AWS_DEFAULT_REGION" value="test"/>
         <env name="AWS_DDB_TABLE_NAME" value="test"/>
+        <env name="AWS_SNS_TOPIC_PRICE_ANALYZER_ARN" value="test"/>
     </php>
 </phpunit>

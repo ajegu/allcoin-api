@@ -115,6 +115,34 @@ class ItemReadManager
     }
 
     /**
+     * @param string $partitionKey
+     * @param string $start
+     * @param string $end
+     * @return array
+     * @throws ItemReadException
+     */
+    public function fetchAllBetween(string $partitionKey, string $start, string $end): array
+    {
+        $partitionKeyValue = $this->marshalValueForReadOperation($partitionKey);
+        $startValue = $this->marshalValueForReadOperation($start);
+        $endValue = $this->marshalValueForReadOperation($end);
+
+        $query = [
+            'TableName' => $this->tableName,
+            'KeyConditionExpression' =>
+                ItemManager::PARTITION_KEY_NAME . ' = :partitionKeyValue and ' . ItemManager::SORT_KEY_NAME . ' BETWEEN :startValue AND :endValue',
+            'ExpressionAttributeValues' => [
+                ':partitionKeyValue' => $partitionKeyValue,
+                ':startValue' => $startValue,
+                ':endValue' => $endValue,
+            ]
+        ];
+
+        return $this->executeFetchAllQuery($query);
+    }
+
+
+    /**
      * @param array $query
      * @return Result
      * @throws ItemReadException

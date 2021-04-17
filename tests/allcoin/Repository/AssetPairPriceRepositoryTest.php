@@ -4,6 +4,7 @@
 namespace Test\AllCoin\Repository;
 
 
+use AllCoin\Database\DynamoDb\Exception\ItemReadException;
 use AllCoin\Database\DynamoDb\Exception\ItemSaveException;
 use AllCoin\Database\DynamoDb\ItemManagerInterface;
 use AllCoin\Model\AssetPair;
@@ -83,5 +84,34 @@ class AssetPairPriceRepositoryTest extends TestCase
             );
 
         $this->assetPairPriceRepository->save($assetPairPrice);
+    }
+
+    /**
+     * @throws ItemReadException
+     */
+    public function testFindAllByDateRangeShouldBeOK(): void
+    {
+        $assetPairId = 'foo';
+        $start = new DateTime();
+        $end = new DateTime();
+
+        $item = [];
+        $items = [$item];
+
+        $this->itemManager->expects($this->once())
+            ->method('fetchAllBetween')
+            ->with(
+                ClassMappingEnum::CLASS_MAPPING[AssetPairPrice::class] . '_' . $assetPairId,
+                (string)$start->getTimestamp(),
+                (string)$end->getTimestamp()
+            )
+            ->willReturn($items);
+
+        $this->serializerService->expects($this->once())
+            ->method('deserializeToModel')
+            ->with($item, AssetPairPrice::class)
+            ->willReturn($this->createMock(AssetPairPrice::class));
+
+        $this->assetPairPriceRepository->findAllByDateRange($assetPairId, $start, $end);
     }
 }
