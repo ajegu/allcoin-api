@@ -4,6 +4,7 @@
 namespace AllCoin\Process\AssetPair;
 
 
+use AllCoin\Builder\AssetPairBuilder;
 use AllCoin\Database\DynamoDb\Exception\ItemSaveException;
 use AllCoin\DataMapper\AssetPairMapper;
 use AllCoin\Dto\AssetPairRequestDto;
@@ -11,12 +12,9 @@ use AllCoin\Dto\AssetPairResponseDto;
 use AllCoin\Dto\RequestDtoInterface;
 use AllCoin\Dto\ResponseDtoInterface;
 use AllCoin\Exception\AssetPair\AssetPairCreateException;
-use AllCoin\Model\AssetPair;
 use AllCoin\Process\ProcessInterface;
 use AllCoin\Repository\AssetPairRepositoryInterface;
 use AllCoin\Repository\AssetRepositoryInterface;
-use AllCoin\Service\DateTimeService;
-use AllCoin\Service\UuidService;
 use JetBrains\PhpStorm\Pure;
 use Psr\Log\LoggerInterface;
 
@@ -26,9 +24,8 @@ class AssetPairCreateProcess extends AbstractAssetPairProcess implements Process
         protected AssetRepositoryInterface $assetRepository,
         protected AssetPairRepositoryInterface $assetPairRepository,
         protected LoggerInterface $logger,
-        private UuidService $uuidService,
-        private DateTimeService $dateTimeService,
-        protected AssetPairMapper $assetPairMapper
+        protected AssetPairMapper $assetPairMapper,
+        private AssetPairBuilder $assetPairBuilder
     )
     {
         parent::__construct(
@@ -50,12 +47,7 @@ class AssetPairCreateProcess extends AbstractAssetPairProcess implements Process
         $assetId = $this->getAssetId($params, AssetPairCreateException::class);
         $asset = $this->getAsset($assetId, AssetPairCreateException::class);
 
-        $assetPair = new AssetPair(
-            id: $this->uuidService->generateUuid(),
-            name: $dto->getName(),
-            createdAt: $this->dateTimeService->now()
-        );
-        $assetPair->setAsset($asset);
+        $assetPair = $this->assetPairBuilder->build($asset, $dto->getName());
 
         try {
             $this->assetPairRepository->save($assetPair);

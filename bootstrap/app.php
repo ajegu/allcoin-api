@@ -82,6 +82,7 @@ $app->register(App\Providers\DynamoDbServiceProvider::class);
 $app->register(App\Providers\SerializerServiceProvider::class);
 $app->register(App\Providers\RepositoryServiceProvider::class);
 $app->register(App\Providers\EventServiceProvider::class);
+$app->register(App\Providers\HttpClientServiceProvider::class);
 
 /*
 |--------------------------------------------------------------------------

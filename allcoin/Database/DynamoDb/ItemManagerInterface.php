@@ -57,4 +57,13 @@ interface ItemManagerInterface
      * @throws ItemReadException
      */
     public function fetchAllBetween(string $partitionKey, string $start, string $end): array;
+
+    /**
+     * @param string $partitionKey
+     * @param string $lsiKeyName
+     * @param string $lsiKey
+     * @return array
+     * @throws ItemReadException
+     */
+    public function fetchOneOnLSI(string $partitionKey, string $lsiKeyName, string $lsiKey): array;
 }

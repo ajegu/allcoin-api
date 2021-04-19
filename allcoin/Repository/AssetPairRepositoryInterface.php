@@ -37,4 +37,5 @@ interface AssetPairRepositoryInterface
      * @throws ItemDeleteException
      */
     public function delete(string $assetPairId): void;
+
 }
