@@ -69,7 +69,11 @@ class AssetPairPriceAnalyzerProcess implements ProcessInterface
                 $newPrice = $prices[count($prices) - 1];
 
                 $evolution = $newPrice->getAskPrice() - $oldPrice->getAskPrice();
-                $percent = round($evolution / $newPrice->getAskPrice() * 100, 2);
+
+                $percent = 0;
+                if ($newPrice->getAskPrice() > 0) {
+                    $percent = round($evolution / $newPrice->getAskPrice() * 100, 2);
+                }
 
                 $this->logger->debug(
                     "{$asset->getName()}{$assetPair->getName()} $percent%",
