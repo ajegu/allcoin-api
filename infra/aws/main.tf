@@ -10,7 +10,6 @@ module "binance_price" {
     app_timezone = var.app_timezone
     log_channel = var.log_channel
     dynamodb_table_name = var.dynamodb_table_name
-    app_version = var.app_version
 }
 
 module "price_analyser" {
@@ -20,5 +19,4 @@ module "price_analyser" {
     app_timezone = var.app_timezone
     log_channel = var.log_channel
     dynamodb_table_name = var.dynamodb_table_name
-    app_version = var.app_version
 }

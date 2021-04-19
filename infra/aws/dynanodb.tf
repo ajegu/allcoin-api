@@ -12,8 +12,8 @@ resource "aws_dynamodb_table" "allcoin" {
     hash_key = local.hash_key
     range_key = local.range_key
     name = var.dynamodb_table_name
-    read_capacity = 1
-    write_capacity = 1
+    read_capacity = 5
+    write_capacity = 5
 
     point_in_time_recovery {
         enabled = true

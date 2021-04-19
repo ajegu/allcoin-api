@@ -1,7 +1,7 @@
-resource "aws_lambda_function" "binance_price" {
+resource "aws_lambda_function" "price_analyzer" {
     function_name = "${var.app_name}${var.lambda_name}Lambda"
-    handler = "lambda/get_binance_price.php"
-    role = aws_iam_role.binance_price.arn
+    handler = "lambda/price_analyzer.php"
+    role = aws_iam_role.price_analyzer.arn
     runtime = "provided.al2"
     layers = [
         "arn:aws:lambda:eu-west-3:209497400698:layer:php-80:8"
@@ -11,7 +11,7 @@ resource "aws_lambda_function" "binance_price" {
             AWS_DDB_TABLE_NAME = var.dynamodb_table_name
             LOG_CHANNEL = var.log_channel
             APP_TIMEZONE = var.app_timezone
-            AWS_SNS_TOPIC_PRICE_ANALYZER_ARN = var.AWS_SNS_TOPIC_PRICE_ANALYZER_ARN
+            AWS_SNS_TOPIC_PRICE_ANALYZER_ARN = aws_sns_topic.price_analyzer.arn
         }
     }
     s3_bucket = "allcoin-api-deployment"
@@ -19,16 +19,16 @@ resource "aws_lambda_function" "binance_price" {
     source_code_hash = base64sha256("allcoin")
 
     depends_on = [
-        aws_iam_role.binance_price,
-        aws_cloudwatch_event_rule.binance_price,
+        aws_iam_role.price_analyzer,
+        aws_cloudwatch_event_rule.price_analyzer,
     ]
 
     timeout = 900
 }
 
-resource "aws_lambda_permission" "binance_price" {
+resource "aws_lambda_permission" "price_analyzer" {
     action = "lambda:InvokeFunction"
-    function_name = aws_lambda_function.binance_price.function_name
+    function_name = aws_lambda_function.price_analyzer.function_name
     principal = "events.amazonaws.com"
-    source_arn = aws_cloudwatch_event_rule.binance_price.arn
+    source_arn = aws_cloudwatch_event_rule.price_analyzer.arn
 }
