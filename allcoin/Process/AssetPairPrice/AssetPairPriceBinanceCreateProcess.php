@@ -42,14 +42,26 @@ class AssetPairPriceBinanceCreateProcess implements ProcessInterface
     {
         $assets = $this->getAssets();
 
+        $this->logger->debug(
+            count($assets) . ' found for get price'
+        );
+
         foreach ($assets as $asset) {
+
+            $assetName = $asset->getName();
+            $this->logger->debug("Get pair for asset {$assetName}");
+
             $assetPairs = $this->getAssetPairs($asset->getId());
 
             foreach ($assetPairs as $assetPair) {
-                $symbol = strtoupper($asset->getName() . $assetPair->getName());
+                $symbol = strtoupper($assetName . $assetPair->getName());
+                $this->logger->debug("Get price for symbol {$symbol}");
                 if ($assetPairPrice = $this->getAssetPairPrice($symbol)) {
                     $assetPairPrice->setAssetPair($assetPair);
                     $this->save($assetPairPrice);
+                    $this->logger->debug("New price saved!");
+                } else {
+                    $this->logger->debug("No price found!");
                 }
             }
         }
