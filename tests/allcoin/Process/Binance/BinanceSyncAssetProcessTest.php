@@ -124,8 +124,8 @@ class BinanceSyncAssetProcessTest extends TestCase
         $symbols = [
             'data' => [
                 [
-                    'base' => 'foo',
-                    'quote' => 'bar'
+                    'b' => 'foo',
+                    'q' => 'bar'
                 ]
             ]
         ];
@@ -167,8 +167,8 @@ class BinanceSyncAssetProcessTest extends TestCase
         $symbols = [
             'data' => [
                 [
-                    'base' => $assetName,
-                    'quote' => $assetPairName
+                    'b' => $assetName,
+                    'q' => $assetPairName
                 ]
             ]
         ];
@@ -216,8 +216,8 @@ class BinanceSyncAssetProcessTest extends TestCase
         $symbols = [
             'data' => [
                 [
-                    'base' => $assetName,
-                    'quote' => $assetPairName
+                    'b' => $assetName,
+                    'q' => $assetPairName
                 ]
             ]
         ];
@@ -273,8 +273,8 @@ class BinanceSyncAssetProcessTest extends TestCase
         $symbols = [
             'data' => [
                 [
-                    'base' => $assetName,
-                    'quote' => $assetPairName
+                    'b' => $assetName,
+                    'q' => $assetPairName
                 ]
             ]
         ];
@@ -336,8 +336,8 @@ class BinanceSyncAssetProcessTest extends TestCase
         $symbols = [
             'data' => [
                 [
-                    'base' => $assetName,
-                    'quote' => $assetPairName
+                    'b' => $assetName,
+                    'q' => $assetPairName
                 ]
             ]
         ];
@@ -413,8 +413,8 @@ class BinanceSyncAssetProcessTest extends TestCase
         $symbols = [
             'data' => [
                 [
-                    'base' => $assetName,
-                    'quote' => $assetPairName
+                    'b' => $assetName,
+                    'q' => $assetPairName
                 ]
             ]
         ];
@@ -488,8 +488,8 @@ class BinanceSyncAssetProcessTest extends TestCase
         $symbols = [
             'data' => [
                 [
-                    'base' => $assetName,
-                    'quote' => $assetPairName
+                    'b' => $assetName,
+                    'q' => $assetPairName
                 ]
             ]
         ];

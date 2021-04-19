@@ -25,7 +25,7 @@ use Psr\Log\LoggerInterface;
 
 class BinanceSyncAssetProcess implements ProcessInterface
 {
-    const BINANCE_URI = 'https://www.binance.com/bapi/margin/v1/public/margin/symbols';
+    const BINANCE_URI = 'https://www.binance.com/bapi/asset/v2/public/asset-service/product/get-products?includeEtf=true';
 
     const NEEDED_ASSET_PAIRS = ['USDT'];
 
@@ -68,8 +68,8 @@ class BinanceSyncAssetProcess implements ProcessInterface
             $result = json_decode($response->getBody(), true);
 
             foreach ($result['data'] as $symbol) {
-                $assetName = $symbol['base'];
-                $assetPairName = $symbol['quote'];
+                $assetName = $symbol['b'];
+                $assetPairName = $symbol['q'];
 
                 if (!in_array($assetPairName, self::NEEDED_ASSET_PAIRS)) {
                     continue;
