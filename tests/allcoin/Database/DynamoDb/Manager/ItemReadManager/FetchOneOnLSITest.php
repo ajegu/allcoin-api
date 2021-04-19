@@ -15,7 +15,7 @@ use Aws\Result;
 use Psr\Log\LoggerInterface;
 use Test\TestCase;
 
-class FetchOneTest extends TestCase
+class FetchOneOnLSITest extends TestCase
 {
     private ItemManager $itemManager;
 
@@ -38,10 +38,11 @@ class FetchOneTest extends TestCase
         );
     }
 
-    public function testFetchOneWithMarshalValueErrorShouldThrowException(): void
+    public function testFetchOneOnLSIWithMarshalValueErrorShouldThrowException(): void
     {
         $partitionKey = 'foo';
-        $sortKey = 'foo';
+        $lsiKeyName = ItemManager::LSI_1;
+        $lsiKey = 'baz';
 
         $this->marshalerService->expects($this->once())
             ->method('marshalValue')
@@ -57,27 +58,29 @@ class FetchOneTest extends TestCase
             ->method('__call');
         $this->marshalerService->expects($this->never())->method('unmarshalItem');
 
-        $this->itemManager->fetchOne($partitionKey, $sortKey);
+        $this->itemManager->fetchOneOnLSI($partitionKey, $lsiKeyName, $lsiKey);
     }
 
-    public function testFetchOneWithDynamoDdQueryErrorShouldThrowException(): void
+    public function testFetchOneOnLSIWithDynamoDdQueryErrorShouldThrowException(): void
     {
         $partitionKey = 'foo';
-        $sortKey = 'bar';
+        $lsiKeyName = ItemManager::LSI_1;
+        $lsiKey = 'baz';
 
-        $marshaledPartitionKey = ['foo' => 'bar'];
-        $marshaledSortKey = ['bar' => 'foo'];
+        $partitionKeyValue = ['S' => $partitionKey];
+        $lsiKeyValue = ['S' => $lsiKey];
         $this->marshalerService->expects($this->exactly(2))
             ->method('marshalValue')
-            ->withConsecutive([$partitionKey], [$sortKey])
-            ->willReturn($marshaledPartitionKey, $marshaledSortKey);
+            ->withConsecutive([$partitionKey], [$lsiKey])
+            ->willReturn($partitionKeyValue, $lsiKeyValue);
 
         $query = [
             'TableName' => $this->tableName,
-            'KeyConditionExpression' => ItemManager::PARTITION_KEY_NAME . ' = :partitionKeyValue and ' . ItemManager::SORT_KEY_NAME . ' = :sortKeyValue',
+            'IndexName' => ItemManager::LSI_INDEXES[$lsiKeyName],
+            'KeyConditionExpression' => ItemManager::PARTITION_KEY_NAME . ' = :partitionKeyValue and ' . $lsiKeyName . ' = :lsiKeyValue',
             'ExpressionAttributeValues' => [
-                ':partitionKeyValue' => $marshaledPartitionKey,
-                ':sortKeyValue' => $marshaledSortKey
+                ':partitionKeyValue' => $partitionKeyValue,
+                ':lsiKeyValue' => $lsiKeyValue
             ]
         ];
 
@@ -93,30 +96,32 @@ class FetchOneTest extends TestCase
 
         $this->marshalerService->expects($this->never())->method('unmarshalItem');
 
-        $this->itemManager->fetchOne($partitionKey, $sortKey);
+        $this->itemManager->fetchOneOnLSI($partitionKey, $lsiKeyName, $lsiKey);
     }
 
     /**
      * @throws ItemReadException
      */
-    public function testFetchOneWithNoItemShouldThrowException(): void
+    public function testFetchOneOnLSIWithNoItemShouldThrowException(): void
     {
         $partitionKey = 'foo';
-        $sortKey = 'bar';
+        $lsiKeyName = ItemManager::LSI_1;
+        $lsiKey = 'baz';
 
-        $marshaledPartitionKey = ['foo' => 'bar'];
-        $marshaledSortKey = ['bar' => 'foo'];
+        $partitionKeyValue = ['S' => $partitionKey];
+        $lsiKeyValue = ['S' => $lsiKey];
         $this->marshalerService->expects($this->exactly(2))
             ->method('marshalValue')
-            ->withConsecutive([$partitionKey], [$sortKey])
-            ->willReturn($marshaledPartitionKey, $marshaledSortKey);
+            ->withConsecutive([$partitionKey], [$lsiKey])
+            ->willReturn($partitionKeyValue, $lsiKeyValue);
 
         $query = [
             'TableName' => $this->tableName,
-            'KeyConditionExpression' => ItemManager::PARTITION_KEY_NAME . ' = :partitionKeyValue and ' . ItemManager::SORT_KEY_NAME . ' = :sortKeyValue',
+            'IndexName' => ItemManager::LSI_INDEXES[$lsiKeyName],
+            'KeyConditionExpression' => ItemManager::PARTITION_KEY_NAME . ' = :partitionKeyValue and ' . $lsiKeyName . ' = :lsiKeyValue',
             'ExpressionAttributeValues' => [
-                ':partitionKeyValue' => $marshaledPartitionKey,
-                ':sortKeyValue' => $marshaledSortKey
+                ':partitionKeyValue' => $partitionKeyValue,
+                ':lsiKeyValue' => $lsiKeyValue
             ]
         ];
 
@@ -135,27 +140,29 @@ class FetchOneTest extends TestCase
         $this->logger->expects($this->never())->method('error');
         $this->marshalerService->expects($this->never())->method('unmarshalItem');
 
-        $this->itemManager->fetchOne($partitionKey, $sortKey);
+        $this->itemManager->fetchOneOnLSI($partitionKey, $lsiKeyName, $lsiKey);
     }
 
-    public function testFetchOneWithItemCountErrorShouldThrowException(): void
+    public function testFetchOneOnLSIWithItemCountErrorShouldThrowException(): void
     {
         $partitionKey = 'foo';
-        $sortKey = 'bar';
+        $lsiKeyName = ItemManager::LSI_1;
+        $lsiKey = 'baz';
 
-        $marshaledPartitionKey = ['foo' => 'bar'];
-        $marshaledSortKey = ['bar' => 'foo'];
+        $partitionKeyValue = ['S' => $partitionKey];
+        $lsiKeyValue = ['S' => $lsiKey];
         $this->marshalerService->expects($this->exactly(2))
             ->method('marshalValue')
-            ->withConsecutive([$partitionKey], [$sortKey])
-            ->willReturn($marshaledPartitionKey, $marshaledSortKey);
+            ->withConsecutive([$partitionKey], [$lsiKey])
+            ->willReturn($partitionKeyValue, $lsiKeyValue);
 
         $query = [
             'TableName' => $this->tableName,
-            'KeyConditionExpression' => ItemManager::PARTITION_KEY_NAME . ' = :partitionKeyValue and ' . ItemManager::SORT_KEY_NAME . ' = :sortKeyValue',
+            'IndexName' => ItemManager::LSI_INDEXES[$lsiKeyName],
+            'KeyConditionExpression' => ItemManager::PARTITION_KEY_NAME . ' = :partitionKeyValue and ' . $lsiKeyName . ' = :lsiKeyValue',
             'ExpressionAttributeValues' => [
-                ':partitionKeyValue' => $marshaledPartitionKey,
-                ':sortKeyValue' => $marshaledSortKey
+                ':partitionKeyValue' => $partitionKeyValue,
+                ':lsiKeyValue' => $lsiKeyValue
             ]
         ];
 
@@ -177,27 +184,29 @@ class FetchOneTest extends TestCase
 
         $this->marshalerService->expects($this->never())->method('unmarshalItem');
 
-        $this->itemManager->fetchOne($partitionKey, $sortKey);
+        $this->itemManager->fetchOneOnLSI($partitionKey, $lsiKeyName, $lsiKey);
     }
 
-    public function testFetchOneWithMarshalItemErrorShouldThrowException(): void
+    public function testFetchOneOnLSIWithMarshalItemErrorShouldThrowException(): void
     {
         $partitionKey = 'foo';
-        $sortKey = 'bar';
+        $lsiKeyName = ItemManager::LSI_1;
+        $lsiKey = 'baz';
 
-        $marshaledPartitionKey = ['foo' => 'bar'];
-        $marshaledSortKey = ['bar' => 'foo'];
+        $partitionKeyValue = ['S' => $partitionKey];
+        $lsiKeyValue = ['S' => $lsiKey];
         $this->marshalerService->expects($this->exactly(2))
             ->method('marshalValue')
-            ->withConsecutive([$partitionKey], [$sortKey])
-            ->willReturn($marshaledPartitionKey, $marshaledSortKey);
+            ->withConsecutive([$partitionKey], [$lsiKey])
+            ->willReturn($partitionKeyValue, $lsiKeyValue);
 
         $query = [
             'TableName' => $this->tableName,
-            'KeyConditionExpression' => ItemManager::PARTITION_KEY_NAME . ' = :partitionKeyValue and ' . ItemManager::SORT_KEY_NAME . ' = :sortKeyValue',
+            'IndexName' => ItemManager::LSI_INDEXES[$lsiKeyName],
+            'KeyConditionExpression' => ItemManager::PARTITION_KEY_NAME . ' = :partitionKeyValue and ' . $lsiKeyName . ' = :lsiKeyValue',
             'ExpressionAttributeValues' => [
-                ':partitionKeyValue' => $marshaledPartitionKey,
-                ':sortKeyValue' => $marshaledSortKey
+                ':partitionKeyValue' => $partitionKeyValue,
+                ':lsiKeyValue' => $lsiKeyValue
             ]
         ];
 
@@ -222,30 +231,32 @@ class FetchOneTest extends TestCase
 
         $this->expectException(ItemReadException::class);
 
-        $this->itemManager->fetchOne($partitionKey, $sortKey);
+        $this->itemManager->fetchOneOnLSI($partitionKey, $lsiKeyName, $lsiKey);
     }
 
     /**
      * @throws ItemReadException
      */
-    public function testFetchOneShouldBeOK(): void
+    public function testFetchOneOnLSIShouldBeOK(): void
     {
         $partitionKey = 'foo';
-        $sortKey = 'bar';
+        $lsiKeyName = ItemManager::LSI_1;
+        $lsiKey = 'baz';
 
-        $marshaledPartitionKey = ['foo' => 'bar'];
-        $marshaledSortKey = ['bar' => 'foo'];
+        $partitionKeyValue = ['S' => $partitionKey];
+        $lsiKeyValue = ['S' => $lsiKey];
         $this->marshalerService->expects($this->exactly(2))
             ->method('marshalValue')
-            ->withConsecutive([$partitionKey], [$sortKey])
-            ->willReturn($marshaledPartitionKey, $marshaledSortKey);
+            ->withConsecutive([$partitionKey], [$lsiKey])
+            ->willReturn($partitionKeyValue, $lsiKeyValue);
 
         $query = [
             'TableName' => $this->tableName,
-            'KeyConditionExpression' => ItemManager::PARTITION_KEY_NAME . ' = :partitionKeyValue and ' . ItemManager::SORT_KEY_NAME . ' = :sortKeyValue',
+            'IndexName' => ItemManager::LSI_INDEXES[$lsiKeyName],
+            'KeyConditionExpression' => ItemManager::PARTITION_KEY_NAME . ' = :partitionKeyValue and ' . $lsiKeyName . ' = :lsiKeyValue',
             'ExpressionAttributeValues' => [
-                ':partitionKeyValue' => $marshaledPartitionKey,
-                ':sortKeyValue' => $marshaledSortKey
+                ':partitionKeyValue' => $partitionKeyValue,
+                ':lsiKeyValue' => $lsiKeyValue
             ]
         ];
 
@@ -268,7 +279,7 @@ class FetchOneTest extends TestCase
         $this->logger->expects($this->never())
             ->method('error');
 
-        $this->itemManager->fetchOne($partitionKey, $sortKey);
+        $this->itemManager->fetchOneOnLSI($partitionKey, $lsiKeyName, $lsiKey);
     }
 
 }

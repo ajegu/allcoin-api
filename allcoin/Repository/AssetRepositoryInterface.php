@@ -36,4 +36,18 @@ interface AssetRepositoryInterface
      * @throws ItemDeleteException
      */
     public function delete(string $assetId);
+
+    /**
+     * @param string $assetName
+     * @return Asset|ModelInterface
+     * @throws ItemReadException
+     */
+    public function findOneByName(string $assetName): Asset|ModelInterface;
+
+    /**
+     * @param string $assetName
+     * @return Asset|ModelInterface|null;
+     * @throws ItemReadException
+     */
+    public function existsByName(string $assetName): Asset|ModelInterface|null;
 }

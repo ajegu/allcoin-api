@@ -4,6 +4,7 @@
 namespace AllCoin\Database\DynamoDb\Manager;
 
 
+use AllCoin\Database\DynamoDb\Exception\ItemNotFoundException;
 use AllCoin\Database\DynamoDb\Exception\ItemReadException;
 use AllCoin\Database\DynamoDb\Exception\MarshalerException;
 use AllCoin\Database\DynamoDb\ItemManager;
@@ -63,30 +64,7 @@ class ItemReadManager
             ]
         ];
 
-        $result = $this->queryForReadOperation($query);
-
-        $items = $result->get('Items');
-        if (count($items) <> 1) {
-            $message = 'The method fetchOne cannot read the result output';
-            $this->logger->error($message, [
-                'items' => $items
-            ]);
-            throw new ItemReadException($message);
-        }
-
-        $rawItem = $items[0];
-        try {
-            $item = $this->marshalerService->unmarshalItem($rawItem);
-        } catch (MarshalerException $exception) {
-            $message = 'Cannot unmarshal the item.';
-            $this->logger->error($message, [
-                'exception' => $exception->getMessage(),
-                'item' => $rawItem
-            ]);
-            throw new ItemReadException($message);
-        }
-
-        return $this->denormalize($item);
+        return $this->executeFetchOneQuery($query);
     }
 
     /**
@@ -139,6 +117,31 @@ class ItemReadManager
         ];
 
         return $this->executeFetchAllQuery($query);
+    }
+
+    /**
+     * @param string $partitionKey
+     * @param string $lsiKeyName
+     * @param string $lsiKey
+     * @return array
+     * @throws ItemReadException
+     */
+    public function fetchOneOnLSI(string $partitionKey, string $lsiKeyName, string $lsiKey): array
+    {
+        $partitionKeyValue = $this->marshalValueForReadOperation($partitionKey);
+        $lsiKeyValue = $this->marshalValueForReadOperation($lsiKey);
+
+        $query = [
+            'TableName' => $this->tableName,
+            'IndexName' => ItemManager::LSI_INDEXES[$lsiKeyName],
+            'KeyConditionExpression' => ItemManager::PARTITION_KEY_NAME . ' = :partitionKeyValue and ' . $lsiKeyName . ' = :lsiKeyValue',
+            'ExpressionAttributeValues' => [
+                ':partitionKeyValue' => $partitionKeyValue,
+                ':lsiKeyValue' => $lsiKeyValue
+            ]
+        ];
+
+        return $this->executeFetchOneQuery($query);
     }
 
 
@@ -217,5 +220,43 @@ class ItemReadManager
             ]);
             throw new ItemReadException($message);
         }
+    }
+
+    /**
+     * @param array $query
+     * @return array
+     * @throws ItemReadException
+     */
+    private function executeFetchOneQuery(array $query): array
+    {
+        $result = $this->queryForReadOperation($query);
+
+        $items = $result->get('Items');
+
+        if (count($items) === 0) {
+            throw new ItemNotFoundException('The item cannot be found!');
+        }
+
+        if (count($items) > 1) {
+            $message = 'The method fetchOne cannot read the result output';
+            $this->logger->error($message, [
+                'items' => $items
+            ]);
+            throw new ItemReadException($message);
+        }
+
+        $rawItem = $items[0];
+        try {
+            $item = $this->marshalerService->unmarshalItem($rawItem);
+        } catch (MarshalerException $exception) {
+            $message = 'Cannot unmarshal the item.';
+            $this->logger->error($message, [
+                'exception' => $exception->getMessage(),
+                'item' => $rawItem
+            ]);
+            throw new ItemReadException($message);
+        }
+
+        return $this->denormalize($item);
     }
 }

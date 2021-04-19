@@ -4,17 +4,15 @@
 namespace AllCoin\Process\Asset;
 
 
+use AllCoin\Builder\AssetBuilder;
 use AllCoin\Database\DynamoDb\Exception\ItemSaveException;
 use AllCoin\DataMapper\AssetMapper;
 use AllCoin\Dto\AssetRequestDto;
 use AllCoin\Dto\RequestDtoInterface;
 use AllCoin\Dto\ResponseDtoInterface;
 use AllCoin\Exception\Asset\AssetCreateException;
-use AllCoin\Model\Asset;
 use AllCoin\Process\ProcessInterface;
 use AllCoin\Repository\AssetRepositoryInterface;
-use AllCoin\Service\DateTimeService;
-use AllCoin\Service\UuidService;
 use Psr\Log\LoggerInterface;
 
 class AssetCreateProcess implements ProcessInterface
@@ -23,8 +21,7 @@ class AssetCreateProcess implements ProcessInterface
         private AssetRepositoryInterface $assetRepository,
         private LoggerInterface $logger,
         private AssetMapper $assetMapper,
-        private DateTimeService $dateTimeService,
-        private UuidService $uuidService
+        private AssetBuilder $assetBuilder
     )
     {
     }
@@ -37,11 +34,7 @@ class AssetCreateProcess implements ProcessInterface
      */
     public function handle(RequestDtoInterface $dto = null, array $params = []): ResponseDtoInterface
     {
-        $asset = new Asset(
-            id: $this->uuidService->generateUuid(),
-            name: $dto->getName(),
-            createdAt: $this->dateTimeService->now()
-        );
+        $asset = $this->assetBuilder->build($dto->getName());
 
         try {
             $this->assetRepository->save($asset);
