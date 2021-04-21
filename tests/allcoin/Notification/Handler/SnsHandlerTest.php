@@ -5,7 +5,7 @@ namespace Test\AllCoin\Notification\Handler;
 
 
 use AllCoin\Exception\NotificationHandlerException;
-use AllCoin\Notification\Event\EventInterface;
+use AllCoin\Model\EventInterface;
 use AllCoin\Notification\Handler\SnsHandler;
 use AllCoin\Service\SerializerService;
 use Aws\Sns\Exception\SnsException;

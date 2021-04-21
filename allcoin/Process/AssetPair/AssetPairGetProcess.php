@@ -15,7 +15,6 @@ class AssetPairGetProcess extends AbstractAssetPairProcess implements ProcessInt
      * @param RequestDtoInterface|null $dto
      * @param array $params
      * @return ResponseDtoInterface|null
-     * @throws AssetPairGetException
      */
     public function handle(RequestDtoInterface $dto = null, array $params = []): ?ResponseDtoInterface
     {

@@ -5,6 +5,7 @@ namespace App\Providers;
 
 
 use Illuminate\Support\ServiceProvider;
+use Symfony\Component\PropertyInfo\Extractor\ReflectionExtractor;
 use Symfony\Component\Serializer\Encoder\JsonEncoder;
 use Symfony\Component\Serializer\Normalizer\DateTimeNormalizer;
 use Symfony\Component\Serializer\Normalizer\NormalizerInterface;
@@ -18,13 +19,13 @@ class SerializerServiceProvider extends ServiceProvider
     {
         $this->app->singleton(SerializerInterface::class, function () {
             $encoders = [new JsonEncoder()];
-            $normalizers = [new DateTimeNormalizer(), new ObjectNormalizer()];
+            $normalizers = [new DateTimeNormalizer(), new ObjectNormalizer(null, null, null, new ReflectionExtractor())];
 
             return new Serializer($normalizers, $encoders);
         });
 
         $this->app->singleton(NormalizerInterface::class, function () {
-            $normalizers = [new DateTimeNormalizer(), new ObjectNormalizer()];
+            $normalizers = [new DateTimeNormalizer(), new ObjectNormalizer(null, null, null, new ReflectionExtractor())];
 
             return new Serializer($normalizers, []);
         });

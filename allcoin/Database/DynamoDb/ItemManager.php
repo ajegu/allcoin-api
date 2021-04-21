@@ -19,9 +19,17 @@ class ItemManager implements ItemManagerInterface
     const SORT_KEY_NAME = 'sk';
 
     const LSI_1 = 'lsi1';
+    const LSI_2 = 'lsi2';
+    const LSI_3 = 'lsi3';
+    const LSI_4 = 'lsi4';
+    const LSI_5 = 'lsi5';
 
     const LSI_INDEXES = [
-        self::LSI_1 => 'lsi1'
+        self::LSI_1 => 'lsi1',
+        self::LSI_2 => 'lsi2',
+        self::LSI_3 => 'lsi3',
+        self::LSI_4 => 'lsi4',
+        self::LSI_5 => 'lsi5',
     ];
 
     /**

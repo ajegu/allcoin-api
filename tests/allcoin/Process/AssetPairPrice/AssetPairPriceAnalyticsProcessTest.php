@@ -4,15 +4,15 @@
 namespace Test\AllCoin\Process\AssetPairPrice;
 
 
+use AllCoin\Builder\EventPriceBuilder;
 use AllCoin\Database\DynamoDb\Exception\ItemReadException;
 use AllCoin\Exception\AssetPairPrice\AssetPairPriceAnalyzerException;
 use AllCoin\Exception\NotificationHandlerException;
 use AllCoin\Model\Asset;
 use AllCoin\Model\AssetPair;
 use AllCoin\Model\AssetPairPrice;
-use AllCoin\Notification\Builder\EventPriceBuilder;
-use AllCoin\Notification\Event\EventEnum;
-use AllCoin\Notification\Event\EventPrice;
+use AllCoin\Model\EventEnum;
+use AllCoin\Model\EventPrice;
 use AllCoin\Notification\Handler\PriceAnalyzerNotificationHandler;
 use AllCoin\Process\AssetPairPrice\AssetPairPriceAnalyzerProcess;
 use AllCoin\Repository\AssetPairPriceRepositoryInterface;

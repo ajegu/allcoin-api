@@ -1,14 +1,13 @@
 <?php
 
 
-namespace AllCoin\Notification\Event;
+namespace AllCoin\Model;
 
 
-use AllCoin\Model\Asset;
-use AllCoin\Model\AssetPair;
+use AllCoin\Dto\RequestDtoInterface;
 use DateTime;
 
-class EventPrice implements EventInterface
+class EventPrice implements EventInterface, RequestDtoInterface
 {
     public function __construct(
         private string $name,

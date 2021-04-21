@@ -1,7 +1,7 @@
 <?php
 
 
-namespace AllCoin\Notification\Event;
+namespace AllCoin\Model;
 
 
 class EventEnum
