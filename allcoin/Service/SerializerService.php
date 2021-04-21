@@ -7,7 +7,9 @@ namespace AllCoin\Service;
 use AllCoin\Dto\RequestDtoInterface;
 use AllCoin\Dto\ResponseDtoInterface;
 use AllCoin\Exception\SerializerException;
+use AllCoin\Model\EventInterface;
 use AllCoin\Model\ModelInterface;
+use Exception;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\Serializer\Exception\ExceptionInterface;
 use Symfony\Component\Serializer\Exception\RuntimeException;
@@ -77,8 +79,26 @@ class SerializerService
     {
         try {
             return $this->serializer->deserialize(json_encode($payload), $className, self::DEFAULT_FORMAT);
-        } catch (RuntimeException $exception) {
+        } catch (Exception $exception) {
             $this->logger->error('Cannot deserialize payload to model', [
+                'payload' => $payload,
+                'exception' => $exception->getMessage()
+            ]);
+            throw new SerializerException();
+        }
+    }
+
+    /**
+     * @param string $payload
+     * @param string $className
+     * @return EventInterface
+     */
+    public function deserializeToEvent(string $payload, string $className): EventInterface
+    {
+        try {
+            return $this->serializer->deserialize($payload, $className, self::DEFAULT_FORMAT);
+        } catch (RuntimeException $exception) {
+            $this->logger->error('Cannot deserialize payload to event', [
                 'payload' => $payload,
                 'exception' => $exception->getMessage()
             ]);

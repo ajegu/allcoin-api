@@ -1,13 +1,13 @@
 <?php
 
 
-namespace Test\AllCoin\Notification\Builder;
+namespace Test\AllCoin\Builder;
 
 
+use AllCoin\Builder\EventPriceBuilder;
 use AllCoin\Model\Asset;
 use AllCoin\Model\AssetPair;
 use AllCoin\Model\AssetPairPrice;
-use AllCoin\Notification\Builder\EventPriceBuilder;
 use DateTime;
 use Test\TestCase;
 

@@ -56,13 +56,9 @@ class AssetPairPriceBinanceCreateProcess implements ProcessInterface
             foreach ($assetPairs as $assetPair) {
                 $symbol = strtoupper($assetName . $assetPair->getName());
                 $this->logger->debug("Get price for symbol {$symbol}");
-                if ($assetPairPrice = $this->getAssetPairPrice($symbol)) {
-                    $assetPairPrice->setAssetPair($assetPair);
-                    $this->save($assetPairPrice);
-                    $this->logger->debug("New price saved!");
-                } else {
-                    $this->logger->debug("No price found!");
-                }
+                $assetPairPrice = $this->getAssetPairPrice($symbol);
+                $assetPairPrice->setAssetPair($assetPair);
+                $this->save($assetPairPrice);
             }
         }
 
@@ -107,10 +103,10 @@ class AssetPairPriceBinanceCreateProcess implements ProcessInterface
 
     /**
      * @param string $symbol
-     * @return AssetPairPrice|null
+     * @return AssetPairPrice
      * @throws AssetPairPriceBinanceCreateException
      */
-    private function getAssetPairPrice(string $symbol): ?AssetPairPrice
+    private function getAssetPairPrice(string $symbol): AssetPairPrice
     {
         try {
             $bookTicker = $this->client->getBookTicker(['symbol' => $symbol]);

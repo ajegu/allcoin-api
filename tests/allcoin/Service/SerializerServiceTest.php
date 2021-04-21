@@ -7,6 +7,7 @@ namespace Test\AllCoin\Service;
 use AllCoin\Dto\RequestDtoInterface;
 use AllCoin\Dto\ResponseDtoInterface;
 use AllCoin\Exception\SerializerException;
+use AllCoin\Model\EventInterface;
 use AllCoin\Model\ModelInterface;
 use AllCoin\Service\SerializerService;
 use Psr\Log\LoggerInterface;
@@ -141,6 +142,41 @@ class SerializerServiceTest extends TestCase
         $dto = $this->serializerService->deserializeToModel($payload, $className);
 
         $this->assertInstanceOf(ModelInterface::class, $dto);
+    }
+
+    public function testDeserializeToEventWithSerializerErrorShouldThrowException(): void
+    {
+        $payload = '';
+        $className = 'foo';
+
+        $this->serializer->expects($this->once())
+            ->method('deserialize')
+            ->with($payload, $className, SerializerService::DEFAULT_FORMAT)
+            ->willThrowException($this->createMock(RuntimeException::class));
+
+        $this->logger->expects($this->once())->method('error');
+
+        $this->expectException(SerializerException::class);
+
+        $this->serializerService->deserializeToEvent($payload, $className);
+    }
+
+    public function testDeserializeToEventShouldBeOK(): void
+    {
+        $payload = '';
+        $className = 'foo';
+
+        $dto = $this->createMock(EventInterface::class);
+        $this->serializer->expects($this->once())
+            ->method('deserialize')
+            ->with($payload, $className, SerializerService::DEFAULT_FORMAT)
+            ->willReturn($dto);
+
+        $this->logger->expects($this->never())->method('error');
+
+        $dto = $this->serializerService->deserializeToEvent($payload, $className);
+
+        $this->assertInstanceOf(EventInterface::class, $dto);
     }
 
     public function testNormalizeResponseDtoWithNormalizerErrorShouldThrowException(): void
