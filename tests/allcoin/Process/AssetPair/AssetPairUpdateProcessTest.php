@@ -147,6 +147,8 @@ class AssetPairUpdateProcessTest extends TestCase
         $params = ['assetId' => $assetId, 'id' => $id];
 
         $asset = $this->createMock(Asset::class);
+        $asset->expects($this->once())->method('getId')->willReturn($assetId);
+
         $this->assetRepository->expects($this->once())
             ->method('findOneById')
             ->with($assetId)
@@ -163,13 +165,12 @@ class AssetPairUpdateProcessTest extends TestCase
             ->method('now')
             ->willReturn($now);
 
-        $assetPair->expects($this->once())->method('setAsset')->with($asset);
         $assetPair->expects($this->once())->method('setName')->with($name);
         $assetPair->expects($this->once())->method('setUpdatedAt')->with($now);
 
         $this->assetPairRepository->expects($this->once())
             ->method('save')
-            ->with($assetPair)
+            ->with($assetPair, $assetId)
             ->willThrowException($this->createMock(ItemSaveException::class));
 
         $this->logger->expects($this->once())->method('error');
@@ -195,6 +196,8 @@ class AssetPairUpdateProcessTest extends TestCase
         $params = ['assetId' => $assetId, 'id' => $id];
 
         $asset = $this->createMock(Asset::class);
+        $asset->expects($this->once())->method('getId')->willReturn($assetId);
+
         $this->assetRepository->expects($this->once())
             ->method('findOneById')
             ->with($assetId)
@@ -211,13 +214,12 @@ class AssetPairUpdateProcessTest extends TestCase
             ->method('now')
             ->willReturn($now);
 
-        $assetPair->expects($this->once())->method('setAsset')->with($asset);
         $assetPair->expects($this->once())->method('setName')->with($name);
         $assetPair->expects($this->once())->method('setUpdatedAt')->with($now);
 
         $this->assetPairRepository->expects($this->once())
             ->method('save')
-            ->with($assetPair);
+            ->with($assetPair, $assetId);
 
         $this->assetPairMapper->expects($this->once())
             ->method('mapModelToResponseDto')

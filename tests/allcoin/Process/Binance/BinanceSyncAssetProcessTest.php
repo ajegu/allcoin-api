@@ -363,7 +363,7 @@ class BinanceSyncAssetProcessTest extends TestCase
 
         $asset = $this->createMock(Asset::class);
         $assetId = 'foo';
-        $asset->expects($this->once())->method('getId')->willReturn($assetId);
+        $asset->expects($this->exactly(2))->method('getId')->willReturn($assetId);
 
         $this->assetBuilder->expects($this->once())
             ->method('build')
@@ -389,7 +389,7 @@ class BinanceSyncAssetProcessTest extends TestCase
 
         $this->assetPairRepository->expects($this->once())
             ->method('save')
-            ->with($newAssetPair)
+            ->with($newAssetPair, $assetId)
             ->willThrowException($this->createMock(ItemSaveException::class));
 
         $this->logger->expects($this->once())->method('error');
@@ -440,7 +440,7 @@ class BinanceSyncAssetProcessTest extends TestCase
 
         $asset = $this->createMock(Asset::class);
         $assetId = 'foo';
-        $asset->expects($this->once())->method('getId')->willReturn($assetId);
+        $asset->expects($this->exactly(2))->method('getId')->willReturn($assetId);
 
         $this->assetBuilder->expects($this->once())
             ->method('build')
@@ -466,7 +466,7 @@ class BinanceSyncAssetProcessTest extends TestCase
 
         $this->assetPairRepository->expects($this->once())
             ->method('save')
-            ->with($newAssetPair);
+            ->with($newAssetPair, $assetId);
 
         $this->logger->expects($this->never())->method('error');
 

@@ -167,19 +167,19 @@ class BinanceSyncAssetProcess implements ProcessInterface
 
     /**
      * @param Asset $asset
-     * @param $quote
+     * @param string $assetPairName
      * @throws BinanceSyncAssetException
      */
-    private function createAssetPair(Asset $asset, $quote): void
+    private function createAssetPair(Asset $asset, string $assetPairName): void
     {
-        $assetPair = $this->assetPairBuilder->build($asset, $quote);
+        $assetPair = $this->assetPairBuilder->build($assetPairName);
 
         try {
-            $this->assetPairRepository->save($assetPair);
+            $this->assetPairRepository->save($assetPair, $asset->getId());
         } catch (ItemSaveException $exception) {
             $message = 'The asset pair cannot be save during Binance sync!';
             $this->logger->error($message, [
-                'quote' => $quote,
+                'assetPairName' => $assetPairName,
                 'message' => $exception->getMessage()
             ]);
             throw new BinanceSyncAssetException($message);

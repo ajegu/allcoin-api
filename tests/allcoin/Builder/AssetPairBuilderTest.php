@@ -5,7 +5,6 @@ namespace Test\AllCoin\Builder;
 
 
 use AllCoin\Builder\AssetPairBuilder;
-use AllCoin\Model\Asset;
 use AllCoin\Service\DateTimeService;
 use AllCoin\Service\UuidService;
 use DateTime;
@@ -31,7 +30,6 @@ class AssetPairBuilderTest extends TestCase
 
     public function testBuildShouldBeOK(): void
     {
-        $asset = $this->createMock(Asset::class);
         $name = 'foo';
 
         $uuid = 'bar';
@@ -44,10 +42,9 @@ class AssetPairBuilderTest extends TestCase
             ->method('now')
             ->willReturn($createdAt);
 
-        $assetPair = $this->assetPairBuilder->build($asset, $name);
+        $assetPair = $this->assetPairBuilder->build($name);
 
         $this->assertEquals($uuid, $assetPair->getId());
-        $this->assertEquals($asset, $assetPair->getAsset());
         $this->assertEquals($name, $assetPair->getName());
         $this->assertEquals($createdAt, $assetPair->getCreatedAt());
         $this->assertNull($assetPair->getUpdatedAt());

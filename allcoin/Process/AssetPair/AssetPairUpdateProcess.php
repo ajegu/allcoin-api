@@ -48,12 +48,11 @@ class AssetPairUpdateProcess extends AbstractAssetPairProcess implements Process
         $asset = $this->getAsset($assetId, AssetPairUpdateException::class);
         $assetPair = $this->getAssetPair($assetPairId, AssetPairUpdateException::class);
 
-        $assetPair->setAsset($asset);
         $assetPair->setName($dto->getName());
         $assetPair->setUpdatedAt($this->dateTimeService->now());
 
         try {
-            $this->assetPairRepository->save($assetPair);
+            $this->assetPairRepository->save($assetPair, $asset->getId());
         } catch (ItemSaveException $exception) {
             $message = 'The asset pair cannot be saved!';
             $this->logger->error($message, [

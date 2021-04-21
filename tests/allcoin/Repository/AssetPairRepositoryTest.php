@@ -9,7 +9,6 @@ use AllCoin\Database\DynamoDb\Exception\ItemReadException;
 use AllCoin\Database\DynamoDb\Exception\ItemSaveException;
 use AllCoin\Database\DynamoDb\ItemManager;
 use AllCoin\Database\DynamoDb\ItemManagerInterface;
-use AllCoin\Model\Asset;
 use AllCoin\Model\AssetPair;
 use AllCoin\Model\ClassMappingEnum;
 use AllCoin\Repository\AssetPairRepository;
@@ -34,32 +33,14 @@ class AssetPairRepositoryTest extends TestCase
         );
     }
 
-    public function testSaveWithNoAssetShouldBeThrowException(): void
-    {
-        $assetPair = $this->createMock(AssetPair::class);
-        $assetPair->expects($this->once())
-            ->method('getAsset')
-            ->willReturn(null);
-
-        $this->expectException(ItemSaveException::class);
-
-        $this->serializerService->expects($this->never())->method('normalizeModel');
-        $this->itemManager->expects($this->never())->method('save');
-
-        $this->assetPairRepository->save($assetPair);
-    }
-
     /**
      * @throws ItemSaveException
      */
     public function testSaveShouldBeOK(): void
     {
-        $asset = $this->createMock(Asset::class);
         $assetId = 'bar';
-        $asset->expects($this->once())->method('getId')->willReturn($assetId);
 
         $assetPair = $this->createMock(AssetPair::class);
-        $assetPair->expects($this->exactly(2))->method('getAsset')->willReturn($asset);
         $assetPairId = 'foo';
         $assetPair->expects($this->once())->method('getId')->willReturn($assetPairId);
 
@@ -79,7 +60,7 @@ class AssetPairRepositoryTest extends TestCase
             ->method('save')
             ->with($itemExpected, ClassMappingEnum::CLASS_MAPPING[AssetPair::class], $assetPairId);
 
-        $this->assetPairRepository->save($assetPair);
+        $this->assetPairRepository->save($assetPair, $assetId);
     }
 
     /**

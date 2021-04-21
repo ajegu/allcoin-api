@@ -94,6 +94,8 @@ class AssetPairCreateProcessTest extends TestCase
         $params = ['assetId' => $assetId];
 
         $asset = $this->createMock(Asset::class);
+        $asset->expects($this->once())->method('getId')->willReturn($assetId);
+
         $this->assetRepository->expects($this->once())
             ->method('findOneById')
             ->with($assetId)
@@ -102,12 +104,12 @@ class AssetPairCreateProcessTest extends TestCase
         $assetPair = $this->createMock(AssetPair::class);
         $this->assetPairBuilder->expects($this->once())
             ->method('build')
-            ->with($asset, $name)
+            ->with($name)
             ->willReturn($assetPair);
 
         $this->assetPairRepository->expects($this->once())
             ->method('save')
-            ->with($assetPair)
+            ->with($assetPair, $assetId)
             ->willThrowException($this->createMock(ItemSaveException::class));
 
         $this->logger->expects($this->once())->method('error');
@@ -133,6 +135,8 @@ class AssetPairCreateProcessTest extends TestCase
         $params = ['assetId' => $assetId];
 
         $asset = $this->createMock(Asset::class);
+        $asset->expects($this->once())->method('getId')->willReturn($assetId);
+
         $this->assetRepository->expects($this->once())
             ->method('findOneById')
             ->with($assetId)
@@ -141,12 +145,12 @@ class AssetPairCreateProcessTest extends TestCase
         $assetPair = $this->createMock(AssetPair::class);
         $this->assetPairBuilder->expects($this->once())
             ->method('build')
-            ->with($asset, $name)
+            ->with($name)
             ->willReturn($assetPair);
 
         $this->assetPairRepository->expects($this->once())
             ->method('save')
-            ->with($assetPair);
+            ->with($assetPair, $assetId);
 
         $this->assetPairMapper->expects($this->once())
             ->method('mapModelToResponseDto')

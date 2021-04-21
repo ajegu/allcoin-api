@@ -16,17 +16,14 @@ class AssetPairRepository extends AbstractRepository implements AssetPairReposit
 {
     /**
      * @param AssetPair $assetPair
+     * @param string $assetPairId
      * @throws ItemSaveException
      */
-    public function save(AssetPair $assetPair): void
+    public function save(AssetPair $assetPair, string $assetPairId): void
     {
-        if ($assetPair->getAsset() === null) {
-            throw new ItemSaveException('You must defined the asset!');
-        }
-
         $data = $this->serializerService->normalizeModel($assetPair);
         unset($data['asset']);
-        $data[ItemManager::LSI_1] = $assetPair->getAsset()->getId();
+        $data[ItemManager::LSI_1] = $assetPairId;
 
         $this->itemManager->save(
             $data,

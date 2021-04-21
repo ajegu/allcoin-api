@@ -14,9 +14,10 @@ interface AssetPairRepositoryInterface
 {
     /**
      * @param AssetPair $assetPair
+     * @param string $assetPairId
      * @throws ItemSaveException
      */
-    public function save(AssetPair $assetPair): void;
+    public function save(AssetPair $assetPair, string $assetPairId): void;
 
     /**
      * @param string $assetPairId
