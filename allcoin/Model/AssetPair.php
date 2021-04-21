@@ -8,8 +8,6 @@ use DateTime;
 
 class AssetPair implements ModelInterface
 {
-    private ?Asset $asset;
-
     public function __construct(
         private string $id,
         private string $name,
@@ -17,25 +15,7 @@ class AssetPair implements ModelInterface
         private ?DateTime $updatedAt = null,
     )
     {
-        $this->asset = null;
     }
-
-    /**
-     * @return Asset|null
-     */
-    public function getAsset(): ?Asset
-    {
-        return $this->asset;
-    }
-
-    /**
-     * @param Asset|null $asset
-     */
-    public function setAsset(?Asset $asset): void
-    {
-        $this->asset = $asset;
-    }
-
 
     /**
      * @return string
