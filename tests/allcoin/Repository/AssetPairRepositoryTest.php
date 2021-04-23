@@ -132,4 +132,26 @@ class AssetPairRepositoryTest extends TestCase
 
         $this->assetPairRepository->findAllByAssetId($assetId);
     }
+
+    /**
+     * @throws ItemReadException
+     */
+    public function testFindAllShouldBeOK(): void
+    {
+        $item = [];
+        $items = [$item];
+        $this->itemManager->expects($this->once())
+            ->method('fetchAll')
+            ->with(
+                partitionKey: ClassMappingEnum::CLASS_MAPPING[AssetPair::class]
+            )
+            ->willReturn($items);
+
+        $this->serializerService->expects($this->once())
+            ->method('deserializeToModel')
+            ->with($item, AssetPair::class)
+            ->willReturn($this->createMock(AssetPair::class));
+
+        $this->assetPairRepository->findAll();
+    }
 }

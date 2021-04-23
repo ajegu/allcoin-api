@@ -14,10 +14,10 @@ interface AssetPairRepositoryInterface
 {
     /**
      * @param AssetPair $assetPair
-     * @param string $assetPairId
+     * @param string $assetId
      * @throws ItemSaveException
      */
-    public function save(AssetPair $assetPair, string $assetPairId): void;
+    public function save(AssetPair $assetPair, string $assetId): void;
 
     /**
      * @param string $assetPairId
@@ -38,5 +38,11 @@ interface AssetPairRepositoryInterface
      * @throws ItemDeleteException
      */
     public function delete(string $assetPairId): void;
+
+    /**
+     * @return AssetPair[]
+     * @throws ItemReadException
+     */
+    public function findAll(): array;
 
 }

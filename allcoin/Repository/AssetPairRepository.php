@@ -16,14 +16,14 @@ class AssetPairRepository extends AbstractRepository implements AssetPairReposit
 {
     /**
      * @param AssetPair $assetPair
-     * @param string $assetPairId
+     * @param string $assetId
      * @throws ItemSaveException
      */
-    public function save(AssetPair $assetPair, string $assetPairId): void
+    public function save(AssetPair $assetPair, string $assetId): void
     {
         $data = $this->serializerService->normalizeModel($assetPair);
         unset($data['asset']);
-        $data[ItemManager::LSI_1] = $assetPairId;
+        $data[ItemManager::LSI_1] = $assetId;
 
         $this->itemManager->save(
             $data,
@@ -81,5 +81,20 @@ class AssetPairRepository extends AbstractRepository implements AssetPairReposit
             partitionKey: ClassMappingEnum::CLASS_MAPPING[AssetPair::class],
             sortKey: $assetPairId
         );
+    }
+
+    /**
+     * @return AssetPair[]
+     * @throws ItemReadException
+     */
+    public function findAll(): array
+    {
+        $items = $this->itemManager->fetchAll(
+            ClassMappingEnum::CLASS_MAPPING[AssetPair::class]
+        );
+
+        return array_map(function (array $item) {
+            return $this->serializerService->deserializeToModel($item, AssetPair::class);
+        }, $items);
     }
 }

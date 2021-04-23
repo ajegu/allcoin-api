@@ -50,4 +50,11 @@ interface AssetRepositoryInterface
      * @throws ItemReadException
      */
     public function existsByName(string $assetName): Asset|ModelInterface|null;
+
+    /**
+     * @param string $assetPairId
+     * @return Asset|ModelInterface
+     * @throws ItemReadException
+     */
+    public function findOneByAssetPairId(string $assetPairId): Asset|ModelInterface;
 }
