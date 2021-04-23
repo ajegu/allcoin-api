@@ -5,43 +5,23 @@ namespace AllCoin\Process\Asset;
 
 
 use AllCoin\Database\DynamoDb\Exception\ItemReadException;
-use AllCoin\DataMapper\AssetMapper;
 use AllCoin\Dto\ListResponseDto;
 use AllCoin\Dto\RequestDtoInterface;
 use AllCoin\Dto\ResponseDtoInterface;
-use AllCoin\Exception\Asset\AssetListException;
 use AllCoin\Model\Asset;
 use AllCoin\Process\ProcessInterface;
-use AllCoin\Repository\AssetRepositoryInterface;
-use Psr\Log\LoggerInterface;
 
-class AssetListProcess implements ProcessInterface
+class AssetListProcess extends AbstractAssetProcess implements ProcessInterface
 {
-    public function __construct(
-        private AssetRepositoryInterface $assetRepository,
-        private AssetMapper $assetMapper,
-        private LoggerInterface $logger
-    )
-    {
-    }
-
     /**
      * @param RequestDtoInterface|null $dto
      * @param array $params
      * @return ResponseDtoInterface
-     * @throws AssetListException
+     * @throws ItemReadException
      */
     public function handle(RequestDtoInterface $dto = null, array $params = []): ResponseDtoInterface
     {
-        try {
-            $assets = $this->assetRepository->findAll();
-        } catch (ItemReadException $exception) {
-            $message = 'Cannot read the asset list.';
-            $this->logger->error($message, [
-                'exception' => $exception->getMessage()
-            ]);
-            throw new AssetListException($message);
-        }
+        $assets = $this->assetRepository->findAll();
 
         $assetsDto = array_map(function (Asset $asset) {
             return $this->assetMapper->mapModelToResponseDto($asset);

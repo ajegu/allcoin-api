@@ -7,7 +7,6 @@ namespace Test\AllCoin\Process\Binance;
 use AllCoin\Builder\TransactionBuilder;
 use AllCoin\Database\DynamoDb\Exception\ItemReadException;
 use AllCoin\Database\DynamoDb\Exception\ItemSaveException;
-use AllCoin\Exception\Binance\BinanceBuyOrderProcessException;
 use AllCoin\Model\Asset;
 use AllCoin\Model\AssetPair;
 use AllCoin\Model\EventPrice;
@@ -42,32 +41,9 @@ class BinanceBuyOrderProcessTest extends TestCase
         );
     }
 
-    public function testHandleWithAssetPairReadErrorShouldThrowException(): void
-    {
-        $assetPairId = 'foo';
-        $assetPair = $this->createMock(AssetPair::class);
-        $assetPair->expects($this->once())->method('getId')->willReturn($assetPairId);
-
-        $dto = $this->createMock(EventPrice::class);
-        $dto->expects($this->once())->method('getAssetPair')->willReturn($assetPair);
-
-        $this->assetPairRepository->expects($this->once())
-            ->method('findOneById')
-            ->with($assetPairId)
-            ->willThrowException($this->createMock(ItemReadException::class));
-
-        $this->logger->expects($this->once())->method('error');
-        $this->expectException(BinanceBuyOrderProcessException::class);
-
-        $this->transactionBuilder->expects($this->never())->method('build');
-        $this->transactionRepository->expects($this->never())->method('save');
-        $this->assetPairRepository->expects($this->never())->method('save');
-
-        $this->binanceBuyOrderProcess->handle($dto);
-    }
-
     /**
-     * @throws BinanceBuyOrderProcessException
+     * @throws ItemReadException
+     * @throws ItemSaveException
      */
     public function testHandleWithExistingTransactionShouldStop(): void
     {
@@ -96,117 +72,8 @@ class BinanceBuyOrderProcessTest extends TestCase
     }
 
     /**
-     * @throws BinanceBuyOrderProcessException
-     */
-    public function testHandleWithTransactionSaveErrorShouldThrowException(): void
-    {
-        $transaction = $this->createMock(Transaction::class);
-        $transaction->expects($this->once())->method('getDirection')->willReturn(Transaction::SELL);
-
-        $assetPairId = 'foo';
-        $assetPair = $this->createMock(AssetPair::class);
-        $assetPair->expects($this->once())->method('getId')->willReturn($assetPairId);
-        $assetPair->expects($this->once())->method('getLastTransaction')->willReturn($transaction);
-
-        $dto = $this->createMock(EventPrice::class);
-        $dto->expects($this->once())->method('getAssetPair')->willReturn($assetPair);
-        $price = 10.;
-        $dto->expects($this->once())->method('getPrice')->willReturn($price);
-        $name = 'foo';
-        $dto->expects($this->once())->method('getName')->willReturn($name);
-
-        $this->assetPairRepository->expects($this->once())
-            ->method('findOneById')
-            ->with($assetPairId)
-            ->willReturn($assetPair);
-
-        $transaction = $this->createMock(Transaction::class);
-        $quantity = BinanceBuyOrderProcess::FIXED_TRANSACTION_AMOUNT / $price;
-        $this->transactionBuilder->expects($this->once())
-            ->method('build')
-            ->with(
-                $quantity,
-                BinanceBuyOrderProcess::FIXED_TRANSACTION_AMOUNT,
-                Transaction::BUY,
-                $name
-            )
-            ->willReturn($transaction);
-
-        $this->transactionRepository->expects($this->once())
-            ->method('save')
-            ->with($transaction, $assetPairId)
-            ->willThrowException($this->createMock(ItemSaveException::class));
-
-        $this->logger->expects($this->once())->method('error');
-        $this->expectException(BinanceBuyOrderProcessException::class);
-
-        $this->assetPairRepository->expects($this->never())->method('save');
-
-        $this->binanceBuyOrderProcess->handle($dto);
-    }
-
-    /**
-     * @throws BinanceBuyOrderProcessException
-     */
-    public function testHandleWithAssetPairSaveErrorShouldThrowException(): void
-    {
-        $transaction = $this->createMock(Transaction::class);
-        $transaction->expects($this->once())->method('getDirection')->willReturn(Transaction::SELL);
-
-        $assetPairId = 'foo';
-        $assetPair = $this->createMock(AssetPair::class);
-        $assetPair->expects($this->once())->method('getId')->willReturn($assetPairId);
-        $assetPair->expects($this->once())->method('getLastTransaction')->willReturn($transaction);
-
-        $dto = $this->createMock(EventPrice::class);
-        $dto->expects($this->once())->method('getAssetPair')->willReturn($assetPair);
-        $price = 10.;
-        $dto->expects($this->once())->method('getPrice')->willReturn($price);
-        $asset = $this->createMock(Asset::class);
-        $assetId = 'foo';
-        $asset->expects($this->once())->method('getId')->willReturn($assetId);
-        $dto->expects($this->once())->method('getAsset')->willReturn($asset);
-        $name = 'foo';
-        $dto->expects($this->once())->method('getName')->willReturn($name);
-
-        $this->assetPairRepository->expects($this->once())
-            ->method('findOneById')
-            ->with($assetPairId)
-            ->willReturn($assetPair);
-
-        $transaction = $this->createMock(Transaction::class);
-        $quantity = BinanceBuyOrderProcess::FIXED_TRANSACTION_AMOUNT / $price;
-        $this->transactionBuilder->expects($this->once())
-            ->method('build')
-            ->with(
-                $quantity,
-                BinanceBuyOrderProcess::FIXED_TRANSACTION_AMOUNT,
-                Transaction::BUY,
-                $name
-            )
-            ->willReturn($transaction);
-
-        $this->transactionRepository->expects($this->once())
-            ->method('save')
-            ->with($transaction, $assetPairId);
-
-        $assetPair->expects($this->once())
-            ->method('setLastTransaction')
-            ->with($transaction);
-
-        $this->assetPairRepository->expects($this->once())
-            ->method('save')
-            ->with($assetPair)
-            ->willThrowException($this->createMock(ItemSaveException::class));
-
-        $this->logger->expects($this->once())->method('error');
-        $this->expectException(BinanceBuyOrderProcessException::class);
-
-        $this->binanceBuyOrderProcess->handle($dto);
-    }
-
-    /**
-     * @throws BinanceBuyOrderProcessException
+     * @throws ItemReadException
+     * @throws ItemSaveException
      */
     public function testHandleShouldBeOK(): void
     {

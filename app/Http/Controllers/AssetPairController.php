@@ -4,12 +4,10 @@
 namespace App\Http\Controllers;
 
 
+use AllCoin\Database\DynamoDb\Exception\ItemDeleteException;
+use AllCoin\Database\DynamoDb\Exception\ItemReadException;
+use AllCoin\Database\DynamoDb\Exception\ItemSaveException;
 use AllCoin\Dto\AssetPairRequestDto;
-use AllCoin\Exception\AssetPair\AssetPairCreateException;
-use AllCoin\Exception\AssetPair\AssetPairDeleteException;
-use AllCoin\Exception\AssetPair\AssetPairGetException;
-use AllCoin\Exception\AssetPair\AssetPairListException;
-use AllCoin\Exception\AssetPair\AssetPairUpdateException;
 use AllCoin\Process\AssetPair\AssetPairCreateProcess;
 use AllCoin\Process\AssetPair\AssetPairDeleteProcess;
 use AllCoin\Process\AssetPair\AssetPairGetProcess;
@@ -40,8 +38,9 @@ class AssetPairController extends Controller
      * @param Request $request
      * @param string $assetId
      * @return JsonResponse
-     * @throws AssetPairCreateException
      * @throws ValidationException
+     * @throws ItemReadException
+     * @throws ItemSaveException
      */
     public function create(Request $request, string $assetId): JsonResponse
     {
@@ -70,7 +69,7 @@ class AssetPairController extends Controller
      * @param string $assetId
      * @param string $id
      * @return JsonResponse
-     * @throws AssetPairGetException
+     * @throws ItemReadException
      */
     public function get(string $assetId, string $id): JsonResponse
     {
@@ -94,7 +93,8 @@ class AssetPairController extends Controller
      * @param string $id
      * @return JsonResponse
      * @throws ValidationException
-     * @throws AssetPairUpdateException
+     * @throws ItemReadException
+     * @throws ItemSaveException
      */
     public function update(Request $request, string $assetId, string $id): JsonResponse
     {
@@ -122,7 +122,7 @@ class AssetPairController extends Controller
     /**
      * @param string $assetId
      * @return JsonResponse
-     * @throws AssetPairListException
+     * @throws ItemReadException
      */
     public function list(string $assetId): JsonResponse
     {
@@ -141,7 +141,8 @@ class AssetPairController extends Controller
      * @param string $assetId
      * @param string $id
      * @return JsonResponse
-     * @throws AssetPairDeleteException
+     * @throws ItemDeleteException
+     * @throws ItemReadException
      */
     public function delete(string $assetId, string $id): JsonResponse
     {

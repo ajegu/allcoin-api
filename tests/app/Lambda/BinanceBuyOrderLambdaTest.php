@@ -4,8 +4,9 @@
 namespace Test\App\Lambda;
 
 
+use AllCoin\Database\DynamoDb\Exception\ItemReadException;
+use AllCoin\Database\DynamoDb\Exception\ItemSaveException;
 use AllCoin\DataMapper\EventPriceMapper;
-use AllCoin\Exception\Binance\BinanceBuyOrderProcessException;
 use AllCoin\Model\EventPrice;
 use AllCoin\Process\Binance\BinanceBuyOrderProcess;
 use App\Lambda\BinanceBuyOrderLambda;
@@ -30,7 +31,8 @@ class BinanceBuyOrderLambdaTest extends TestCase
     }
 
     /**
-     * @throws BinanceBuyOrderProcessException
+     * @throws ItemReadException
+     * @throws ItemSaveException
      */
     public function testInvokeShouldBeOK(): void
     {

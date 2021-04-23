@@ -4,13 +4,12 @@
 namespace Test\App\Http\Controllers;
 
 
+use AllCoin\Database\DynamoDb\Exception\ItemDeleteException;
+use AllCoin\Database\DynamoDb\Exception\ItemReadException;
+use AllCoin\Database\DynamoDb\Exception\ItemSaveException;
 use AllCoin\Dto\AssetRequestDto;
 use AllCoin\Dto\AssetResponseDto;
 use AllCoin\Dto\ResponseDtoInterface;
-use AllCoin\Exception\Asset\AssetCreateException;
-use AllCoin\Exception\Asset\AssetDeleteException;
-use AllCoin\Exception\Asset\AssetGetException;
-use AllCoin\Exception\Asset\AssetUpdateException;
 use AllCoin\Process\Asset\AssetCreateProcess;
 use AllCoin\Process\Asset\AssetDeleteProcess;
 use AllCoin\Process\Asset\AssetGetProcess;
@@ -59,8 +58,8 @@ class AssetControllerTest extends TestCase
     }
 
     /**
-     * @throws AssetCreateException
      * @throws ValidationException
+     * @throws ItemSaveException
      */
     public function testCreateShouldBeOK(): void
     {
@@ -96,6 +95,9 @@ class AssetControllerTest extends TestCase
         $this->assertEquals(Response::HTTP_CREATED, $response->getStatusCode());
     }
 
+    /**
+     * @throws ItemReadException
+     */
     public function testListShouldBeOK(): void
     {
         $responseDto = $this->createMock(ResponseDtoInterface::class);
@@ -114,7 +116,8 @@ class AssetControllerTest extends TestCase
     }
 
     /**
-     * @throws AssetUpdateException
+     * @throws ItemReadException
+     * @throws ItemSaveException
      * @throws ValidationException
      */
     public function testUpdateShouldBeOK(): void
@@ -153,7 +156,7 @@ class AssetControllerTest extends TestCase
     }
 
     /**
-     * @throws AssetDeleteException
+     * @throws ItemDeleteException
      */
     public function testDeleteShouldBeOk(): void
     {
@@ -170,7 +173,7 @@ class AssetControllerTest extends TestCase
     }
 
     /**
-     * @throws AssetGetException
+     * @throws ItemReadException
      */
     public function testGetShouldBeOK(): void
     {

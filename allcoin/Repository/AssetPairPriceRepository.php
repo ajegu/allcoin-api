@@ -12,10 +12,11 @@ use AllCoin\Model\ClassMappingEnum;
 use AllCoin\Service\DateTimeService;
 use AllCoin\Service\SerializerService;
 use DateTime;
+use JetBrains\PhpStorm\Pure;
 
 class AssetPairPriceRepository extends AbstractRepository implements AssetPairPriceRepositoryInterface
 {
-    public function __construct(
+    #[Pure] public function __construct(
         protected ItemManagerInterface $itemManager,
         protected SerializerService $serializerService,
         private DateTimeService $dateTimeService

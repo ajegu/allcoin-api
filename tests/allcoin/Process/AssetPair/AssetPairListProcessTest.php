@@ -9,13 +9,12 @@ use AllCoin\DataMapper\AssetPairMapper;
 use AllCoin\Dto\AssetPairRequestDto;
 use AllCoin\Dto\AssetResponseDto;
 use AllCoin\Dto\ListResponseDto;
-use AllCoin\Exception\AssetPair\AssetPairListException;
+use AllCoin\Exception\RequiredParameterException;
 use AllCoin\Model\Asset;
 use AllCoin\Model\AssetPair;
 use AllCoin\Process\AssetPair\AssetPairListProcess;
 use AllCoin\Repository\AssetPairRepositoryInterface;
 use AllCoin\Repository\AssetRepositoryInterface;
-use Psr\Log\LoggerInterface;
 use Test\TestCase;
 
 class AssetPairListProcessTest extends TestCase
@@ -24,30 +23,30 @@ class AssetPairListProcessTest extends TestCase
 
     private AssetRepositoryInterface $assetRepository;
     private AssetPairRepositoryInterface $assetPairRepository;
-    private LoggerInterface $logger;
     private AssetPairMapper $assetPairMapper;
 
     public function setUp(): void
     {
         $this->assetRepository = $this->createMock(AssetRepositoryInterface::class);
         $this->assetPairRepository = $this->createMock(AssetPairRepositoryInterface::class);
-        $this->logger = $this->createMock(LoggerInterface::class);
         $this->assetPairMapper = $this->createMock(AssetPairMapper::class);
 
         $this->assetPairListProcess = new AssetPairListProcess(
             $this->assetRepository,
             $this->assetPairRepository,
-            $this->logger,
             $this->assetPairMapper,
         );
     }
 
+    /**
+     * @throws ItemReadException
+     */
     public function testHandleWithNoAssetIdShouldThrowException(): void
     {
         $requestDto = $this->createMock(AssetPairRequestDto::class);
         $params = [];
 
-        $this->expectException(AssetPairListException::class);
+        $this->expectException(RequiredParameterException::class);
 
         $this->assetRepository->expects($this->never())->method('findOneById');
         $this->assetPairRepository->expects($this->never())->method('findAllByAssetId');
@@ -56,53 +55,8 @@ class AssetPairListProcessTest extends TestCase
         $this->assetPairListProcess->handle($requestDto, $params);
     }
 
-    public function testHandleWithAssetReadErrorShouldThrowException(): void
-    {
-        $requestDto = $this->createMock(AssetPairRequestDto::class);
-        $assetId = 'foo';
-        $params = ['assetId' => $assetId];
-
-        $this->assetRepository->expects($this->once())
-            ->method('findOneById')
-            ->with($assetId)
-            ->willThrowException($this->createMock(ItemReadException::class));
-
-        $this->logger->expects($this->once())->method('error');
-        $this->expectException(AssetPairListException::class);
-
-        $this->assetPairRepository->expects($this->never())->method('findAllByAssetId');
-        $this->assetPairMapper->expects($this->never())->method('mapModelToResponseDto');
-
-        $this->assetPairListProcess->handle($requestDto, $params);
-    }
-
-    public function testHandleWithAssetPairReadErrorShouldThrowException(): void
-    {
-        $requestDto = $this->createMock(AssetPairRequestDto::class);
-        $assetId = 'foo';
-        $params = ['assetId' => $assetId];
-
-        $asset = $this->createMock(Asset::class);
-        $this->assetRepository->expects($this->once())
-            ->method('findOneById')
-            ->with($assetId)
-            ->willReturn($asset);
-
-        $this->assetPairRepository->expects($this->once())
-            ->method('findAllByAssetId')
-            ->with($assetId)
-            ->willThrowException($this->createMock(ItemReadException::class));
-
-        $this->logger->expects($this->once())->method('error');
-        $this->expectException(AssetPairListException::class);
-
-        $this->assetPairMapper->expects($this->never())->method('mapModelToResponseDto');
-
-        $this->assetPairListProcess->handle($requestDto, $params);
-    }
-
     /**
-     * @throws AssetPairListException
+     * @throws ItemReadException
      */
     public function testHandleShouldBeOK(): void
     {
@@ -111,6 +65,8 @@ class AssetPairListProcessTest extends TestCase
         $params = ['assetId' => $assetId];
 
         $asset = $this->createMock(Asset::class);
+        $asset->expects($this->once())->method('getId')->willReturn($assetId);
+
         $this->assetRepository->expects($this->once())
             ->method('findOneById')
             ->with($assetId)
@@ -128,8 +84,6 @@ class AssetPairListProcessTest extends TestCase
             ->method('mapModelToResponseDto')
             ->with($assetPair)
             ->willReturn($assetResponseDto);
-
-        $this->logger->expects($this->never())->method('error');
 
         /** @var ListResponseDto $response */
         $response = $this->assetPairListProcess->handle($requestDto, $params);

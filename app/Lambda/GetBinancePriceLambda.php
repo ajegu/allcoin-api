@@ -4,7 +4,8 @@
 namespace App\Lambda;
 
 
-use AllCoin\Exception\AssetPairPrice\AssetPairPriceBinanceCreateException;
+use AllCoin\Database\DynamoDb\Exception\ItemReadException;
+use AllCoin\Database\DynamoDb\Exception\ItemSaveException;
 use AllCoin\Process\AssetPairPrice\AssetPairPriceBinanceCreateProcess;
 
 class GetBinancePriceLambda
@@ -17,7 +18,8 @@ class GetBinancePriceLambda
 
     /**
      * @param array $event
-     * @throws AssetPairPriceBinanceCreateException
+     * @throws ItemReadException
+     * @throws ItemSaveException
      */
     public function __invoke(array $event): void
     {

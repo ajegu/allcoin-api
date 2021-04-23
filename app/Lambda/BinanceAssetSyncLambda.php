@@ -4,8 +4,10 @@
 namespace App\Lambda;
 
 
-use AllCoin\Exception\Binance\BinanceSyncAssetException;
+use AllCoin\Database\DynamoDb\Exception\ItemReadException;
+use AllCoin\Database\DynamoDb\Exception\ItemSaveException;
 use AllCoin\Process\Binance\BinanceSyncAssetProcess;
+use Psr\Http\Client\ClientExceptionInterface;
 
 class BinanceAssetSyncLambda
 {
@@ -17,7 +19,9 @@ class BinanceAssetSyncLambda
 
     /**
      * @param array $event
-     * @throws BinanceSyncAssetException
+     * @throws ItemReadException
+     * @throws ItemSaveException
+     * @throws ClientExceptionInterface
      */
     public function __invoke(array $event): void
     {

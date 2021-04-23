@@ -4,7 +4,8 @@
 namespace App\Lambda;
 
 
-use AllCoin\Exception\AssetPairPrice\AssetPairPriceAnalyzerException;
+use AllCoin\Database\DynamoDb\Exception\ItemReadException;
+use AllCoin\Exception\NotificationHandlerException;
 use AllCoin\Process\AssetPairPrice\AssetPairPriceAnalyzerProcess;
 
 class PriceAnalyzerLambda
@@ -17,7 +18,8 @@ class PriceAnalyzerLambda
 
     /**
      * @param array $event
-     * @throws AssetPairPriceAnalyzerException
+     * @throws ItemReadException
+     * @throws NotificationHandlerException
      */
     public function __invoke(array $event): void
     {
