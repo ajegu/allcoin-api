@@ -10,6 +10,7 @@ use AllCoin\Database\DynamoDb\Exception\ItemReadException;
 use AllCoin\Database\DynamoDb\Exception\ItemSaveException;
 use AllCoin\Database\DynamoDb\ItemManager;
 use AllCoin\Model\Asset;
+use AllCoin\Model\AssetPair;
 use AllCoin\Model\ClassMappingEnum;
 use AllCoin\Model\ModelInterface;
 
@@ -102,6 +103,23 @@ class AssetRepository extends AbstractRepository implements AssetRepositoryInter
         } catch (ItemNotFoundException) {
             return null;
         }
+    }
+
+    /**
+     * @param string $assetPairId
+     * @return Asset|ModelInterface
+     * @throws ItemReadException
+     */
+    public function findOneByAssetPairId(string $assetPairId): Asset|ModelInterface
+    {
+        $item = $this->itemManager->fetchOne(
+            ClassMappingEnum::CLASS_MAPPING[AssetPair::class],
+            $assetPairId
+        );
+
+        $assetId = $item[ItemManager::LSI_1];
+
+        return $this->findOneById($assetId);
     }
 
 }

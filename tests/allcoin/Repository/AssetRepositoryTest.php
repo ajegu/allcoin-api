@@ -11,6 +11,7 @@ use AllCoin\Database\DynamoDb\Exception\ItemSaveException;
 use AllCoin\Database\DynamoDb\ItemManager;
 use AllCoin\Database\DynamoDb\ItemManagerInterface;
 use AllCoin\Model\Asset;
+use AllCoin\Model\AssetPair;
 use AllCoin\Model\ClassMappingEnum;
 use AllCoin\Repository\AssetRepository;
 use AllCoin\Service\SerializerService;
@@ -195,5 +196,36 @@ class AssetRepositoryTest extends TestCase
 
         $result = $this->assetRepository->existsByName($assetName);
         $this->assertNull($result);
+    }
+
+    /**
+     * @throws ItemReadException
+     */
+    public function testFindOneByAssetPairIdShouldBeOK(): void
+    {
+        $assetId = 'bar';
+        $assetPairId = 'foo';
+        $itemAssetPair = [
+            ItemManager::LSI_1 => $assetId
+        ];
+        $itemAsset = [];
+        $this->itemManager->expects($this->exactly(2))
+            ->method('fetchOne')
+            ->withConsecutive([
+                ClassMappingEnum::CLASS_MAPPING[AssetPair::class],
+                $assetPairId
+            ], [
+                ClassMappingEnum::CLASS_MAPPING[Asset::class],
+                $assetId
+            ])
+            ->willReturn($itemAssetPair, $itemAsset);
+
+        $this->serializerService->expects($this->once())
+            ->method('deserializeToModel')
+            ->with($itemAsset, Asset::class)
+            ->willReturn($this->createMock(Asset::class));
+
+        $this->assetRepository->findOneByAssetPairId($assetPairId);
+
     }
 }

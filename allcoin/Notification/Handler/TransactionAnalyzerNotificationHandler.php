@@ -3,10 +3,9 @@
 
 namespace AllCoin\Notification\Handler;
 
-
 use JetBrains\PhpStorm\Pure;
 
-class PriceAnalyzerNotificationHandler extends AbstractNotificationHandler
+class TransactionAnalyzerNotificationHandler extends AbstractNotificationHandler
 {
     #[Pure] public function __construct(
         private string $topicArn,
