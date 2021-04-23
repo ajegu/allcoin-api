@@ -7,11 +7,9 @@ namespace Test\AllCoin\Process\Asset;
 use AllCoin\Database\DynamoDb\Exception\ItemReadException;
 use AllCoin\DataMapper\AssetMapper;
 use AllCoin\Dto\ResponseDtoInterface;
-use AllCoin\Exception\Asset\AssetListException;
 use AllCoin\Model\Asset;
 use AllCoin\Process\Asset\AssetListProcess;
 use AllCoin\Repository\AssetRepositoryInterface;
-use Psr\Log\LoggerInterface;
 use Test\TestCase;
 
 class AssetListProcessTest extends TestCase
@@ -20,38 +18,20 @@ class AssetListProcessTest extends TestCase
 
     private AssetRepositoryInterface $assetRepository;
     private AssetMapper $assetMapper;
-    private LoggerInterface $logger;
 
     public function setUp(): void
     {
         $this->assetRepository = $this->createMock(AssetRepositoryInterface::class);
         $this->assetMapper = $this->createMock(AssetMapper::class);
-        $this->logger = $this->createMock(LoggerInterface::class);
 
         $this->assetListProcess = new AssetListProcess(
             $this->assetRepository,
-            $this->assetMapper,
-            $this->logger
+            $this->assetMapper
         );
     }
 
-    public function testHandleWithReadErrorShouldThrowException(): void
-    {
-        $this->assetRepository->expects($this->once())
-            ->method('findAll')
-            ->willThrowException($this->createMock(ItemReadException::class));
-
-        $this->logger->expects($this->once())->method('error');
-
-        $this->assetMapper->expects($this->never())->method('mapModelToResponseDto');
-
-        $this->expectException(AssetListException::class);
-
-        $this->assetListProcess->handle();
-    }
-
     /**
-     * @throws AssetListException
+     * @throws ItemReadException
      */
     public function testHandleShouldBeOK(): void
     {
@@ -63,8 +43,6 @@ class AssetListProcessTest extends TestCase
         $this->assetRepository->expects($this->once())
             ->method('findAll')
             ->willReturn($assets);
-
-        $this->logger->expects($this->never())->method('error');
 
         $this->assetMapper->expects($this->once())
             ->method('mapModelToResponseDto')

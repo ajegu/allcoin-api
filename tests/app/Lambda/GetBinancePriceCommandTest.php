@@ -4,7 +4,8 @@
 namespace Test\App\Lambda;
 
 
-use AllCoin\Exception\AssetPairPrice\AssetPairPriceBinanceCreateException;
+use AllCoin\Database\DynamoDb\Exception\ItemReadException;
+use AllCoin\Database\DynamoDb\Exception\ItemSaveException;
 use AllCoin\Process\AssetPairPrice\AssetPairPriceBinanceCreateProcess;
 use App\Lambda\GetBinancePriceLambda;
 use Test\TestCase;
@@ -25,7 +26,8 @@ class GetBinancePriceCommandTest extends TestCase
     }
 
     /**
-     * @throws AssetPairPriceBinanceCreateException
+     * @throws ItemReadException
+     * @throws ItemSaveException
      */
     public function testInvokeShouldBeOK(): void
     {

@@ -5,25 +5,21 @@ namespace AllCoin\Process\AssetPair;
 
 
 use AllCoin\Builder\AssetPairBuilder;
+use AllCoin\Database\DynamoDb\Exception\ItemReadException;
 use AllCoin\Database\DynamoDb\Exception\ItemSaveException;
 use AllCoin\DataMapper\AssetPairMapper;
-use AllCoin\Dto\AssetPairRequestDto;
-use AllCoin\Dto\AssetPairResponseDto;
 use AllCoin\Dto\RequestDtoInterface;
 use AllCoin\Dto\ResponseDtoInterface;
-use AllCoin\Exception\AssetPair\AssetPairCreateException;
 use AllCoin\Process\ProcessInterface;
 use AllCoin\Repository\AssetPairRepositoryInterface;
 use AllCoin\Repository\AssetRepositoryInterface;
 use JetBrains\PhpStorm\Pure;
-use Psr\Log\LoggerInterface;
 
 class AssetPairCreateProcess extends AbstractAssetPairProcess implements ProcessInterface
 {
     #[Pure] public function __construct(
         protected AssetRepositoryInterface $assetRepository,
         protected AssetPairRepositoryInterface $assetPairRepository,
-        protected LoggerInterface $logger,
         protected AssetPairMapper $assetPairMapper,
         private AssetPairBuilder $assetPairBuilder
     )
@@ -31,35 +27,26 @@ class AssetPairCreateProcess extends AbstractAssetPairProcess implements Process
         parent::__construct(
             $assetRepository,
             $assetPairRepository,
-            $logger,
             $assetPairMapper,
         );
     }
 
     /**
-     * @param AssetPairRequestDto|null $dto
+     * @param RequestDtoInterface|null $dto
      * @param array $params
-     * @return AssetPairResponseDto|null
-     * @throws AssetPairCreateException
+     * @return ResponseDtoInterface|null
+     * @throws ItemSaveException
+     * @throws ItemReadException
      */
     public function handle(RequestDtoInterface $dto = null, array $params = []): ?ResponseDtoInterface
     {
-        $assetId = $this->getAssetId($params, AssetPairCreateException::class);
-        $asset = $this->getAsset($assetId, AssetPairCreateException::class);
+        $asset = $this->assetRepository->findOneById(
+            $this->getAssetId($params)
+        );
 
         $assetPair = $this->assetPairBuilder->build($dto->getName());
 
-        try {
-            $this->assetPairRepository->save($assetPair, $asset->getId());
-        } catch (ItemSaveException $exception) {
-            $message = 'The asset pair cannot be saved!';
-            $this->logger->error($message, [
-                'id' => $assetId,
-                'name' => $assetPair->getName(),
-                'exception' => $exception->getMessage()
-            ]);
-            throw new AssetPairCreateException($message);
-        }
+        $this->assetPairRepository->save($assetPair, $asset->getId());
 
         return $this->assetPairMapper->mapModelToResponseDto($assetPair);
     }

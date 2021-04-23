@@ -4,14 +4,12 @@
 namespace Test\App\Http\Controllers;
 
 
+use AllCoin\Database\DynamoDb\Exception\ItemDeleteException;
+use AllCoin\Database\DynamoDb\Exception\ItemReadException;
+use AllCoin\Database\DynamoDb\Exception\ItemSaveException;
 use AllCoin\Dto\AssetPairRequestDto;
 use AllCoin\Dto\AssetPairResponseDto;
 use AllCoin\Dto\ListResponseDto;
-use AllCoin\Exception\AssetPair\AssetPairCreateException;
-use AllCoin\Exception\AssetPair\AssetPairDeleteException;
-use AllCoin\Exception\AssetPair\AssetPairGetException;
-use AllCoin\Exception\AssetPair\AssetPairListException;
-use AllCoin\Exception\AssetPair\AssetPairUpdateException;
 use AllCoin\Process\AssetPair\AssetPairCreateProcess;
 use AllCoin\Process\AssetPair\AssetPairDeleteProcess;
 use AllCoin\Process\AssetPair\AssetPairGetProcess;
@@ -61,8 +59,9 @@ class AssetPairControllerTest extends TestCase
     }
 
     /**
-     * @throws AssetPairCreateException
      * @throws ValidationException
+     * @throws ItemReadException
+     * @throws ItemSaveException
      */
     public function testCreateShouldBeOK(): void
     {
@@ -100,7 +99,7 @@ class AssetPairControllerTest extends TestCase
     }
 
     /**
-     * @throws AssetPairGetException
+     * @throws ItemReadException
      */
     public function testGetShouldBeOK(): void
     {
@@ -129,7 +128,8 @@ class AssetPairControllerTest extends TestCase
 
     /**
      * @throws ValidationException
-     * @throws AssetPairUpdateException
+     * @throws ItemReadException
+     * @throws ItemSaveException
      */
     public function testUpdateShouldBeOK(): void
     {
@@ -168,7 +168,7 @@ class AssetPairControllerTest extends TestCase
     }
 
     /**
-     * @throws AssetPairListException
+     * @throws ItemReadException
      */
     public function testListShouldBeOK(): void
     {
@@ -191,7 +191,8 @@ class AssetPairControllerTest extends TestCase
     }
 
     /**
-     * @throws AssetPairDeleteException
+     * @throws ItemDeleteException
+     * @throws ItemReadException
      */
     public function testDeleteShouldBeOK(): void
     {

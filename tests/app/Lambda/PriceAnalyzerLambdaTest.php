@@ -4,7 +4,8 @@
 namespace Test\App\Lambda;
 
 
-use AllCoin\Exception\AssetPairPrice\AssetPairPriceAnalyzerException;
+use AllCoin\Database\DynamoDb\Exception\ItemReadException;
+use AllCoin\Exception\NotificationHandlerException;
 use AllCoin\Process\AssetPairPrice\AssetPairPriceAnalyzerProcess;
 use App\Lambda\PriceAnalyzerLambda;
 use Test\TestCase;
@@ -25,7 +26,8 @@ class PriceAnalyzerLambdaTest extends TestCase
     }
 
     /**
-     * @throws AssetPairPriceAnalyzerException
+     * @throws ItemReadException
+     * @throws NotificationHandlerException
      */
     public function testInvokeShouldBeOK(): void
     {

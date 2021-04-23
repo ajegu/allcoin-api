@@ -8,7 +8,6 @@ use AllCoin\Builder\AssetBuilder;
 use AllCoin\Builder\AssetPairBuilder;
 use AllCoin\Database\DynamoDb\Exception\ItemReadException;
 use AllCoin\Database\DynamoDb\Exception\ItemSaveException;
-use AllCoin\Exception\Binance\BinanceSyncAssetException;
 use AllCoin\Model\Asset;
 use AllCoin\Model\AssetPair;
 use AllCoin\Process\Binance\BinanceSyncAssetProcess;
@@ -54,33 +53,10 @@ class BinanceSyncAssetProcessTest extends TestCase
         );
     }
 
-    public function testHandleWithRequestErrorShouldThrowException(): void
-    {
-        $request = new Request(
-            method: IlluminateRequest::METHOD_GET,
-            uri: BinanceSyncAssetProcess::BINANCE_URI
-        );
-
-        $this->client->expects($this->once())
-            ->method('sendRequest')
-            ->with($request)
-            ->willThrowException($this->createMock(ClientExceptionInterface::class));
-
-        $this->logger->expects($this->once())->method('error');
-        $this->expectException(BinanceSyncAssetException::class);
-
-        $this->assetRepository->expects($this->never())->method('existsByName');
-        $this->assetBuilder->expects($this->never())->method('build');
-        $this->assetRepository->expects($this->never())->method('save');
-        $this->assetPairRepository->expects($this->never())->method('findAllByAssetId');
-        $this->assetPairBuilder->expects($this->never())->method('build');
-        $this->assetPairRepository->expects($this->never())->method('save');
-
-        $this->binanceSyncAssetProcess->handle();
-    }
-
     /**
-     * @throws BinanceSyncAssetException
+     * @throws ClientExceptionInterface
+     * @throws ItemReadException
+     * @throws ItemSaveException
      */
     public function testHandleWithBadStatusCodeShouldStop(): void
     {
@@ -112,7 +88,9 @@ class BinanceSyncAssetProcessTest extends TestCase
     }
 
     /**
-     * @throws BinanceSyncAssetException
+     * @throws ClientExceptionInterface
+     * @throws ItemReadException
+     * @throws ItemSaveException
      */
     public function testHandleWithNotNeedAssetPairShouldStop(): void
     {
@@ -155,251 +133,10 @@ class BinanceSyncAssetProcessTest extends TestCase
         $this->binanceSyncAssetProcess->handle();
     }
 
-    public function testHandleWithAssetReadErrorShouldThrowException(): void
-    {
-        $request = new Request(
-            method: IlluminateRequest::METHOD_GET,
-            uri: BinanceSyncAssetProcess::BINANCE_URI
-        );
-
-        $assetName = 'foo';
-        $assetPairName = 'USDT';
-        $symbols = [
-            'data' => [
-                [
-                    'b' => $assetName,
-                    'q' => $assetPairName
-                ]
-            ]
-        ];
-
-        $body = $this->createMock(StreamInterface::class);
-        $body->expects($this->once())
-            ->method('__toString')
-            ->willReturn(json_encode($symbols));
-
-        $response = $this->createMock(ResponseInterface::class);
-        $response->expects($this->once())->method('getStatusCode')->willReturn(Response::HTTP_OK);
-        $response->expects($this->once())->method('getBody')->willReturn($body);
-
-        $this->client->expects($this->once())
-            ->method('sendRequest')
-            ->with($request)
-            ->willReturn($response);
-
-        $this->assetRepository->expects($this->once())
-            ->method('existsByName')
-            ->with($assetName)
-            ->willThrowException($this->createMock(ItemReadException::class));
-
-        $this->logger->expects($this->once())->method('error');
-        $this->expectException(BinanceSyncAssetException::class);
-
-        $this->assetBuilder->expects($this->never())->method('build');
-        $this->assetRepository->expects($this->never())->method('save');
-        $this->assetPairRepository->expects($this->never())->method('findAllByAssetId');
-        $this->assetPairBuilder->expects($this->never())->method('build');
-        $this->assetPairRepository->expects($this->never())->method('save');
-
-        $this->binanceSyncAssetProcess->handle();
-    }
-
-    public function testHandleWithAssetSaveErrorShouldThrowException(): void
-    {
-        $request = new Request(
-            method: IlluminateRequest::METHOD_GET,
-            uri: BinanceSyncAssetProcess::BINANCE_URI
-        );
-
-        $assetName = 'foo';
-        $assetPairName = 'USDT';
-        $symbols = [
-            'data' => [
-                [
-                    'b' => $assetName,
-                    'q' => $assetPairName
-                ]
-            ]
-        ];
-
-        $body = $this->createMock(StreamInterface::class);
-        $body->expects($this->once())
-            ->method('__toString')
-            ->willReturn(json_encode($symbols));
-
-        $response = $this->createMock(ResponseInterface::class);
-        $response->expects($this->once())->method('getStatusCode')->willReturn(Response::HTTP_OK);
-        $response->expects($this->once())->method('getBody')->willReturn($body);
-
-        $this->client->expects($this->once())
-            ->method('sendRequest')
-            ->with($request)
-            ->willReturn($response);
-
-        $this->assetRepository->expects($this->once())
-            ->method('existsByName')
-            ->with($assetName)
-            ->willReturn(null);
-
-        $asset = $this->createMock(Asset::class);
-        $this->assetBuilder->expects($this->once())
-            ->method('build')
-            ->with($assetName)
-            ->willReturn($asset);
-
-        $this->assetRepository->expects($this->once())
-            ->method('save')
-            ->willThrowException($this->createMock(ItemSaveException::class));
-
-        $this->logger->expects($this->once())->method('error');
-        $this->expectException(BinanceSyncAssetException::class);
-
-        $this->assetPairRepository->expects($this->never())->method('findAllByAssetId');
-        $this->assetPairBuilder->expects($this->never())->method('build');
-        $this->assetPairRepository->expects($this->never())->method('save');
-
-        $this->binanceSyncAssetProcess->handle();
-    }
-
-    public function testHandleWithAssetPairReadErrorShouldThrowException(): void
-    {
-        $request = new Request(
-            method: IlluminateRequest::METHOD_GET,
-            uri: BinanceSyncAssetProcess::BINANCE_URI
-        );
-
-        $assetName = 'foo';
-        $assetPairName = 'USDT';
-        $symbols = [
-            'data' => [
-                [
-                    'b' => $assetName,
-                    'q' => $assetPairName
-                ]
-            ]
-        ];
-
-        $body = $this->createMock(StreamInterface::class);
-        $body->expects($this->once())
-            ->method('__toString')
-            ->willReturn(json_encode($symbols));
-
-        $response = $this->createMock(ResponseInterface::class);
-        $response->expects($this->once())->method('getStatusCode')->willReturn(Response::HTTP_OK);
-        $response->expects($this->once())->method('getBody')->willReturn($body);
-
-        $this->client->expects($this->once())
-            ->method('sendRequest')
-            ->with($request)
-            ->willReturn($response);
-
-        $this->assetRepository->expects($this->once())
-            ->method('existsByName')
-            ->with($assetName)
-            ->willReturn(null);
-
-        $asset = $this->createMock(Asset::class);
-        $assetId = 'foo';
-        $asset->expects($this->once())->method('getId')->willReturn($assetId);
-
-        $this->assetBuilder->expects($this->once())
-            ->method('build')
-            ->with($assetName)
-            ->willReturn($asset);
-
-        $this->assetRepository->expects($this->once())
-            ->method('save');
-
-        $this->assetPairRepository->expects($this->once())
-            ->method('findAllByAssetId')
-            ->with($assetId)
-            ->willThrowException($this->createMock(ItemReadException::class));
-
-        $this->logger->expects($this->once())->method('error');
-        $this->expectException(BinanceSyncAssetException::class);
-
-        $this->assetPairBuilder->expects($this->never())->method('build');
-        $this->assetPairRepository->expects($this->never())->method('save');
-
-        $this->binanceSyncAssetProcess->handle();
-    }
-
-    public function testHandleWithAssetPairSaveErrorShouldThrowException(): void
-    {
-        $request = new Request(
-            method: IlluminateRequest::METHOD_GET,
-            uri: BinanceSyncAssetProcess::BINANCE_URI
-        );
-
-        $assetName = 'foo';
-        $assetPairName = 'USDT';
-        $symbols = [
-            'data' => [
-                [
-                    'b' => $assetName,
-                    'q' => $assetPairName
-                ]
-            ]
-        ];
-
-        $body = $this->createMock(StreamInterface::class);
-        $body->expects($this->once())
-            ->method('__toString')
-            ->willReturn(json_encode($symbols));
-
-        $response = $this->createMock(ResponseInterface::class);
-        $response->expects($this->once())->method('getStatusCode')->willReturn(Response::HTTP_OK);
-        $response->expects($this->once())->method('getBody')->willReturn($body);
-
-        $this->client->expects($this->once())
-            ->method('sendRequest')
-            ->with($request)
-            ->willReturn($response);
-
-        $this->assetRepository->expects($this->once())
-            ->method('existsByName')
-            ->with($assetName)
-            ->willReturn(null);
-
-        $asset = $this->createMock(Asset::class);
-        $assetId = 'foo';
-        $asset->expects($this->exactly(2))->method('getId')->willReturn($assetId);
-
-        $this->assetBuilder->expects($this->once())
-            ->method('build')
-            ->with($assetName)
-            ->willReturn($asset);
-
-        $this->assetRepository->expects($this->once())
-            ->method('save');
-
-        $assetPair = $this->createMock(AssetPair::class);
-        $assetPairName = 'foo';
-        $assetPair->expects($this->once())->method('getName')->willReturn($assetPairName);
-
-        $this->assetPairRepository->expects($this->once())
-            ->method('findAllByAssetId')
-            ->with($assetId)
-            ->willReturn([$assetPair]);
-
-        $newAssetPair = $this->createMock(AssetPair::class);
-        $this->assetPairBuilder->expects($this->once())
-            ->method('build')
-            ->willReturn($newAssetPair);
-
-        $this->assetPairRepository->expects($this->once())
-            ->method('save')
-            ->with($newAssetPair, $assetId)
-            ->willThrowException($this->createMock(ItemSaveException::class));
-
-        $this->logger->expects($this->once())->method('error');
-        $this->expectException(BinanceSyncAssetException::class);
-
-        $this->binanceSyncAssetProcess->handle();
-    }
-
     /**
-     * @throws BinanceSyncAssetException
+     * @throws ClientExceptionInterface
+     * @throws ItemReadException
+     * @throws ItemSaveException
      */
     public function testHandleShouldBeOKWithNonExistingAssetPair(): void
     {
@@ -474,7 +211,9 @@ class BinanceSyncAssetProcessTest extends TestCase
     }
 
     /**
-     * @throws BinanceSyncAssetException
+     * @throws ClientExceptionInterface
+     * @throws ItemReadException
+     * @throws ItemSaveException
      */
     public function testHandleShouldBeOKWithExistingAssetPair(): void
     {

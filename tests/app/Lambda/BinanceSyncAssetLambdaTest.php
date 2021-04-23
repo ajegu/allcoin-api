@@ -4,9 +4,11 @@
 namespace Test\App\Lambda;
 
 
-use AllCoin\Exception\Binance\BinanceSyncAssetException;
+use AllCoin\Database\DynamoDb\Exception\ItemReadException;
+use AllCoin\Database\DynamoDb\Exception\ItemSaveException;
 use AllCoin\Process\Binance\BinanceSyncAssetProcess;
 use App\Lambda\BinanceAssetSyncLambda;
+use Psr\Http\Client\ClientExceptionInterface;
 use Test\TestCase;
 
 class BinanceSyncAssetLambdaTest extends TestCase
@@ -25,7 +27,9 @@ class BinanceSyncAssetLambdaTest extends TestCase
     }
 
     /**
-     * @throws BinanceSyncAssetException
+     * @throws ItemReadException
+     * @throws ItemSaveException
+     * @throws ClientExceptionInterface
      */
     public function testInvokeShouldBeOK(): void
     {

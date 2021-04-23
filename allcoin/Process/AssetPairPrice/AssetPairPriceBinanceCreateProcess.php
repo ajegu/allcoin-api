@@ -5,14 +5,10 @@ namespace AllCoin\Process\AssetPairPrice;
 
 
 use Ajegu\BinanceSdk\Client;
-use Ajegu\BinanceSdk\Exception\UnexpectedStatusCodeException;
 use AllCoin\Database\DynamoDb\Exception\ItemReadException;
 use AllCoin\Database\DynamoDb\Exception\ItemSaveException;
 use AllCoin\Dto\RequestDtoInterface;
 use AllCoin\Dto\ResponseDtoInterface;
-use AllCoin\Exception\AssetPairPrice\AssetPairPriceBinanceCreateException;
-use AllCoin\Model\Asset;
-use AllCoin\Model\AssetPair;
 use AllCoin\Model\AssetPairPrice;
 use AllCoin\Process\ProcessInterface;
 use AllCoin\Repository\AssetPairPriceRepositoryInterface;
@@ -36,11 +32,12 @@ class AssetPairPriceBinanceCreateProcess implements ProcessInterface
      * @param RequestDtoInterface|null $dto
      * @param array $params
      * @return ResponseDtoInterface|null
-     * @throws AssetPairPriceBinanceCreateException
+     * @throws ItemReadException
+     * @throws ItemSaveException
      */
     public function handle(RequestDtoInterface $dto = null, array $params = []): ?ResponseDtoInterface
     {
-        $assets = $this->getAssets();
+        $assets = $this->assetRepository->findAll();
 
         $this->logger->debug(
             count($assets) . ' found for get price'
@@ -51,14 +48,14 @@ class AssetPairPriceBinanceCreateProcess implements ProcessInterface
             $assetName = $asset->getName();
             $this->logger->debug("Get pair for asset {$assetName}");
 
-            $assetPairs = $this->getAssetPairs($asset->getId());
+            $assetPairs = $this->assetPairRepository->findAllByAssetId($asset->getId());
 
             foreach ($assetPairs as $assetPair) {
                 $symbol = strtoupper($assetName . $assetPair->getName());
                 $this->logger->debug("Get price for symbol {$symbol}");
                 $assetPairPrice = $this->getAssetPairPrice($symbol);
                 $assetPairPrice->setAssetPair($assetPair);
-                $this->save($assetPairPrice);
+                $this->assetPairPriceRepository->save($assetPairPrice);
             }
         }
 
@@ -66,79 +63,16 @@ class AssetPairPriceBinanceCreateProcess implements ProcessInterface
     }
 
     /**
-     * @return Asset[]
-     * @throws AssetPairPriceBinanceCreateException
-     */
-    private function getAssets(): array
-    {
-        try {
-            return $this->assetRepository->findAll();
-        } catch (ItemReadException $exception) {
-            $message = 'Cannot get the assets for Binance process';
-            $this->logger->error($message, [
-                'exception' => $exception->getMessage()
-            ]);
-            throw new AssetPairPriceBinanceCreateException($message);
-        }
-    }
-
-    /**
-     * @param string $assetId
-     * @return AssetPair[]
-     * @throws AssetPairPriceBinanceCreateException
-     */
-    private function getAssetPairs(string $assetId): array
-    {
-        try {
-            return $this->assetPairRepository->findAllByAssetId($assetId);
-        } catch (ItemReadException $exception) {
-            $message = 'Cannot get the asset pairs for Binance process.';
-            $this->logger->error($message, [
-                'exception' => $exception->getMessage(),
-                'assetId' => $assetId
-            ]);
-            throw new AssetPairPriceBinanceCreateException($message);
-        }
-    }
-
-    /**
      * @param string $symbol
      * @return AssetPairPrice
-     * @throws AssetPairPriceBinanceCreateException
      */
     private function getAssetPairPrice(string $symbol): AssetPairPrice
     {
-        try {
-            $bookTicker = $this->client->getBookTicker(['symbol' => $symbol]);
-        } catch (UnexpectedStatusCodeException $exception) {
-            $message = 'Cannot get the book ticker from Binance.';
-            $this->logger->error($message, [
-                'exception' => $exception->getMessage()
-            ]);
-            throw new AssetPairPriceBinanceCreateException($message);
-        }
+        $bookTicker = $this->client->getBookTicker(['symbol' => $symbol]);
 
         return new AssetPairPrice(
             bidPrice: $bookTicker->getBidPrice(),
             askPrice: $bookTicker->getAskPrice()
         );
-    }
-
-    /**
-     * @param AssetPairPrice $assetPairPrice
-     * @throws AssetPairPriceBinanceCreateException
-     */
-    private function save(AssetPairPrice $assetPairPrice): void
-    {
-        try {
-            $this->assetPairPriceRepository->save($assetPairPrice);
-        } catch (ItemSaveException $exception) {
-            $message = 'Cannot save the asset pair price for Binance process.';
-            $this->logger->error($message, [
-                'exception' => $exception->getMessage(),
-                'assetPairId' => $assetPairPrice->getAssetPair()->getId()
-            ]);
-            throw new AssetPairPriceBinanceCreateException($message);
-        }
     }
 }

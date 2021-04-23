@@ -4,12 +4,10 @@
 namespace App\Http\Controllers;
 
 
+use AllCoin\Database\DynamoDb\Exception\ItemDeleteException;
+use AllCoin\Database\DynamoDb\Exception\ItemReadException;
+use AllCoin\Database\DynamoDb\Exception\ItemSaveException;
 use AllCoin\Dto\AssetRequestDto;
-use AllCoin\Exception\Asset\AssetCreateException;
-use AllCoin\Exception\Asset\AssetDeleteException;
-use AllCoin\Exception\Asset\AssetGetException;
-use AllCoin\Exception\Asset\AssetListException;
-use AllCoin\Exception\Asset\AssetUpdateException;
 use AllCoin\Process\Asset\AssetCreateProcess;
 use AllCoin\Process\Asset\AssetDeleteProcess;
 use AllCoin\Process\Asset\AssetGetProcess;
@@ -39,8 +37,8 @@ final class AssetController extends Controller
     /**
      * @param Request $request
      * @return JsonResponse
-     * @throws AssetCreateException
      * @throws ValidationException
+     * @throws ItemSaveException
      */
     public function create(Request $request): JsonResponse
     {
@@ -57,7 +55,7 @@ final class AssetController extends Controller
 
     /**
      * @return JsonResponse
-     * @throws AssetListException
+     * @throws ItemReadException
      */
     public function list(): JsonResponse
     {
@@ -72,8 +70,9 @@ final class AssetController extends Controller
      * @param Request $request
      * @param string $id
      * @return JsonResponse
+     * @throws ItemReadException
+     * @throws ItemSaveException
      * @throws ValidationException
-     * @throws AssetUpdateException
      */
     public function update(Request $request, string $id): JsonResponse
     {
@@ -91,7 +90,7 @@ final class AssetController extends Controller
     /**
      * @param string $id
      * @return JsonResponse
-     * @throws AssetDeleteException
+     * @throws ItemDeleteException
      */
     public function delete(string $id): JsonResponse
     {
@@ -103,7 +102,7 @@ final class AssetController extends Controller
     /**
      * @param string $id
      * @return JsonResponse
-     * @throws AssetGetException
+     * @throws ItemReadException
      */
     public function get(string $id): JsonResponse
     {

@@ -10,9 +10,6 @@ use AllCoin\Database\DynamoDb\Exception\ItemReadException;
 use AllCoin\Database\DynamoDb\Exception\ItemSaveException;
 use AllCoin\Dto\RequestDtoInterface;
 use AllCoin\Dto\ResponseDtoInterface;
-use AllCoin\Exception\Binance\BinanceSyncAssetException;
-use AllCoin\Model\Asset;
-use AllCoin\Model\AssetPair;
 use AllCoin\Process\ProcessInterface;
 use AllCoin\Repository\AssetPairRepositoryInterface;
 use AllCoin\Repository\AssetRepositoryInterface;
@@ -44,7 +41,9 @@ class BinanceSyncAssetProcess implements ProcessInterface
      * @param RequestDtoInterface|null $dto
      * @param array $params
      * @return ResponseDtoInterface|null
-     * @throws BinanceSyncAssetException
+     * @throws ItemReadException
+     * @throws ItemSaveException
+     * @throws ClientExceptionInterface
      */
     public function handle(RequestDtoInterface $dto = null, array $params = []): ?ResponseDtoInterface
     {
@@ -53,16 +52,7 @@ class BinanceSyncAssetProcess implements ProcessInterface
             uri: self::BINANCE_URI
         );
 
-        try {
-            $response = $this->client->sendRequest($request);
-        } catch (ClientExceptionInterface $exception) {
-            $message = 'Cannot fetch the symbol from Binance!';
-            $this->logger->error($message, [
-                'url' => self::BINANCE_URI,
-                'message' => $exception->getMessage()
-            ]);
-            throw new BinanceSyncAssetException($message);
-        }
+        $response = $this->client->sendRequest($request);
 
         if ($response->getStatusCode() === Response::HTTP_OK) {
             $result = json_decode($response->getBody(), true);
@@ -75,114 +65,29 @@ class BinanceSyncAssetProcess implements ProcessInterface
                     continue;
                 }
 
-                if (!$asset = $this->existsAsset($assetName)) {
-                    $asset = $this->createAsset($assetName);
+                if (!$asset = $this->assetRepository->existsByName($assetName)) {
+                    $asset = $this->assetBuilder->build($assetName);
+                    $this->assetRepository->save($asset);
                 }
 
-                if (null === $this->getAssetPair($asset->getId(), $assetPairName)) {
-                    $this->createAssetPair($asset, $assetPairName);
+                $assetPairs = $this->assetPairRepository->findAllByAssetId($asset->getId());
+                $assetPairExists = null;
+                foreach ($assetPairs as $assetPair) {
+                    if ($assetPair->getName() === $assetPairName) {
+                        $assetPairExists = $assetPair;
+                    }
+                }
+                if (null === $assetPairExists) {
+                    $assetPair = $this->assetPairBuilder->build($assetPairName);
+                    $this->assetPairRepository->save($assetPair, $asset->getId());
                 }
             }
         } else {
-            $this->logger->warning(
-                'The assets could not be sync for Binance',
-                [
-                    'response' => (string)$response->getBody()
-                ]
-            );
+            $this->logger->warning('The assets could not be sync for Binance', [
+                'response' => (string)$response->getBody()
+            ]);
         }
 
         return null;
-    }
-
-    /**
-     * @param string $assetName
-     * @return ?Asset
-     * @throws BinanceSyncAssetException
-     */
-    private function existsAsset(string $assetName): ?Asset
-    {
-        try {
-            return $this->assetRepository->existsByName($assetName);
-        } catch (ItemReadException $exception) {
-            $message = 'The asset cannot be verify during Binance sync!';
-            $this->logger->error($message, [
-                'name' => $assetName,
-                'message' => $exception->getMessage()
-            ]);
-            throw new BinanceSyncAssetException($message);
-        }
-    }
-
-    /**
-     * @param string $base
-     * @return Asset
-     * @throws BinanceSyncAssetException
-     */
-    private function createAsset(string $base): Asset
-    {
-        $asset = $this->assetBuilder->build($base);
-
-        try {
-            $this->assetRepository->save($asset);
-        } catch (ItemSaveException $exception) {
-            $message = 'The asset cannot be save during Binance sync!';
-            $this->logger->error($message, [
-                'base' => $base,
-                'message' => $exception->getMessage()
-            ]);
-            throw new BinanceSyncAssetException($message);
-        }
-
-        return $asset;
-    }
-
-    /**
-     * @param string $assetId
-     * @param string $assetPairName
-     * @return AssetPair|null
-     * @throws BinanceSyncAssetException
-     */
-    private function getAssetPair(string $assetId, string $assetPairName): ?AssetPair
-    {
-        try {
-            $assetPairs = $this->assetPairRepository->findAllByAssetId($assetId);
-        } catch (ItemReadException $exception) {
-            $message = 'The asset pair cannot be find during Binance sync!';
-            $this->logger->error($message, [
-                'assetId' => $assetId,
-                'message' => $exception->getMessage()
-            ]);
-            throw new BinanceSyncAssetException($message);
-        }
-
-        foreach ($assetPairs as $assetPair) {
-            if ($assetPair->getName() === $assetPairName) {
-                return $assetPair;
-            }
-        }
-
-        return null;
-    }
-
-    /**
-     * @param Asset $asset
-     * @param string $assetPairName
-     * @throws BinanceSyncAssetException
-     */
-    private function createAssetPair(Asset $asset, string $assetPairName): void
-    {
-        $assetPair = $this->assetPairBuilder->build($assetPairName);
-
-        try {
-            $this->assetPairRepository->save($assetPair, $asset->getId());
-        } catch (ItemSaveException $exception) {
-            $message = 'The asset pair cannot be save during Binance sync!';
-            $this->logger->error($message, [
-                'assetPairName' => $assetPairName,
-                'message' => $exception->getMessage()
-            ]);
-            throw new BinanceSyncAssetException($message);
-        }
     }
 }
