@@ -23,7 +23,6 @@ variable "AWS_SNS_TOPIC_PRICE_ANALYZER_ARN" {
     type = string
 }
 
-
 variable "AWS_SNS_TOPIC_ORDER_ANALYZER_ARN" {
     type = string
 }
