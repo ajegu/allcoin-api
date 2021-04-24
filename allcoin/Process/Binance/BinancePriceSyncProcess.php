@@ -16,7 +16,7 @@ use AllCoin\Repository\AssetPairRepositoryInterface;
 use AllCoin\Repository\AssetRepositoryInterface;
 use Psr\Log\LoggerInterface;
 
-class BinanceSyncPriceProcess implements ProcessInterface
+class BinancePriceSyncProcess implements ProcessInterface
 {
     public function __construct(
         private Client $client,

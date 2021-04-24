@@ -8,23 +8,23 @@ use AllCoin\Database\DynamoDb\Exception\ItemReadException;
 use AllCoin\Database\DynamoDb\Exception\ItemSaveException;
 use AllCoin\DataMapper\EventPriceMapper;
 use AllCoin\Model\EventPrice;
-use AllCoin\Process\Binance\BinanceBuyOrderProcess;
-use App\Lambda\BinanceBuyOrderLambda;
+use AllCoin\Process\Binance\BinanceOrderBuyProcess;
+use App\Lambda\BinanceOrderBuyLambda;
 use Test\TestCase;
 
-class BinanceBuyOrderLambdaTest extends TestCase
+class BinanceOrderBuyLambdaTest extends TestCase
 {
-    private BinanceBuyOrderLambda $binanceBuyOrderLambda;
+    private BinanceOrderBuyLambda $binanceBuyOrderLambda;
 
-    private BinanceBuyOrderProcess $binanceBuyOrderProcess;
+    private BinanceOrderBuyProcess $binanceBuyOrderProcess;
     private EventPriceMapper $eventPriceMapper;
 
     public function setUp(): void
     {
-        $this->binanceBuyOrderProcess = $this->createMock(BinanceBuyOrderProcess::class);
+        $this->binanceBuyOrderProcess = $this->createMock(BinanceOrderBuyProcess::class);
         $this->eventPriceMapper = $this->createMock(EventPriceMapper::class);
 
-        $this->binanceBuyOrderLambda = new BinanceBuyOrderLambda(
+        $this->binanceBuyOrderLambda = new BinanceOrderBuyLambda(
             $this->binanceBuyOrderProcess,
             $this->eventPriceMapper,
         );

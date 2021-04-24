@@ -10,7 +10,7 @@ use AllCoin\Database\DynamoDb\Exception\ItemReadException;
 use AllCoin\Database\DynamoDb\Exception\ItemSaveException;
 use AllCoin\Model\Asset;
 use AllCoin\Model\AssetPair;
-use AllCoin\Process\Binance\BinanceSyncAssetProcess;
+use AllCoin\Process\Binance\BinanceAssetSyncProcess;
 use AllCoin\Repository\AssetPairRepositoryInterface;
 use AllCoin\Repository\AssetRepositoryInterface;
 use Http\Client\HttpClient;
@@ -23,9 +23,9 @@ use Psr\Http\Message\StreamInterface;
 use Psr\Log\LoggerInterface;
 use Test\TestCase;
 
-class BinanceSyncAssetProcessTest extends TestCase
+class BinanceAssetSyncProcessTest extends TestCase
 {
-    private BinanceSyncAssetProcess $binanceSyncAssetProcess;
+    private BinanceAssetSyncProcess $binanceSyncAssetProcess;
 
     private HttpClient $client;
     private AssetRepositoryInterface $assetRepository;
@@ -43,7 +43,7 @@ class BinanceSyncAssetProcessTest extends TestCase
         $this->assetBuilder = $this->createMock(AssetBuilder::class);
         $this->assetPairBuilder = $this->createMock(AssetPairBuilder::class);
 
-        $this->binanceSyncAssetProcess = new BinanceSyncAssetProcess(
+        $this->binanceSyncAssetProcess = new BinanceAssetSyncProcess(
             $this->client,
             $this->assetRepository,
             $this->assetPairRepository,
@@ -62,7 +62,7 @@ class BinanceSyncAssetProcessTest extends TestCase
     {
         $request = new Request(
             method: IlluminateRequest::METHOD_GET,
-            uri: BinanceSyncAssetProcess::BINANCE_URI
+            uri: BinanceAssetSyncProcess::BINANCE_URI
         );
 
         $response = $this->createMock(ResponseInterface::class);
@@ -96,7 +96,7 @@ class BinanceSyncAssetProcessTest extends TestCase
     {
         $request = new Request(
             method: IlluminateRequest::METHOD_GET,
-            uri: BinanceSyncAssetProcess::BINANCE_URI
+            uri: BinanceAssetSyncProcess::BINANCE_URI
         );
 
         $symbols = [
@@ -142,7 +142,7 @@ class BinanceSyncAssetProcessTest extends TestCase
     {
         $request = new Request(
             method: IlluminateRequest::METHOD_GET,
-            uri: BinanceSyncAssetProcess::BINANCE_URI
+            uri: BinanceAssetSyncProcess::BINANCE_URI
         );
 
         $assetName = 'foo';
@@ -219,7 +219,7 @@ class BinanceSyncAssetProcessTest extends TestCase
     {
         $request = new Request(
             method: IlluminateRequest::METHOD_GET,
-            uri: BinanceSyncAssetProcess::BINANCE_URI
+            uri: BinanceAssetSyncProcess::BINANCE_URI
         );
 
         $assetName = 'foo';

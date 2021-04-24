@@ -7,7 +7,7 @@ namespace AllCoin\DataMapper;
 use AllCoin\Model\EventInterface;
 use AllCoin\Model\EventPrice;
 
-class EventPriceMapper extends AbstractDataMapper
+class EventPriceMapper extends AbstractDataMapper implements EventMapperInterface
 {
     public function mapJsonToEvent(string $data): EventPrice|EventInterface
     {

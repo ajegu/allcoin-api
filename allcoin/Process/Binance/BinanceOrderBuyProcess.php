@@ -16,7 +16,7 @@ use AllCoin\Repository\AssetPairRepositoryInterface;
 use AllCoin\Repository\OrderRepositoryInterface;
 use Psr\Log\LoggerInterface;
 
-class BinanceBuyOrderProcess implements ProcessInterface
+class BinanceOrderBuyProcess implements ProcessInterface
 {
     const FIXED_TRANSACTION_AMOUNT = 10;
 
@@ -63,7 +63,7 @@ class BinanceBuyOrderProcess implements ProcessInterface
         $assetPair->setLastOrder($order);
         $this->assetPairRepository->save($assetPair, $dto->getAsset()->getId());
 
-        $this->logger->debug('Order created!');
+        $this->logger->debug('Order buy created!');
 
         return null;
     }

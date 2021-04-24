@@ -11,16 +11,16 @@ use AllCoin\Database\DynamoDb\Exception\ItemSaveException;
 use AllCoin\Model\Asset;
 use AllCoin\Model\AssetPair;
 use AllCoin\Model\AssetPairPrice;
-use AllCoin\Process\Binance\BinanceSyncPriceProcess;
+use AllCoin\Process\Binance\BinancePriceSyncProcess;
 use AllCoin\Repository\AssetPairPriceRepositoryInterface;
 use AllCoin\Repository\AssetPairRepositoryInterface;
 use AllCoin\Repository\AssetRepositoryInterface;
 use Psr\Log\LoggerInterface;
 use Test\TestCase;
 
-class BinanceSyncPriceProcessTest extends TestCase
+class BinancePriceSyncProcessTest extends TestCase
 {
-    private BinanceSyncPriceProcess $assetPairPriceBinanceCreateProcess;
+    private BinancePriceSyncProcess $assetPairPriceBinanceCreateProcess;
 
     private Client $client;
     private AssetRepositoryInterface $assetRepository;
@@ -36,7 +36,7 @@ class BinanceSyncPriceProcessTest extends TestCase
         $this->assetPairPriceRepository = $this->createMock(AssetPairPriceRepositoryInterface::class);
         $this->logger = $this->createMock(LoggerInterface::class);
 
-        $this->assetPairPriceBinanceCreateProcess = new BinanceSyncPriceProcess(
+        $this->assetPairPriceBinanceCreateProcess = new BinancePriceSyncProcess(
             $this->client,
             $this->assetRepository,
             $this->assetPairRepository,
