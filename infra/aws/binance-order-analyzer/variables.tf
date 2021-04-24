@@ -16,10 +16,5 @@ variable "dynamodb_table_name" {
 
 variable "lambda_name" {
     type = string
-    default = "BinancePriceAnalyzer"
-}
-
-variable "AWS_SNS_TOPIC_ORDER_ANALYZER_ARN" {
-    type = string
-    default = "not use"
+    default = "BinanceOrderAnalyzer"
 }

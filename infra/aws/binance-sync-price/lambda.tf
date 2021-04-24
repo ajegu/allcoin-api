@@ -12,6 +12,7 @@ resource "aws_lambda_function" "binance_sync_price" {
             LOG_CHANNEL = var.log_channel
             APP_TIMEZONE = var.app_timezone
             AWS_SNS_TOPIC_PRICE_ANALYZER_ARN = var.AWS_SNS_TOPIC_PRICE_ANALYZER_ARN
+            AWS_SNS_TOPIC_ORDER_ANALYZER_ARN = var.AWS_SNS_TOPIC_ORDER_ANALYZER_ARN
         }
     }
     s3_bucket = "allcoin-api-deployment"

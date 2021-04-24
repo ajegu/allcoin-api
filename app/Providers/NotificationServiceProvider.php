@@ -41,7 +41,7 @@ class NotificationServiceProvider extends ServiceProvider
      */
     private function registerOrderAnalyzerNotificationHandler(): void
     {
-        $env = 'AWS_SNS_TOPIC_TRANSACTION_ANALYZER_ARN';
+        $env = 'AWS_SNS_TOPIC_ORDER_ANALYZER_ARN';
         if (!getenv($env)) {
             throw new ServiceProviderException(
                 "You must defined the environment variable {$env}"

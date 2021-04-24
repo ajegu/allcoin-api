@@ -20,3 +20,12 @@ module "binance_price_analyzer" {
     log_channel = var.log_channel
     dynamodb_table_name = var.dynamodb_table_name
 }
+
+module "binance_order_analyzer" {
+    source = "./binance-order-analyzer"
+
+    app_name = var.app_name
+    app_timezone = var.app_timezone
+    log_channel = var.log_channel
+    dynamodb_table_name = var.dynamodb_table_name
+}
