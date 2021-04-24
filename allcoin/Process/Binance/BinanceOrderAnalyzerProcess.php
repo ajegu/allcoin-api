@@ -53,7 +53,7 @@ class BinanceOrderAnalyzerProcess implements ProcessInterface
 
             $lastOrder = $assetPair->getLastOrder();
 
-            if ($lastOrder->getDirection() === Order::SELL) {
+            if ($lastOrder === null || $lastOrder->getDirection() === Order::SELL) {
                 $this->logger->debug('Not a buy order.');
                 continue;
             }
