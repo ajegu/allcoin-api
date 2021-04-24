@@ -10,6 +10,7 @@ use AllCoin\DataMapper\EventPriceMapper;
 use AllCoin\Model\EventPrice;
 use AllCoin\Process\Binance\BinanceOrderBuyProcess;
 use App\Lambda\BinanceOrderBuyLambda;
+use Psr\Log\LoggerInterface;
 use Test\TestCase;
 
 class BinanceOrderBuyLambdaTest extends TestCase
@@ -27,6 +28,7 @@ class BinanceOrderBuyLambdaTest extends TestCase
         $this->binanceBuyOrderLambda = new BinanceOrderBuyLambda(
             $this->binanceBuyOrderProcess,
             $this->eventPriceMapper,
+            $this->createMock(LoggerInterface::class)
         );
     }
 
