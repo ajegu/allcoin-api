@@ -1,7 +1,7 @@
 <?php
 
 
-namespace Test\AllCoin\Process\AssetPairPrice;
+namespace Test\AllCoin\Process\Binance;
 
 
 use AllCoin\Builder\EventPriceBuilder;
@@ -13,7 +13,7 @@ use AllCoin\Model\AssetPairPrice;
 use AllCoin\Model\EventEnum;
 use AllCoin\Model\EventPrice;
 use AllCoin\Notification\Handler\PriceAnalyzerNotificationHandler;
-use AllCoin\Process\AssetPairPrice\AssetPairPriceAnalyzerProcess;
+use AllCoin\Process\Binance\BinancePriceAnalyzerProcess;
 use AllCoin\Repository\AssetPairPriceRepositoryInterface;
 use AllCoin\Repository\AssetPairRepositoryInterface;
 use AllCoin\Repository\AssetRepositoryInterface;
@@ -22,9 +22,9 @@ use DateTime;
 use Psr\Log\LoggerInterface;
 use Test\TestCase;
 
-class AssetPairPriceAnalyticsProcessTest extends TestCase
+class BinancePriceAnalyzerProcessTest extends TestCase
 {
-    private AssetPairPriceAnalyzerProcess $assetPairPriceAnalyzerProcess;
+    private BinancePriceAnalyzerProcess $assetPairPriceAnalyzerProcess;
 
     private AssetRepositoryInterface $assetRepository;
     private AssetPairRepositoryInterface $assetPairRepository;
@@ -44,7 +44,7 @@ class AssetPairPriceAnalyticsProcessTest extends TestCase
         $this->eventHandler = $this->createMock(PriceAnalyzerNotificationHandler::class);
         $this->eventPriceBuilder = $this->createMock(EventPriceBuilder::class);
 
-        $this->assetPairPriceAnalyzerProcess = new AssetPairPriceAnalyzerProcess(
+        $this->assetPairPriceAnalyzerProcess = new BinancePriceAnalyzerProcess(
             $this->assetRepository,
             $this->assetPairRepository,
             $this->assetPairPriceRepository,
@@ -66,7 +66,7 @@ class AssetPairPriceAnalyticsProcessTest extends TestCase
         $start = DateTime::createFromFormat('Y-m-d', '2020-04-16');
         $this->dateTimeService->expects($this->once())
             ->method('sub')
-            ->with($end, 'PT' . AssetPairPriceAnalyzerProcess::TIME_ANALYTICS . 'M')
+            ->with($end, 'PT' . BinancePriceAnalyzerProcess::TIME_ANALYTICS . 'M')
             ->willReturn($start);
 
         $asset = $this->createMock(Asset::class);
@@ -133,7 +133,7 @@ class AssetPairPriceAnalyticsProcessTest extends TestCase
         $start = DateTime::createFromFormat('Y-m-d', '2020-04-16');
         $this->dateTimeService->expects($this->once())
             ->method('sub')
-            ->with($end, 'PT' . AssetPairPriceAnalyzerProcess::TIME_ANALYTICS . 'M')
+            ->with($end, 'PT' . BinancePriceAnalyzerProcess::TIME_ANALYTICS . 'M')
             ->willReturn($start);
 
         $asset = $this->createMock(Asset::class);
@@ -200,7 +200,7 @@ class AssetPairPriceAnalyticsProcessTest extends TestCase
         $start = DateTime::createFromFormat('Y-m-d', '2020-04-16');
         $this->dateTimeService->expects($this->once())
             ->method('sub')
-            ->with($end, 'PT' . AssetPairPriceAnalyzerProcess::TIME_ANALYTICS . 'M')
+            ->with($end, 'PT' . BinancePriceAnalyzerProcess::TIME_ANALYTICS . 'M')
             ->willReturn($start);
 
         $asset = $this->createMock(Asset::class);

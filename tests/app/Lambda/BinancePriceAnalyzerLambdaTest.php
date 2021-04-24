@@ -6,21 +6,21 @@ namespace Test\App\Lambda;
 
 use AllCoin\Database\DynamoDb\Exception\ItemReadException;
 use AllCoin\Exception\NotificationHandlerException;
-use AllCoin\Process\AssetPairPrice\AssetPairPriceAnalyzerProcess;
-use App\Lambda\PriceAnalyzerLambda;
+use AllCoin\Process\Binance\BinancePriceAnalyzerProcess;
+use App\Lambda\BinancePriceAnalyzerLambda;
 use Test\TestCase;
 
-class PriceAnalyzerLambdaTest extends TestCase
+class BinancePriceAnalyzerLambdaTest extends TestCase
 {
-    private PriceAnalyzerLambda $priceAnalyzerLambda;
+    private BinancePriceAnalyzerLambda $priceAnalyzerLambda;
 
-    private AssetPairPriceAnalyzerProcess $assetPairPriceAnalyzerProcess;
+    private BinancePriceAnalyzerProcess $assetPairPriceAnalyzerProcess;
 
     public function setUp(): void
     {
-        $this->assetPairPriceAnalyzerProcess = $this->createMock(AssetPairPriceAnalyzerProcess::class);
+        $this->assetPairPriceAnalyzerProcess = $this->createMock(BinancePriceAnalyzerProcess::class);
 
-        $this->priceAnalyzerLambda = new PriceAnalyzerLambda(
+        $this->priceAnalyzerLambda = new BinancePriceAnalyzerLambda(
             $this->assetPairPriceAnalyzerProcess
         );
     }

@@ -1,7 +1,7 @@
-resource "aws_lambda_function" "binance_price" {
-    function_name = "${var.app_name}${var.lambda_name}Lambda"
-    handler = "lambda/get_binance_price.php"
-    role = aws_iam_role.binance_price.arn
+resource "aws_lambda_function" "binance_sync_price" {
+    function_name = "${var.app_name}-${var.lambda_name}Lambda"
+    handler = "lambda/binance_sync_price.php"
+    role = aws_iam_role.binance_sync_price.arn
     runtime = "provided.al2"
     layers = [
         "arn:aws:lambda:eu-west-3:209497400698:layer:php-80:8"
@@ -19,16 +19,16 @@ resource "aws_lambda_function" "binance_price" {
     source_code_hash = base64sha256("allcoin")
 
     depends_on = [
-        aws_iam_role.binance_price,
-        aws_cloudwatch_event_rule.binance_price,
+        aws_iam_role.binance_sync_price,
+        aws_cloudwatch_event_rule.binance_sync_price,
     ]
 
     timeout = 900
 }
 
-resource "aws_lambda_permission" "binance_price" {
+resource "aws_lambda_permission" "binance_sync_price" {
     action = "lambda:InvokeFunction"
-    function_name = aws_lambda_function.binance_price.function_name
+    function_name = aws_lambda_function.binance_sync_price.function_name
     principal = "events.amazonaws.com"
-    source_arn = aws_cloudwatch_event_rule.binance_price.arn
+    source_arn = aws_cloudwatch_event_rule.binance_sync_price.arn
 }
