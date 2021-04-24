@@ -96,6 +96,8 @@ class BinanceOrderAnalyzerProcess implements ProcessInterface
             }
         }
 
+        $this->logger->debug('Nothing to do.');
+
         return null;
     }
 

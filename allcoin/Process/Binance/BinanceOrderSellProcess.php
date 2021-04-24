@@ -52,7 +52,7 @@ class BinanceOrderSellProcess implements ProcessInterface
         $assetPair->setLastOrder($order);
         $this->assetPairRepository->save($assetPair, $dto->getAsset()->getId());
 
-        $this->logger->debug('Order buy created!');
+        $this->logger->debug('Order sell created!');
 
         return null;
     }
