@@ -56,6 +56,12 @@ class BinancePriceAnalyzerProcess implements ProcessInterface
             foreach ($assetPairs as $assetPair) {
                 $prices = $this->assetPairPriceRepository->findAllByDateRange($assetPair->getId(), $start, $end);
 
+                if (count($prices) === 0) {
+                    $this->logger->debug('No prices found.', [
+                        'assetPair' => $assetPair
+                    ]);
+                    continue;
+                }
                 $oldPrice = $prices[0];
                 $newPrice = $prices[count($prices) - 1];
 

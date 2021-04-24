@@ -241,4 +241,49 @@ class BinancePriceAnalyzerProcessTest extends TestCase
 
         $this->assetPairPriceAnalyzerProcess->handle();
     }
+
+    /**
+     * @throws ItemReadException
+     * @throws NotificationHandlerException
+     */
+    public function testHandleWithNoPriceFoundShouldStop(): void
+    {
+        $end = DateTime::createFromFormat('Y-m-d', '2020-04-17');
+        $this->dateTimeService->expects($this->once())->method('now')->willReturn($end);
+        $start = DateTime::createFromFormat('Y-m-d', '2020-04-16');
+        $this->dateTimeService->expects($this->once())
+            ->method('sub')
+            ->with($end, 'PT' . BinancePriceAnalyzerProcess::TIME_ANALYTICS . 'M')
+            ->willReturn($start);
+
+        $asset = $this->createMock(Asset::class);
+        $assetId = 'foo';
+        $asset->expects($this->once())->method('getId')->willReturn($assetId);
+
+        $this->assetRepository->expects($this->once())
+            ->method('findAll')
+            ->willReturn([$asset]);
+
+        $assetPair = $this->createMock(AssetPair::class);
+        $assetPairId = 'foo';
+        $assetPair->expects($this->once())->method('getId')->willReturn($assetPairId);
+
+        $this->assetPairRepository->expects($this->once())
+            ->method('findAllByAssetId')
+            ->with($assetId)
+            ->willReturn([$assetPair]);
+
+        $this->assetPairPriceRepository->expects($this->once())
+            ->method('findAllByDateRange')
+            ->with($assetPairId, $start, $end)
+            ->willReturn([]);
+
+        $this->eventPriceBuilder->expects($this->never())->method('build');
+
+        $this->eventHandler->expects($this->never())->method('dispatch');
+
+        $this->logger->expects($this->never())->method('error');
+
+        $this->assetPairPriceAnalyzerProcess->handle();
+    }
 }
