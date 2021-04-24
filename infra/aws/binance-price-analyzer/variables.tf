@@ -21,5 +21,4 @@ variable "lambda_name" {
 
 variable "AWS_SNS_TOPIC_ORDER_ANALYZER_ARN" {
     type = string
-    default = "not use"
 }
