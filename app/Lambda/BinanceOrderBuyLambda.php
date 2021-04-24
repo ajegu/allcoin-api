@@ -10,7 +10,7 @@ use AllCoin\DataMapper\EventPriceMapper;
 use AllCoin\Process\Binance\BinanceOrderBuyProcess;
 use Psr\Log\LoggerInterface;
 
-class BinanceOrderBuyLambda implements LambdaInterface
+class BinanceOrderBuyLambda extends AbstractLambda implements LambdaInterface
 {
     public function __construct(
         private BinanceOrderBuyProcess $binanceBuyOrderProcess,
@@ -30,7 +30,15 @@ class BinanceOrderBuyLambda implements LambdaInterface
         $this->logger->debug('Receive event', [
             'event' => $event
         ]);
-        $eventPrice = $this->eventPriceMapper->mapJsonToEvent($event['Message']);
-        $this->binanceBuyOrderProcess->handle($eventPrice);
+
+        $message = $this->getMessageFromEvent($event);
+        $this->logger->debug('Message extract', [
+            'message' => $message
+        ]);
+
+        if ($message) {
+            $eventPrice = $this->eventPriceMapper->mapJsonToEvent($message);
+            $this->binanceBuyOrderProcess->handle($eventPrice);
+        }
     }
 }

@@ -9,6 +9,7 @@ use AllCoin\DataMapper\EventOrderMapper;
 use AllCoin\Model\EventOrder;
 use AllCoin\Process\Binance\BinanceOrderSellProcess;
 use App\Lambda\BinanceOrderSellLambda;
+use Psr\Log\LoggerInterface;
 use Test\TestCase;
 
 class BinanceOrderSellLambdaTest extends TestCase
@@ -26,7 +27,21 @@ class BinanceOrderSellLambdaTest extends TestCase
         $this->binanceOrderSellLambda = new BinanceOrderSellLambda(
             $this->binanceOrderSellProcess,
             $this->eventOrderMapper,
+            $this->createMock(LoggerInterface::class)
         );
+    }
+
+    /**
+     * @throws ItemSaveException
+     */
+    public function testInvokeWithNoMessageShouldStop(): void
+    {
+        $event = [];
+
+        $this->eventOrderMapper->expects($this->never())->method('mapJsonToEvent');
+        $this->binanceOrderSellProcess->expects($this->never())->method('handle');
+
+        $this->binanceOrderSellLambda->__invoke($event);
     }
 
     /**
@@ -35,7 +50,16 @@ class BinanceOrderSellLambdaTest extends TestCase
     public function testInvokeShouldBeOk(): void
     {
         $message = 'foo';
-        $event = ['Message' => $message];
+
+        $event = [
+            'Records' => [
+                [
+                    'Sns' => [
+                        'Message' => $message
+                    ]
+                ]
+            ]
+        ];
 
         $eventOrder = $this->createMock(EventOrder::class);
 
