@@ -1,7 +1,7 @@
 <?php
 
 
-namespace AllCoin\Process\AssetPairPrice;
+namespace AllCoin\Process\Binance;
 
 
 use AllCoin\Builder\EventPriceBuilder;
@@ -18,7 +18,7 @@ use AllCoin\Repository\AssetRepositoryInterface;
 use AllCoin\Service\DateTimeService;
 use Psr\Log\LoggerInterface;
 
-class AssetPairPriceAnalyzerProcess implements ProcessInterface
+class BinancePriceAnalyzerProcess implements ProcessInterface
 {
     const TIME_ANALYTICS = 5; // in minutes
     const ALERT_PERCENT_PRICE_UP = 5;

@@ -1,7 +1,7 @@
 <?php
 
 
-namespace AllCoin\Process\AssetPairPrice;
+namespace AllCoin\Process\Binance;
 
 
 use Ajegu\BinanceSdk\Client;
@@ -16,7 +16,7 @@ use AllCoin\Repository\AssetPairRepositoryInterface;
 use AllCoin\Repository\AssetRepositoryInterface;
 use Psr\Log\LoggerInterface;
 
-class AssetPairPriceBinanceCreateProcess implements ProcessInterface
+class BinanceSyncPriceProcess implements ProcessInterface
 {
     public function __construct(
         private Client $client,

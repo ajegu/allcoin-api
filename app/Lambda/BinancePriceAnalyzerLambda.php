@@ -6,12 +6,12 @@ namespace App\Lambda;
 
 use AllCoin\Database\DynamoDb\Exception\ItemReadException;
 use AllCoin\Exception\NotificationHandlerException;
-use AllCoin\Process\AssetPairPrice\AssetPairPriceAnalyzerProcess;
+use AllCoin\Process\Binance\BinancePriceAnalyzerProcess;
 
-class PriceAnalyzerLambda
+class BinancePriceAnalyzerLambda
 {
     public function __construct(
-        private AssetPairPriceAnalyzerProcess $assetPairPriceAnalyzerProcess
+        private BinancePriceAnalyzerProcess $assetPairPriceAnalyzerProcess
     )
     {
     }

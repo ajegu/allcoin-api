@@ -1,5 +1,5 @@
-resource "aws_iam_policy" "price_analyzer_logs" {
-    name = "${var.app_name}${var.lambda_name}IAMPolicyLogs"
+resource "aws_iam_policy" "binance_price_analyzer_logs" {
+    name = "${var.app_name}-${var.lambda_name}IAMPolicyLogs"
 
     path = "/"
     description = "IAM policy for logging from a lambda"
@@ -22,7 +22,7 @@ resource "aws_iam_policy" "price_analyzer_logs" {
 EOF
 }
 
-resource "aws_iam_role_policy_attachment" "policy_attachment_price_analyzer_logs" {
-    role = aws_iam_role.price_analyzer.name
-    policy_arn = aws_iam_policy.price_analyzer_logs.arn
+resource "aws_iam_role_policy_attachment" "policy_attachment_binance_price_analyzer_logs" {
+    role = aws_iam_role.binance_price_analyzer.name
+    policy_arn = aws_iam_policy.binance_price_analyzer_logs.arn
 }

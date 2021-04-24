@@ -1,9 +1,9 @@
 <?php
 /** @var Application $app */
 
-use App\Lambda\PriceAnalyzerLambda;
+use App\Lambda\BinanceSyncPriceLambda;
 use Laravel\Lumen\Application;
 
 $app = require __DIR__ . '/../bootstrap/app.php';
 
-return $app->make(PriceAnalyzerLambda::class);
+return $app->make(BinanceSyncPriceLambda::class);

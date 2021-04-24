@@ -1,7 +1,7 @@
 <?php
 
 
-namespace Test\AllCoin\Process\AssetPairPrice;
+namespace Test\AllCoin\Process\Binance;
 
 
 use Ajegu\BinanceSdk\Client;
@@ -11,16 +11,16 @@ use AllCoin\Database\DynamoDb\Exception\ItemSaveException;
 use AllCoin\Model\Asset;
 use AllCoin\Model\AssetPair;
 use AllCoin\Model\AssetPairPrice;
-use AllCoin\Process\AssetPairPrice\AssetPairPriceBinanceCreateProcess;
+use AllCoin\Process\Binance\BinanceSyncPriceProcess;
 use AllCoin\Repository\AssetPairPriceRepositoryInterface;
 use AllCoin\Repository\AssetPairRepositoryInterface;
 use AllCoin\Repository\AssetRepositoryInterface;
 use Psr\Log\LoggerInterface;
 use Test\TestCase;
 
-class AssetPairPriceBinanceCreateProcessTest extends TestCase
+class BinanceSyncPriceProcessTest extends TestCase
 {
-    private AssetPairPriceBinanceCreateProcess $assetPairPriceBinanceCreateProcess;
+    private BinanceSyncPriceProcess $assetPairPriceBinanceCreateProcess;
 
     private Client $client;
     private AssetRepositoryInterface $assetRepository;
@@ -36,7 +36,7 @@ class AssetPairPriceBinanceCreateProcessTest extends TestCase
         $this->assetPairPriceRepository = $this->createMock(AssetPairPriceRepositoryInterface::class);
         $this->logger = $this->createMock(LoggerInterface::class);
 
-        $this->assetPairPriceBinanceCreateProcess = new AssetPairPriceBinanceCreateProcess(
+        $this->assetPairPriceBinanceCreateProcess = new BinanceSyncPriceProcess(
             $this->client,
             $this->assetRepository,
             $this->assetPairRepository,

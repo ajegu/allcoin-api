@@ -1,5 +1,5 @@
-resource "aws_iam_role" "binance_price" {
-    name = "${var.app_name}${var.lambda_name}Role"
+resource "aws_iam_role" "binance_price_analyzer" {
+    name = "${var.app_name}-${var.lambda_name}Role"
 
     assume_role_policy = <<EOF
 {

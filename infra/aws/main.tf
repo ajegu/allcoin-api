@@ -3,8 +3,8 @@ provider "aws" {
     region = "eu-west-3"
 }
 
-module "binance_price" {
-    source = "./binance-price"
+module "binance_sync_price" {
+    source = "./binance-sync-price"
 
     app_name = var.app_name
     app_timezone = var.app_timezone
@@ -12,8 +12,8 @@ module "binance_price" {
     dynamodb_table_name = var.dynamodb_table_name
 }
 
-module "price_analyser" {
-    source = "./price-analyzer"
+module "binance_price_analyzer" {
+    source = "./binance-price-analyzer"
 
     app_name = var.app_name
     app_timezone = var.app_timezone
