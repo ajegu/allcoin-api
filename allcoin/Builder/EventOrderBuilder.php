@@ -7,10 +7,10 @@ namespace AllCoin\Builder;
 use AllCoin\Model\Asset;
 use AllCoin\Model\AssetPair;
 use AllCoin\Model\AssetPairPrice;
-use AllCoin\Model\EventTransaction;
+use AllCoin\Model\EventOrder;
 use AllCoin\Service\DateTimeService;
 
-class EventTransactionBuilder
+class EventOrderBuilder
 {
     public function __construct(
         private DateTimeService $dateTimeService
@@ -23,9 +23,9 @@ class EventTransactionBuilder
         Asset $asset,
         AssetPair $assetPair,
         AssetPairPrice $assetPairPrice,
-    ): EventTransaction
+    ): EventOrder
     {
-        return new EventTransaction(
+        return new EventOrder(
             $eventName,
             $asset,
             $assetPair,

@@ -4,7 +4,7 @@
 namespace AllCoin\Process\Binance;
 
 
-use AllCoin\Builder\EventTransactionBuilder;
+use AllCoin\Builder\EventOrderBuilder;
 use AllCoin\Database\DynamoDb\Exception\ItemReadException;
 use AllCoin\Dto\RequestDtoInterface;
 use AllCoin\Dto\ResponseDtoInterface;
@@ -12,8 +12,8 @@ use AllCoin\Exception\NotificationHandlerException;
 use AllCoin\Model\AssetPair;
 use AllCoin\Model\AssetPairPrice;
 use AllCoin\Model\EventEnum;
-use AllCoin\Model\Transaction;
-use AllCoin\Notification\Handler\TransactionAnalyzerNotificationHandler;
+use AllCoin\Model\Order;
+use AllCoin\Notification\Handler\OrderAnalyzerNotificationHandler;
 use AllCoin\Process\ProcessInterface;
 use AllCoin\Repository\AssetPairPriceRepositoryInterface;
 use AllCoin\Repository\AssetPairRepositoryInterface;
@@ -21,7 +21,7 @@ use AllCoin\Repository\AssetRepositoryInterface;
 use AllCoin\Service\DateTimeService;
 use Psr\Log\LoggerInterface;
 
-class BinanceTransactionAnalyzerProcess implements ProcessInterface
+class BinanceOrderAnalyzerProcess implements ProcessInterface
 {
     const STOP_LOSS_PERCENT = 10;
     const BREAK_EVENT_PERCENT = 10;
@@ -32,8 +32,8 @@ class BinanceTransactionAnalyzerProcess implements ProcessInterface
         private AssetPairPriceRepositoryInterface $assetPairPriceRepository,
         private LoggerInterface $logger,
         private DateTimeService $dateTimeService,
-        private TransactionAnalyzerNotificationHandler $transactionAnalyzerNotificationHandler,
-        private EventTransactionBuilder $eventTransactionBuilder
+        private OrderAnalyzerNotificationHandler $orderAnalyzerNotificationHandler,
+        private EventOrderBuilder $eventOrderBuilder
     )
     {
     }
@@ -51,16 +51,16 @@ class BinanceTransactionAnalyzerProcess implements ProcessInterface
 
         foreach ($assetPairs as $assetPair) {
 
-            $lastTransaction = $assetPair->getLastTransaction();
+            $lastOrder = $assetPair->getLastOrder();
 
-            if ($lastTransaction->getDirection() === Transaction::SELL) {
-                $this->logger->debug('Not a buy transaction.');
+            if ($lastOrder->getDirection() === Order::SELL) {
+                $this->logger->debug('Not a buy order.');
                 continue;
             }
 
             $prices = $this->assetPairPriceRepository->findAllByDateRange(
                 $assetPair->getId(),
-                $lastTransaction->getCreatedAt(),
+                $lastOrder->getCreatedAt(),
                 $this->dateTimeService->now()
             );
 
@@ -70,7 +70,7 @@ class BinanceTransactionAnalyzerProcess implements ProcessInterface
                 continue;
             }
 
-            $unitPrice = $lastTransaction->getAmount() / $lastTransaction->getQuantity();
+            $unitPrice = $lastOrder->getAmount() / $lastOrder->getQuantity();
 
             $stopLoss = $unitPrice - ($unitPrice * (self::STOP_LOSS_PERCENT / 100));
 
@@ -109,13 +109,13 @@ class BinanceTransactionAnalyzerProcess implements ProcessInterface
     private function createEvent(AssetPair $assetPair, AssetPairPrice $price, string $eventName): void
     {
         $asset = $this->assetRepository->findOneByAssetPairId($assetPair->getId());
-        $event = $this->eventTransactionBuilder->build(
+        $event = $this->eventOrderBuilder->build(
             $eventName,
             $asset,
             $assetPair,
             $price
         );
-        $this->transactionAnalyzerNotificationHandler->dispatch($event);
+        $this->orderAnalyzerNotificationHandler->dispatch($event);
     }
 
 }

@@ -6,7 +6,7 @@ namespace AllCoin\Model;
 
 use DateTime;
 
-class EventTransaction implements EventInterface
+class EventOrder implements EventInterface
 {
     public function __construct(
         private string $name,

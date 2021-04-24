@@ -4,15 +4,15 @@
 namespace Test\AllCoin\Builder;
 
 
-use AllCoin\Builder\TransactionBuilder;
+use AllCoin\Builder\OrderBuilder;
 use AllCoin\Service\DateTimeService;
 use AllCoin\Service\UuidService;
 use DateTime;
 use Test\TestCase;
 
-class TransactionBuilderTest extends TestCase
+class OrderBuilderTest extends TestCase
 {
-    private TransactionBuilder $transactionBuilder;
+    private OrderBuilder $orderBuilder;
 
     private DateTimeService $dateTimeService;
     private UuidService $uuidService;
@@ -22,7 +22,7 @@ class TransactionBuilderTest extends TestCase
         $this->dateTimeService = $this->createMock(DateTimeService::class);
         $this->uuidService = $this->createMock(UuidService::class);
 
-        $this->transactionBuilder = new TransactionBuilder(
+        $this->orderBuilder = new OrderBuilder(
             $this->dateTimeService,
             $this->uuidService,
         );
@@ -41,18 +41,18 @@ class TransactionBuilderTest extends TestCase
         $now = new DateTime();
         $this->dateTimeService->expects($this->once())->method('now')->willReturn($now);
 
-        $transaction = $this->transactionBuilder->build(
+        $order = $this->orderBuilder->build(
             $quantity,
             $amount,
             $direction,
             $version
         );
 
-        $this->assertEquals($uuid, $transaction->getId());
-        $this->assertEquals($quantity, $transaction->getQuantity());
-        $this->assertEquals($amount, $transaction->getAmount());
-        $this->assertEquals($direction, $transaction->getDirection());
-        $this->assertEquals($now, $transaction->getCreatedAt());
-        $this->assertEquals($version, $transaction->getVersion());
+        $this->assertEquals($uuid, $order->getId());
+        $this->assertEquals($quantity, $order->getQuantity());
+        $this->assertEquals($amount, $order->getAmount());
+        $this->assertEquals($direction, $order->getDirection());
+        $this->assertEquals($now, $order->getCreatedAt());
+        $this->assertEquals($version, $order->getVersion());
     }
 }

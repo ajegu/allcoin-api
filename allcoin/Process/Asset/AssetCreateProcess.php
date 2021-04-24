@@ -11,10 +11,11 @@ use AllCoin\Dto\RequestDtoInterface;
 use AllCoin\Dto\ResponseDtoInterface;
 use AllCoin\Process\ProcessInterface;
 use AllCoin\Repository\AssetRepositoryInterface;
+use JetBrains\PhpStorm\Pure;
 
 class AssetCreateProcess extends AbstractAssetProcess implements ProcessInterface
 {
-    public function __construct(
+    #[Pure] public function __construct(
         protected AssetRepositoryInterface $assetRepository,
         protected AssetMapper $assetMapper,
         private AssetBuilder $assetBuilder

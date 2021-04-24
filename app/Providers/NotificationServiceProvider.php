@@ -3,8 +3,8 @@
 
 namespace App\Providers;
 
+use AllCoin\Notification\Handler\OrderAnalyzerNotificationHandler;
 use AllCoin\Notification\Handler\PriceAnalyzerNotificationHandler;
-use AllCoin\Notification\Handler\TransactionAnalyzerNotificationHandler;
 use App\Exceptions\ServiceProviderException;
 use Illuminate\Support\ServiceProvider;
 
@@ -16,7 +16,7 @@ class NotificationServiceProvider extends ServiceProvider
     public function register(): void
     {
         $this->registerPriceAnalyzerNotificationHandler();
-        $this->registerTransactionAnalyzerNotificationHandler();
+        $this->registerOrderAnalyzerNotificationHandler();
     }
 
     /**
@@ -39,7 +39,7 @@ class NotificationServiceProvider extends ServiceProvider
     /**
      * @throws ServiceProviderException
      */
-    private function registerTransactionAnalyzerNotificationHandler(): void
+    private function registerOrderAnalyzerNotificationHandler(): void
     {
         $env = 'AWS_SNS_TOPIC_TRANSACTION_ANALYZER_ARN';
         if (!getenv($env)) {
@@ -48,7 +48,7 @@ class NotificationServiceProvider extends ServiceProvider
             );
         }
 
-        $this->app->when(TransactionAnalyzerNotificationHandler::class)
+        $this->app->when(OrderAnalyzerNotificationHandler::class)
             ->needs('$topicArn')
             ->give(getenv($env));
     }

@@ -6,7 +6,7 @@ namespace AllCoin\Model;
 
 use DateTime;
 
-class Transaction implements ModelInterface
+class Order implements ModelInterface
 {
     const SELL = 'SELL';
     const BUY = 'BUY';

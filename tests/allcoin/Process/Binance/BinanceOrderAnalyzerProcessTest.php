@@ -4,17 +4,17 @@
 namespace Test\AllCoin\Process\Binance;
 
 
-use AllCoin\Builder\EventTransactionBuilder;
+use AllCoin\Builder\EventOrderBuilder;
 use AllCoin\Database\DynamoDb\Exception\ItemReadException;
 use AllCoin\Exception\NotificationHandlerException;
 use AllCoin\Model\Asset;
 use AllCoin\Model\AssetPair;
 use AllCoin\Model\AssetPairPrice;
 use AllCoin\Model\EventEnum;
-use AllCoin\Model\EventTransaction;
-use AllCoin\Model\Transaction;
-use AllCoin\Notification\Handler\TransactionAnalyzerNotificationHandler;
-use AllCoin\Process\Binance\BinanceTransactionAnalyzerProcess;
+use AllCoin\Model\EventOrder;
+use AllCoin\Model\Order;
+use AllCoin\Notification\Handler\OrderAnalyzerNotificationHandler;
+use AllCoin\Process\Binance\BinanceOrderAnalyzerProcess;
 use AllCoin\Repository\AssetPairPriceRepositoryInterface;
 use AllCoin\Repository\AssetPairRepositoryInterface;
 use AllCoin\Repository\AssetRepositoryInterface;
@@ -23,16 +23,16 @@ use DateTime;
 use Psr\Log\LoggerInterface;
 use Test\TestCase;
 
-class BinanceTransactionAnalyzerProcessTest extends TestCase
+class BinanceOrderAnalyzerProcessTest extends TestCase
 {
-    private BinanceTransactionAnalyzerProcess $binanceTransactionAnalyzerProcess;
+    private BinanceOrderAnalyzerProcess $binanceOrderAnalyzerProcess;
 
     private AssetRepositoryInterface $assetRepository;
     private AssetPairRepositoryInterface $assetPairRepository;
     private AssetPairPriceRepositoryInterface $assetPairPriceRepository;
     private DateTimeService $dateTimeService;
-    private TransactionAnalyzerNotificationHandler $transactionAnalyzerNotificationHandler;
-    private EventTransactionBuilder $eventTransactionBuilder;
+    private OrderAnalyzerNotificationHandler $orderAnalyzerNotificationHandler;
+    private EventOrderBuilder $eventOrderBuilder;
 
     public function setUp(): void
     {
@@ -40,17 +40,17 @@ class BinanceTransactionAnalyzerProcessTest extends TestCase
         $this->assetPairRepository = $this->createMock(AssetPairRepositoryInterface::class);
         $this->assetPairPriceRepository = $this->createMock(AssetPairPriceRepositoryInterface::class);
         $this->dateTimeService = $this->createMock(DateTimeService::class);
-        $this->transactionAnalyzerNotificationHandler = $this->createMock(TransactionAnalyzerNotificationHandler::class);
-        $this->eventTransactionBuilder = $this->createMock(EventTransactionBuilder::class);
+        $this->orderAnalyzerNotificationHandler = $this->createMock(OrderAnalyzerNotificationHandler::class);
+        $this->eventOrderBuilder = $this->createMock(EventOrderBuilder::class);
 
-        $this->binanceTransactionAnalyzerProcess = new BinanceTransactionAnalyzerProcess(
+        $this->binanceOrderAnalyzerProcess = new BinanceOrderAnalyzerProcess(
             $this->assetRepository,
             $this->assetPairRepository,
             $this->assetPairPriceRepository,
             $this->createMock(LoggerInterface::class),
             $this->dateTimeService,
-            $this->transactionAnalyzerNotificationHandler,
-            $this->eventTransactionBuilder,
+            $this->orderAnalyzerNotificationHandler,
+            $this->eventOrderBuilder,
         );
     }
 
@@ -58,12 +58,12 @@ class BinanceTransactionAnalyzerProcessTest extends TestCase
      * @throws ItemReadException
      * @throws NotificationHandlerException
      */
-    public function testHandleWithNoBuyTransactionShouldStop(): void
+    public function testHandleWithNoBuyOrderShouldStop(): void
     {
-        $lastTransaction = $this->createMock(Transaction::class);
-        $lastTransaction->expects($this->once())->method('getDirection')->willReturn(Transaction::SELL);
+        $lastOrder = $this->createMock(Order::class);
+        $lastOrder->expects($this->once())->method('getDirection')->willReturn(Order::SELL);
         $assetPair = $this->createMock(AssetPair::class);
-        $assetPair->expects($this->once())->method('getLastTransaction')->willReturn($lastTransaction);
+        $assetPair->expects($this->once())->method('getLastOrder')->willReturn($lastOrder);
 
         $this->assetPairRepository->expects($this->once())
             ->method('findAll')
@@ -72,10 +72,10 @@ class BinanceTransactionAnalyzerProcessTest extends TestCase
         $this->dateTimeService->expects($this->never())->method('now');
         $this->assetPairPriceRepository->expects($this->never())->method('findAllByDateRange');
         $this->assetRepository->expects($this->never())->method('findOneByAssetPairId');
-        $this->eventTransactionBuilder->expects($this->never())->method('build');
-        $this->transactionAnalyzerNotificationHandler->expects($this->never())->method('dispatch');
+        $this->eventOrderBuilder->expects($this->never())->method('build');
+        $this->orderAnalyzerNotificationHandler->expects($this->never())->method('dispatch');
 
-        $this->binanceTransactionAnalyzerProcess->handle();
+        $this->binanceOrderAnalyzerProcess->handle();
     }
 
     /**
@@ -84,13 +84,13 @@ class BinanceTransactionAnalyzerProcessTest extends TestCase
      */
     public function testHandleWithNoPriceHistoryShouldStop(): void
     {
-        $lastTransaction = $this->createMock(Transaction::class);
-        $lastTransaction->expects($this->once())->method('getDirection')->willReturn(Transaction::BUY);
+        $lastOrder = $this->createMock(Order::class);
+        $lastOrder->expects($this->once())->method('getDirection')->willReturn(Order::BUY);
         $createdAt = new DateTime();
-        $lastTransaction->expects($this->once())->method('getCreatedAt')->willReturn($createdAt);
+        $lastOrder->expects($this->once())->method('getCreatedAt')->willReturn($createdAt);
 
         $assetPair = $this->createMock(AssetPair::class);
-        $assetPair->expects($this->once())->method('getLastTransaction')->willReturn($lastTransaction);
+        $assetPair->expects($this->once())->method('getLastOrder')->willReturn($lastOrder);
         $assetPairId = 'foo';
         $assetPair->expects($this->once())->method('getId')->willReturn($assetPairId);
 
@@ -110,10 +110,10 @@ class BinanceTransactionAnalyzerProcessTest extends TestCase
 
 
         $this->assetRepository->expects($this->never())->method('findOneByAssetPairId');
-        $this->eventTransactionBuilder->expects($this->never())->method('build');
-        $this->transactionAnalyzerNotificationHandler->expects($this->never())->method('dispatch');
+        $this->eventOrderBuilder->expects($this->never())->method('build');
+        $this->orderAnalyzerNotificationHandler->expects($this->never())->method('dispatch');
 
-        $this->binanceTransactionAnalyzerProcess->handle();
+        $this->binanceOrderAnalyzerProcess->handle();
     }
 
     /**
@@ -122,17 +122,17 @@ class BinanceTransactionAnalyzerProcessTest extends TestCase
      */
     public function testHandleWithStopLossShouldSendEvent(): void
     {
-        $lastTransaction = $this->createMock(Transaction::class);
-        $lastTransaction->expects($this->once())->method('getDirection')->willReturn(Transaction::BUY);
+        $lastOrder = $this->createMock(Order::class);
+        $lastOrder->expects($this->once())->method('getDirection')->willReturn(Order::BUY);
         $createdAt = new DateTime();
-        $lastTransaction->expects($this->once())->method('getCreatedAt')->willReturn($createdAt);
+        $lastOrder->expects($this->once())->method('getCreatedAt')->willReturn($createdAt);
         $amount = 10.;
-        $lastTransaction->expects($this->once())->method('getAmount')->willReturn($amount);
+        $lastOrder->expects($this->once())->method('getAmount')->willReturn($amount);
         $quantity = 5.;
-        $lastTransaction->expects($this->once())->method('getQuantity')->willReturn($quantity);
+        $lastOrder->expects($this->once())->method('getQuantity')->willReturn($quantity);
 
         $assetPair = $this->createMock(AssetPair::class);
-        $assetPair->expects($this->once())->method('getLastTransaction')->willReturn($lastTransaction);
+        $assetPair->expects($this->once())->method('getLastOrder')->willReturn($lastOrder);
         $assetPairId = 'foo';
         $assetPair->expects($this->exactly(2))->method('getId')->willReturn($assetPairId);
 
@@ -160,8 +160,8 @@ class BinanceTransactionAnalyzerProcessTest extends TestCase
             ->with($assetPairId)
             ->willReturn($asset);
 
-        $event = $this->createMock(EventTransaction::class);
-        $this->eventTransactionBuilder->expects($this->once())
+        $event = $this->createMock(EventOrder::class);
+        $this->eventOrderBuilder->expects($this->once())
             ->method('build')
             ->with(
                 EventEnum::STOP_LOSS,
@@ -172,11 +172,11 @@ class BinanceTransactionAnalyzerProcessTest extends TestCase
             ->willReturn($event);
 
 
-        $this->transactionAnalyzerNotificationHandler->expects($this->once())
+        $this->orderAnalyzerNotificationHandler->expects($this->once())
             ->method('dispatch')
             ->with($event);
 
-        $this->binanceTransactionAnalyzerProcess->handle();
+        $this->binanceOrderAnalyzerProcess->handle();
     }
 
     /**
@@ -185,17 +185,17 @@ class BinanceTransactionAnalyzerProcessTest extends TestCase
      */
     public function testHandleWithBreakEventShouldSendEvent(): void
     {
-        $lastTransaction = $this->createMock(Transaction::class);
-        $lastTransaction->expects($this->once())->method('getDirection')->willReturn(Transaction::BUY);
+        $lastOrder = $this->createMock(Order::class);
+        $lastOrder->expects($this->once())->method('getDirection')->willReturn(Order::BUY);
         $createdAt = new DateTime();
-        $lastTransaction->expects($this->once())->method('getCreatedAt')->willReturn($createdAt);
+        $lastOrder->expects($this->once())->method('getCreatedAt')->willReturn($createdAt);
         $amount = 10.;
-        $lastTransaction->expects($this->once())->method('getAmount')->willReturn($amount);
+        $lastOrder->expects($this->once())->method('getAmount')->willReturn($amount);
         $quantity = 5.;
-        $lastTransaction->expects($this->once())->method('getQuantity')->willReturn($quantity);
+        $lastOrder->expects($this->once())->method('getQuantity')->willReturn($quantity);
 
         $assetPair = $this->createMock(AssetPair::class);
-        $assetPair->expects($this->once())->method('getLastTransaction')->willReturn($lastTransaction);
+        $assetPair->expects($this->once())->method('getLastOrder')->willReturn($lastOrder);
         $assetPairId = 'foo';
         $assetPair->expects($this->exactly(2))->method('getId')->willReturn($assetPairId);
 
@@ -227,8 +227,8 @@ class BinanceTransactionAnalyzerProcessTest extends TestCase
             ->with($assetPairId)
             ->willReturn($asset);
 
-        $event = $this->createMock(EventTransaction::class);
-        $this->eventTransactionBuilder->expects($this->once())
+        $event = $this->createMock(EventOrder::class);
+        $this->eventOrderBuilder->expects($this->once())
             ->method('build')
             ->with(
                 EventEnum::BREAK_EVENT,
@@ -239,10 +239,10 @@ class BinanceTransactionAnalyzerProcessTest extends TestCase
             ->willReturn($event);
 
 
-        $this->transactionAnalyzerNotificationHandler->expects($this->once())
+        $this->orderAnalyzerNotificationHandler->expects($this->once())
             ->method('dispatch')
             ->with($event);
 
-        $this->binanceTransactionAnalyzerProcess->handle();
+        $this->binanceOrderAnalyzerProcess->handle();
     }
 }

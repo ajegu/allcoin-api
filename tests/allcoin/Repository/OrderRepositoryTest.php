@@ -8,15 +8,15 @@ use AllCoin\Database\DynamoDb\Exception\ItemSaveException;
 use AllCoin\Database\DynamoDb\ItemManager;
 use AllCoin\Database\DynamoDb\ItemManagerInterface;
 use AllCoin\Model\ClassMappingEnum;
-use AllCoin\Model\Transaction;
-use AllCoin\Repository\TransactionRepository;
+use AllCoin\Model\Order;
+use AllCoin\Repository\OrderRepository;
 use AllCoin\Service\SerializerService;
 use DateTime;
 use Test\TestCase;
 
-class TransactionRepositoryTest extends TestCase
+class OrderRepositoryTest extends TestCase
 {
-    private TransactionRepository $transactionRepository;
+    private OrderRepository $orderRepository;
 
     private ItemManagerInterface $itemManager;
     private SerializerService $serializerService;
@@ -26,7 +26,7 @@ class TransactionRepositoryTest extends TestCase
         $this->itemManager = $this->createMock(ItemManagerInterface::class);
         $this->serializerService = $this->createMock(SerializerService::class);
 
-        $this->transactionRepository = new TransactionRepository(
+        $this->orderRepository = new OrderRepository(
             $this->itemManager,
             $this->serializerService
         );
@@ -37,20 +37,20 @@ class TransactionRepositoryTest extends TestCase
      */
     public function testSaveShouldBeOK(): void
     {
-        $transaction = $this->createMock(Transaction::class);
+        $order = $this->createMock(Order::class);
         $version = 'bar';
-        $transaction->expects($this->once())->method('getVersion')->willReturn($version);
+        $order->expects($this->once())->method('getVersion')->willReturn($version);
         $createdAt = new DateTime();
-        $transaction->expects($this->once())->method('getCreatedAt')->willReturn($createdAt);
-        $transactionId = 'baz';
-        $transaction->expects($this->once())->method('getId')->willReturn($transactionId);
+        $order->expects($this->once())->method('getCreatedAt')->willReturn($createdAt);
+        $orderId = 'baz';
+        $order->expects($this->once())->method('getId')->willReturn($orderId);
 
         $assetPairId = 'foo';
 
         $data = [];
         $this->serializerService->expects($this->once())
             ->method('normalizeModel')
-            ->with($transaction)
+            ->with($order)
             ->willReturn($data);
 
         $data[ItemManager::LSI_1] = $assetPairId;
@@ -61,10 +61,10 @@ class TransactionRepositoryTest extends TestCase
             ->method('save')
             ->with(
                 data: $data,
-                partitionKey: ClassMappingEnum::CLASS_MAPPING[Transaction::class],
-                sortKey: $transactionId
+                partitionKey: ClassMappingEnum::CLASS_MAPPING[Order::class],
+                sortKey: $orderId
             );
 
-        $this->transactionRepository->save($transaction, $assetPairId);
+        $this->orderRepository->save($order, $assetPairId);
     }
 }
