@@ -4,7 +4,7 @@
 namespace Test\AllCoin\Builder;
 
 
-use AllCoin\Builder\EventTransactionBuilder;
+use AllCoin\Builder\EventOrderBuilder;
 use AllCoin\Model\Asset;
 use AllCoin\Model\AssetPair;
 use AllCoin\Model\AssetPairPrice;
@@ -12,9 +12,9 @@ use AllCoin\Service\DateTimeService;
 use DateTime;
 use Test\TestCase;
 
-class EventTransactionBuilderTest extends TestCase
+class EventOrderBuilderTest extends TestCase
 {
-    private EventTransactionBuilder $eventTransactionBuilder;
+    private EventOrderBuilder $eventOrderBuilder;
 
     private DateTimeService $dateTimeService;
 
@@ -22,7 +22,7 @@ class EventTransactionBuilderTest extends TestCase
     {
         $this->dateTimeService = $this->createMock(DateTimeService::class);
 
-        $this->eventTransactionBuilder = new EventTransactionBuilder(
+        $this->eventOrderBuilder = new EventOrderBuilder(
             $this->dateTimeService
         );
     }
@@ -41,7 +41,7 @@ class EventTransactionBuilderTest extends TestCase
             ->method('now')
             ->willReturn($date);
 
-        $event = $this->eventTransactionBuilder->build(
+        $event = $this->eventOrderBuilder->build(
             $eventName,
             $asset,
             $assetPair,

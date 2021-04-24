@@ -5,7 +5,7 @@ namespace AllCoin\Notification\Handler;
 
 use JetBrains\PhpStorm\Pure;
 
-class TransactionAnalyzerNotificationHandler extends AbstractNotificationHandler
+class OrderAnalyzerNotificationHandler extends AbstractNotificationHandler
 {
     #[Pure] public function __construct(
         private string $topicArn,

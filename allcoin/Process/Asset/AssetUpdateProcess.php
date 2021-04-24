@@ -12,10 +12,11 @@ use AllCoin\Dto\ResponseDtoInterface;
 use AllCoin\Process\ProcessInterface;
 use AllCoin\Repository\AssetRepositoryInterface;
 use AllCoin\Service\DateTimeService;
+use JetBrains\PhpStorm\Pure;
 
 class AssetUpdateProcess extends AbstractAssetProcess implements ProcessInterface
 {
-    public function __construct(
+    #[Pure] public function __construct(
         protected AssetRepositoryInterface $assetRepository,
         protected AssetMapper $assetMapper,
         private DateTimeService $dateTimeService

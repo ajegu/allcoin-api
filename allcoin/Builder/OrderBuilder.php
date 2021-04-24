@@ -4,11 +4,11 @@
 namespace AllCoin\Builder;
 
 
-use AllCoin\Model\Transaction;
+use AllCoin\Model\Order;
 use AllCoin\Service\DateTimeService;
 use AllCoin\Service\UuidService;
 
-class TransactionBuilder
+class OrderBuilder
 {
     public function __construct(
         private DateTimeService $dateTimeService,
@@ -22,9 +22,9 @@ class TransactionBuilder
         float $amount,
         string $direction,
         string $version = ''
-    ): Transaction
+    ): Order
     {
-        return new Transaction(
+        return new Order(
             id: $this->uuidService->generateUuid(),
             quantity: $quantity,
             amount: $amount,

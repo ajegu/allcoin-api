@@ -6,13 +6,13 @@ namespace Test\AllCoin\Notification\Handler;
 
 use AllCoin\Exception\NotificationHandlerException;
 use AllCoin\Model\EventInterface;
+use AllCoin\Notification\Handler\OrderAnalyzerNotificationHandler;
 use AllCoin\Notification\Handler\SnsHandler;
-use AllCoin\Notification\Handler\TransactionAnalyzerNotificationHandler;
 use Test\TestCase;
 
-class TransactionAnalyzerNotificationHandlerTest extends TestCase
+class OrderAnalyzerNotificationHandlerTest extends TestCase
 {
-    private TransactionAnalyzerNotificationHandler $transactionAnalyzerNotificationHandler;
+    private OrderAnalyzerNotificationHandler $orderAnalyzerNotificationHandler;
 
     private string $topicArn;
     private SnsHandler $snsHandler;
@@ -22,7 +22,7 @@ class TransactionAnalyzerNotificationHandlerTest extends TestCase
         $this->topicArn = 'foo';
         $this->snsHandler = $this->createMock(SnsHandler::class);
 
-        $this->transactionAnalyzerNotificationHandler = new TransactionAnalyzerNotificationHandler(
+        $this->orderAnalyzerNotificationHandler = new OrderAnalyzerNotificationHandler(
             $this->topicArn,
             $this->snsHandler
         );
@@ -39,6 +39,6 @@ class TransactionAnalyzerNotificationHandlerTest extends TestCase
             ->method('publish')
             ->with($event, $this->topicArn);
 
-        $this->transactionAnalyzerNotificationHandler->dispatch($event);
+        $this->orderAnalyzerNotificationHandler->dispatch($event);
     }
 }

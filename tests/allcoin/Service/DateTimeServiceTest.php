@@ -14,14 +14,12 @@ class DateTimeServiceTest extends TestCase
 {
     private DateTimeService $dateTimeService;
 
-    private LoggerInterface $logger;
-
     public function setUp(): void
     {
-        $this->logger = $this->createMock(LoggerInterface::class);
+        $logger = $this->createMock(LoggerInterface::class);
 
         $this->dateTimeService = new DateTimeService(
-            $this->logger
+            $logger
         );
     }
 

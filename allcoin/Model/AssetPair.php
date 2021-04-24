@@ -8,7 +8,7 @@ use DateTime;
 
 class AssetPair implements ModelInterface
 {
-    private ?Transaction $lastTransaction;
+    private ?Order $lastOrder;
 
     public function __construct(
         private string $id,
@@ -17,7 +17,7 @@ class AssetPair implements ModelInterface
         private ?DateTime $updatedAt = null,
     )
     {
-        $this->lastTransaction = null;
+        $this->lastOrder = null;
     }
 
     /**
@@ -85,18 +85,20 @@ class AssetPair implements ModelInterface
     }
 
     /**
-     * @return Transaction|null
+     * @return Order|null
      */
-    public function getLastTransaction(): ?Transaction
+    public function getLastOrder(): ?Order
     {
-        return $this->lastTransaction;
+        return $this->lastOrder;
     }
 
     /**
-     * @param Transaction|null $lastTransaction
+     * @param Order|null $lastOrder
      */
-    public function setLastTransaction(?Transaction $lastTransaction): void
+    public function setLastOrder(?Order $lastOrder): void
     {
-        $this->lastTransaction = $lastTransaction;
+        $this->lastOrder = $lastOrder;
     }
+
+
 }
