@@ -41,7 +41,13 @@ class BinanceOrderBuyLambdaTest extends TestCase
         $message = 'foo';
 
         $event = [
-            'Message' => $message
+            'Records' => [
+                [
+                    'Sns' => [
+                        'Message' => $message
+                    ]
+                ]
+            ]
         ];
 
         $eventPrice = $this->createMock(EventPrice::class);
@@ -54,6 +60,20 @@ class BinanceOrderBuyLambdaTest extends TestCase
         $this->binanceBuyOrderProcess->expects($this->once())
             ->method('handle')
             ->with($eventPrice);
+
+        $this->binanceBuyOrderLambda->__invoke($event);
+    }
+
+    /**
+     * @throws ItemReadException
+     * @throws ItemSaveException
+     */
+    public function testInvokeWithNoMessageShouldStop(): void
+    {
+        $event = [];
+
+        $this->eventPriceMapper->expects($this->never())->method('mapJsonToEvent');
+        $this->binanceBuyOrderProcess->expects($this->never())->method('handle');
 
         $this->binanceBuyOrderLambda->__invoke($event);
     }

@@ -7,12 +7,14 @@ namespace App\Lambda;
 use AllCoin\Database\DynamoDb\Exception\ItemSaveException;
 use AllCoin\DataMapper\EventOrderMapper;
 use AllCoin\Process\Binance\BinanceOrderSellProcess;
+use Psr\Log\LoggerInterface;
 
-class BinanceOrderSellLambda implements LambdaInterface
+class BinanceOrderSellLambda extends AbstractLambda implements LambdaInterface
 {
     public function __construct(
         private BinanceOrderSellProcess $binanceOrderSellProcess,
-        private EventOrderMapper $eventOrderMapper
+        private EventOrderMapper $eventOrderMapper,
+        private LoggerInterface $logger
     )
     {
     }
@@ -23,8 +25,18 @@ class BinanceOrderSellLambda implements LambdaInterface
      */
     public function __invoke(array $event): void
     {
-        $eventOrder = $this->eventOrderMapper->mapJsonToEvent($event['Message']);
-        $this->binanceOrderSellProcess->handle($eventOrder);
+        $this->logger->debug('Receive event', [
+            'event' => $event
+        ]);
+        $message = $this->getMessageFromEvent($event);
+        $this->logger->debug('Message extract', [
+            'message' => $message
+        ]);
+
+        if ($message) {
+            $eventOrder = $this->eventOrderMapper->mapJsonToEvent($message);
+            $this->binanceOrderSellProcess->handle($eventOrder);
+        }
     }
 
 }
