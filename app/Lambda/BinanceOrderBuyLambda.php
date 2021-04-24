@@ -7,12 +7,12 @@ namespace App\Lambda;
 use AllCoin\Database\DynamoDb\Exception\ItemReadException;
 use AllCoin\Database\DynamoDb\Exception\ItemSaveException;
 use AllCoin\DataMapper\EventPriceMapper;
-use AllCoin\Process\Binance\BinanceBuyOrderProcess;
+use AllCoin\Process\Binance\BinanceOrderBuyProcess;
 
-class BinanceBuyOrderLambda
+class BinanceOrderBuyLambda implements LambdaInterface
 {
     public function __construct(
-        private BinanceBuyOrderProcess $binanceBuyOrderProcess,
+        private BinanceOrderBuyProcess $binanceBuyOrderProcess,
         private EventPriceMapper $eventPriceMapper
     )
     {
@@ -23,7 +23,7 @@ class BinanceBuyOrderLambda
      * @throws ItemReadException
      * @throws ItemSaveException
      */
-    public function __invoke(array $event)
+    public function __invoke(array $event): void
     {
         $eventPrice = $this->eventPriceMapper->mapJsonToEvent($event['Message']);
         $this->binanceBuyOrderProcess->handle($eventPrice);

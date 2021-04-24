@@ -11,15 +11,15 @@ use AllCoin\Model\Asset;
 use AllCoin\Model\AssetPair;
 use AllCoin\Model\EventPrice;
 use AllCoin\Model\Order;
-use AllCoin\Process\Binance\BinanceBuyOrderProcess;
+use AllCoin\Process\Binance\BinanceOrderBuyProcess;
 use AllCoin\Repository\AssetPairRepositoryInterface;
 use AllCoin\Repository\OrderRepositoryInterface;
 use Psr\Log\LoggerInterface;
 use Test\TestCase;
 
-class BinanceBuyOrderProcessTest extends TestCase
+class BinanceOrderBuyProcessTest extends TestCase
 {
-    private BinanceBuyOrderProcess $binanceBuyOrderProcess;
+    private BinanceOrderBuyProcess $binanceBuyOrderProcess;
 
     private OrderBuilder $orderBuilder;
     private OrderRepositoryInterface $orderRepository;
@@ -33,7 +33,7 @@ class BinanceBuyOrderProcessTest extends TestCase
         $this->assetPairRepository = $this->createMock(AssetPairRepositoryInterface::class);
         $this->logger = $this->createMock(LoggerInterface::class);
 
-        $this->binanceBuyOrderProcess = new BinanceBuyOrderProcess(
+        $this->binanceBuyOrderProcess = new BinanceOrderBuyProcess(
             $this->orderBuilder,
             $this->orderRepository,
             $this->assetPairRepository,
@@ -102,12 +102,12 @@ class BinanceBuyOrderProcessTest extends TestCase
             ->willReturn($assetPair);
 
         $order = $this->createMock(Order::class);
-        $quantity = BinanceBuyOrderProcess::FIXED_TRANSACTION_AMOUNT / $price;
+        $quantity = BinanceOrderBuyProcess::FIXED_TRANSACTION_AMOUNT / $price;
         $this->orderBuilder->expects($this->once())
             ->method('build')
             ->with(
                 $quantity,
-                BinanceBuyOrderProcess::FIXED_TRANSACTION_AMOUNT,
+                BinanceOrderBuyProcess::FIXED_TRANSACTION_AMOUNT,
                 Order::BUY,
                 $name
             )

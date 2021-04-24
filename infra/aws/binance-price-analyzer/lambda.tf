@@ -27,7 +27,7 @@ resource "aws_lambda_function" "binance_price_analyzer" {
     timeout = 900
 }
 
-resource "aws_lambda_permission" "price_analyzer" {
+resource "aws_lambda_permission" "binance_price_analyzer" {
     action = "lambda:InvokeFunction"
     function_name = aws_lambda_function.binance_price_analyzer.function_name
     principal = "events.amazonaws.com"

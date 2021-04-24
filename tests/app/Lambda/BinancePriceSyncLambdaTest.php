@@ -6,21 +6,21 @@ namespace Test\App\Lambda;
 
 use AllCoin\Database\DynamoDb\Exception\ItemReadException;
 use AllCoin\Database\DynamoDb\Exception\ItemSaveException;
-use AllCoin\Process\Binance\BinanceSyncPriceProcess;
-use App\Lambda\BinanceSyncPriceLambda;
+use AllCoin\Process\Binance\BinancePriceSyncProcess;
+use App\Lambda\BinancePriceSyncLambda;
 use Test\TestCase;
 
-class BinanceSyncPriceLambdaTest extends TestCase
+class BinancePriceSyncLambdaTest extends TestCase
 {
-    private BinanceSyncPriceLambda $getBinancePriceCommand;
+    private BinancePriceSyncLambda $getBinancePriceCommand;
 
-    private BinanceSyncPriceProcess $assetPairPriceBinanceCreateProcess;
+    private BinancePriceSyncProcess $assetPairPriceBinanceCreateProcess;
 
     public function setUp(): void
     {
-        $this->assetPairPriceBinanceCreateProcess = $this->createMock(BinanceSyncPriceProcess::class);
+        $this->assetPairPriceBinanceCreateProcess = $this->createMock(BinancePriceSyncProcess::class);
 
-        $this->getBinancePriceCommand = new BinanceSyncPriceLambda(
+        $this->getBinancePriceCommand = new BinancePriceSyncLambda(
             $this->assetPairPriceBinanceCreateProcess
         );
     }

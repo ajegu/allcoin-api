@@ -8,7 +8,7 @@ use AllCoin\Database\DynamoDb\Exception\ItemReadException;
 use AllCoin\Exception\NotificationHandlerException;
 use AllCoin\Process\Binance\BinancePriceAnalyzerProcess;
 
-class BinancePriceAnalyzerLambda
+class BinancePriceAnalyzerLambda implements LambdaInterface
 {
     public function __construct(
         private BinancePriceAnalyzerProcess $assetPairPriceAnalyzerProcess

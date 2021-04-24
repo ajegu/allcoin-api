@@ -1,4 +1,4 @@
-resource "aws_iam_policy" "binance_sync_price_dynamodb" {
+resource "aws_iam_policy" "binance_price_sync_dynamodb" {
     name = "${var.app_name}-${var.lambda_name}DynamoDb"
 
     path = "/"
@@ -21,8 +21,8 @@ resource "aws_iam_policy" "binance_sync_price_dynamodb" {
 EOF
 }
 
-resource "aws_iam_role_policy_attachment" "policy_attachment_binance_sync_price_dynamodb" {
-    role = aws_iam_role.binance_sync_price.name
-    policy_arn = aws_iam_policy.binance_sync_price_dynamodb.arn
+resource "aws_iam_role_policy_attachment" "policy_attachment_binance_price_sync_dynamodb" {
+    role = aws_iam_role.binance_price_sync.name
+    policy_arn = aws_iam_policy.binance_price_sync_dynamodb.arn
 }
 

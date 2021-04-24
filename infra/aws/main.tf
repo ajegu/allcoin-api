@@ -3,8 +3,8 @@ provider "aws" {
     region = "eu-west-3"
 }
 
-module "binance_sync_price" {
-    source = "./binance-sync-price"
+module "binance_price_sync" {
+    source = "./binance-price-sync"
 
     app_name = var.app_name
     app_timezone = var.app_timezone

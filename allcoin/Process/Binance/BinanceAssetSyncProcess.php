@@ -20,7 +20,7 @@ use Nyholm\Psr7\Request;
 use Psr\Http\Client\ClientExceptionInterface;
 use Psr\Log\LoggerInterface;
 
-class BinanceSyncAssetProcess implements ProcessInterface
+class BinanceAssetSyncProcess implements ProcessInterface
 {
     const BINANCE_URI = 'https://www.binance.com/bapi/asset/v2/public/asset-service/product/get-products?includeEtf=true';
 

@@ -6,20 +6,20 @@ namespace Test\App\Lambda;
 
 use AllCoin\Database\DynamoDb\Exception\ItemReadException;
 use AllCoin\Database\DynamoDb\Exception\ItemSaveException;
-use AllCoin\Process\Binance\BinanceSyncAssetProcess;
+use AllCoin\Process\Binance\BinanceAssetSyncProcess;
 use App\Lambda\BinanceAssetSyncLambda;
 use Psr\Http\Client\ClientExceptionInterface;
 use Test\TestCase;
 
-class BinanceSyncAssetLambdaTest extends TestCase
+class BinanceAssetSyncLambdaTest extends TestCase
 {
     private BinanceAssetSyncLambda $binanceAssetSyncLambda;
 
-    private BinanceSyncAssetProcess $binanceSyncAssetProcess;
+    private BinanceAssetSyncProcess $binanceSyncAssetProcess;
 
     public function setUp(): void
     {
-        $this->binanceSyncAssetProcess = $this->createMock(BinanceSyncAssetProcess::class);
+        $this->binanceSyncAssetProcess = $this->createMock(BinanceAssetSyncProcess::class);
 
         $this->binanceAssetSyncLambda = new BinanceAssetSyncLambda(
             $this->binanceSyncAssetProcess

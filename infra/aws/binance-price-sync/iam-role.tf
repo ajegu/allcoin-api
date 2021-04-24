@@ -1,4 +1,4 @@
-resource "aws_iam_role" "binance_sync_price" {
+resource "aws_iam_role" "binance_price_sync" {
     name = "${var.app_name}-${var.lambda_name}Role"
 
     assume_role_policy = <<EOF

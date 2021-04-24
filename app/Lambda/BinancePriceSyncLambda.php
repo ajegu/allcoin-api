@@ -6,12 +6,12 @@ namespace App\Lambda;
 
 use AllCoin\Database\DynamoDb\Exception\ItemReadException;
 use AllCoin\Database\DynamoDb\Exception\ItemSaveException;
-use AllCoin\Process\Binance\BinanceSyncPriceProcess;
+use AllCoin\Process\Binance\BinancePriceSyncProcess;
 
-class BinanceSyncPriceLambda
+class BinancePriceSyncLambda implements LambdaInterface
 {
     public function __construct(
-        private BinanceSyncPriceProcess $assetPairPriceBinanceCreateProcess
+        private BinancePriceSyncProcess $assetPairPriceBinanceCreateProcess
     )
     {
     }

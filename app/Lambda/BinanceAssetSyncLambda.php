@@ -6,13 +6,13 @@ namespace App\Lambda;
 
 use AllCoin\Database\DynamoDb\Exception\ItemReadException;
 use AllCoin\Database\DynamoDb\Exception\ItemSaveException;
-use AllCoin\Process\Binance\BinanceSyncAssetProcess;
+use AllCoin\Process\Binance\BinanceAssetSyncProcess;
 use Psr\Http\Client\ClientExceptionInterface;
 
-class BinanceAssetSyncLambda
+class BinanceAssetSyncLambda implements LambdaInterface
 {
     public function __construct(
-        private BinanceSyncAssetProcess $binanceSyncAssetProcess
+        private BinanceAssetSyncProcess $binanceSyncAssetProcess
     )
     {
     }
