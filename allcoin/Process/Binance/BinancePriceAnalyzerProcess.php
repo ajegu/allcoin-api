@@ -21,7 +21,7 @@ use Psr\Log\LoggerInterface;
 class BinancePriceAnalyzerProcess implements ProcessInterface
 {
     const TIME_ANALYTICS = 5; // in minutes
-    const ALERT_PERCENT_PRICE_UP = 5;
+    const ALERT_PERCENT_PRICE_UP = 2;
     const ALERT_PERCENT_PRICE_DOWN = -5;
 
     public function __construct(

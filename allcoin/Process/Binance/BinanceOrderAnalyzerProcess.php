@@ -23,8 +23,8 @@ use Psr\Log\LoggerInterface;
 
 class BinanceOrderAnalyzerProcess implements ProcessInterface
 {
-    const STOP_LOSS_PERCENT = 10;
-    const BREAK_EVENT_PERCENT = 10;
+    const STOP_LOSS_PERCENT = 5;
+    const BREAK_EVENT_PERCENT = 2;
 
     public function __construct(
         private AssetRepositoryInterface $assetRepository,
