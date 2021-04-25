@@ -4,6 +4,7 @@
 namespace Test\AllCoin\Repository;
 
 
+use AllCoin\Database\DynamoDb\Exception\ItemReadException;
 use AllCoin\Database\DynamoDb\Exception\ItemSaveException;
 use AllCoin\Database\DynamoDb\ItemManager;
 use AllCoin\Database\DynamoDb\ItemManagerInterface;
@@ -66,5 +67,32 @@ class OrderRepositoryTest extends TestCase
             );
 
         $this->orderRepository->save($order, $assetPairId);
+    }
+
+    /**
+     * @throws ItemReadException
+     */
+    public function testFindAllGroupByAssetPairIdShouldBeOK(): void
+    {
+        $lsi = 'foo';
+        $item = [
+            ItemManager::LSI_1 => $lsi
+        ];
+        $items = [$item];
+        $this->itemManager->expects($this->once())
+            ->method('fetchAll')
+            ->with(ClassMappingEnum::CLASS_MAPPING[Order::class])
+            ->willReturn($items);
+
+        $order = $this->createMock(Order::class);
+        $this->serializerService->expects($this->once())
+            ->method('deserializeToModel')
+            ->with($item, Order::class)
+            ->willReturn($order);
+
+        $orders = $this->orderRepository->findAllGroupByAssetPairId();
+
+        $this->assertArrayHasKey($lsi, $orders);
+        $this->assertEquals($order, $orders[$lsi][0]);
     }
 }

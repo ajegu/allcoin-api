@@ -8,3 +8,5 @@ Homestead.yaml
 /infra/aws/.terraform/
 /infra/aws/.terraform.tfstate.lock.info
 /infra/aws/terraform.tfvars
+/infra/aws/terraform.tfstate
+/infra/aws/terraform.tfstate.backup
