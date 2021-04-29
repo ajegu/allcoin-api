@@ -20,8 +20,6 @@ use Psr\Log\LoggerInterface;
 
 class BinancePriceAnalyzerProcess implements ProcessInterface
 {
-    const TIME_ANALYTICS = 5; // in minutes
-    const ALERT_PERCENT_PRICE_UP = 2;
     const ALERT_PERCENT_PRICE_DOWN = -5;
 
     public function __construct(
@@ -31,7 +29,9 @@ class BinancePriceAnalyzerProcess implements ProcessInterface
         private LoggerInterface $logger,
         private DateTimeService $dateTimeService,
         private PriceAnalyzerNotificationHandler $eventHandler,
-        private EventPriceBuilder $eventPriceBuilder
+        private EventPriceBuilder $eventPriceBuilder,
+        private int $timeAnalytics,
+        private int $alertPercentPriceUp
     )
     {
     }
@@ -46,7 +46,7 @@ class BinancePriceAnalyzerProcess implements ProcessInterface
     public function handle(RequestDtoInterface $dto = null, array $params = []): ?ResponseDtoInterface
     {
         $end = $this->dateTimeService->now();
-        $start = $this->dateTimeService->sub($end, 'PT' . self::TIME_ANALYTICS . 'M');
+        $start = $this->dateTimeService->sub($end, 'PT' . $this->timeAnalytics . 'M');
 
         $assets = $this->assetRepository->findAll();
 
@@ -81,7 +81,7 @@ class BinancePriceAnalyzerProcess implements ProcessInterface
                 );
 
                 $eventName = null;
-                if ($percent >= self::ALERT_PERCENT_PRICE_UP) {
+                if ($percent >= $this->alertPercentPriceUp) {
                     $eventName = EventEnum::PRICE_UP;
                 } else if ($percent <= self::ALERT_PERCENT_PRICE_DOWN) {
                     $eventName = EventEnum::PRICE_DOWN;

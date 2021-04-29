@@ -23,9 +23,6 @@ use Psr\Log\LoggerInterface;
 
 class BinanceOrderAnalyzerProcess implements ProcessInterface
 {
-    const STOP_LOSS_PERCENT = 5;
-    const BREAK_EVENT_PERCENT = 2;
-
     public function __construct(
         private AssetRepositoryInterface $assetRepository,
         private AssetPairRepositoryInterface $assetPairRepository,
@@ -33,7 +30,9 @@ class BinanceOrderAnalyzerProcess implements ProcessInterface
         private LoggerInterface $logger,
         private DateTimeService $dateTimeService,
         private OrderAnalyzerNotificationHandler $orderAnalyzerNotificationHandler,
-        private EventOrderBuilder $eventOrderBuilder
+        private EventOrderBuilder $eventOrderBuilder,
+        private int $stopLossPercent,
+        private int $breakEventPercent
     )
     {
     }
@@ -72,7 +71,7 @@ class BinanceOrderAnalyzerProcess implements ProcessInterface
 
             $unitPrice = $lastOrder->getAmount() / $lastOrder->getQuantity();
 
-            $stopLoss = $unitPrice - ($unitPrice * (self::STOP_LOSS_PERCENT / 100));
+            $stopLoss = $unitPrice - ($unitPrice * ($this->stopLossPercent / 100));
 
             $lastBidPrice = $lastPrice->getBidPrice();
             if ($lastBidPrice <= $stopLoss) {
@@ -90,7 +89,7 @@ class BinanceOrderAnalyzerProcess implements ProcessInterface
 
             // if the latest price is under the latest top price - 10% => break event
             $topBidPrice = $latestTopPrice->getBidPrice();
-            if ($lastBidPrice <= $topBidPrice - ($topBidPrice * (self::BREAK_EVENT_PERCENT / 100))) {
+            if ($lastBidPrice <= $topBidPrice - ($topBidPrice * ($this->breakEventPercent / 100))) {
                 $this->logger->debug('Break event reach.');
                 $this->createEvent($assetPair, $lastPrice, EventEnum::BREAK_EVENT);
             }

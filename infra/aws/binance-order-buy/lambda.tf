@@ -11,8 +11,6 @@ resource "aws_lambda_function" "binance_order_buy" {
             AWS_DDB_TABLE_NAME = var.dynamodb_table_name
             LOG_CHANNEL = var.log_channel
             APP_TIMEZONE = var.app_timezone
-            AWS_SNS_TOPIC_PRICE_ANALYZER_ARN = var.AWS_SNS_TOPIC_PRICE_ANALYZER_ARN
-            AWS_SNS_TOPIC_ORDER_ANALYZER_ARN = var.AWS_SNS_TOPIC_ORDER_ANALYZER_ARN
         }
     }
     s3_bucket = "allcoin-api-deployment"
@@ -31,13 +29,13 @@ resource "aws_lambda_permission" "binance_order_buy" {
     action = "lambda:InvokeFunction"
     function_name = aws_lambda_function.binance_order_buy.function_name
     principal = "sns.amazonaws.com"
-    source_arn = var.AWS_SNS_TOPIC_PRICE_ANALYZER_ARN
+    source_arn = var.binance_price_analyzer_topic_arn
 }
 
 resource "aws_sns_topic_subscription" "binance_order_buy" {
     endpoint = aws_lambda_function.binance_order_buy.arn
     protocol = "lambda"
-    topic_arn = var.AWS_SNS_TOPIC_PRICE_ANALYZER_ARN
+    topic_arn = var.binance_price_analyzer_topic_arn
     filter_policy = <<EOF
 {
     "event": ["price_up"]
