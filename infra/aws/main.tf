@@ -54,3 +54,13 @@ module "binance_order_sell" {
     AWS_SNS_TOPIC_ORDER_ANALYZER_ARN = module.binance_order_analyzer.AWS_SNS_TOPIC_ORDER_ANALYZER_ARN
 }
 
+module "order_report" {
+    source = "./order-report"
+    app_name = var.app_name
+    app_timezone = var.app_timezone
+    log_channel = var.log_channel
+    dynamodb_table_name = var.dynamodb_table_name
+    AWS_SNS_TOPIC_PRICE_ANALYZER_ARN = module.binance_price_analyzer.AWS_SNS_TOPIC_PRICE_ANALYZER_ARN
+    AWS_SNS_TOPIC_ORDER_ANALYZER_ARN = module.binance_order_analyzer.AWS_SNS_TOPIC_ORDER_ANALYZER_ARN
+}
+
