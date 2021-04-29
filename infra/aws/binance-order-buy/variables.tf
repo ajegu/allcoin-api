@@ -19,10 +19,6 @@ variable "lambda_name" {
     default = "BinanceOrderBuy"
 }
 
-variable "AWS_SNS_TOPIC_PRICE_ANALYZER_ARN" {
-    type = string
-}
-
-variable "AWS_SNS_TOPIC_ORDER_ANALYZER_ARN" {
+variable "binance_price_analyzer_topic_arn" {
     type = string
 }

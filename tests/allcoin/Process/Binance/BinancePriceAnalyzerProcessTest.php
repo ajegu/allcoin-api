@@ -33,6 +33,7 @@ class BinancePriceAnalyzerProcessTest extends TestCase
     private DateTimeService $dateTimeService;
     private PriceAnalyzerNotificationHandler $eventHandler;
     private EventPriceBuilder $eventPriceBuilder;
+    private int $timeAnalytics = 5;
 
     public function setUp(): void
     {
@@ -52,6 +53,8 @@ class BinancePriceAnalyzerProcessTest extends TestCase
             $this->dateTimeService,
             $this->eventHandler,
             $this->eventPriceBuilder,
+            $this->timeAnalytics,
+            5
         );
     }
 
@@ -66,7 +69,7 @@ class BinancePriceAnalyzerProcessTest extends TestCase
         $start = DateTime::createFromFormat('Y-m-d', '2020-04-16');
         $this->dateTimeService->expects($this->once())
             ->method('sub')
-            ->with($end, 'PT' . BinancePriceAnalyzerProcess::TIME_ANALYTICS . 'M')
+            ->with($end, 'PT' . $this->timeAnalytics . 'M')
             ->willReturn($start);
 
         $asset = $this->createMock(Asset::class);
@@ -133,7 +136,7 @@ class BinancePriceAnalyzerProcessTest extends TestCase
         $start = DateTime::createFromFormat('Y-m-d', '2020-04-16');
         $this->dateTimeService->expects($this->once())
             ->method('sub')
-            ->with($end, 'PT' . BinancePriceAnalyzerProcess::TIME_ANALYTICS . 'M')
+            ->with($end, 'PT' . $this->timeAnalytics . 'M')
             ->willReturn($start);
 
         $asset = $this->createMock(Asset::class);
@@ -200,7 +203,7 @@ class BinancePriceAnalyzerProcessTest extends TestCase
         $start = DateTime::createFromFormat('Y-m-d', '2020-04-16');
         $this->dateTimeService->expects($this->once())
             ->method('sub')
-            ->with($end, 'PT' . BinancePriceAnalyzerProcess::TIME_ANALYTICS . 'M')
+            ->with($end, 'PT' . $this->timeAnalytics . 'M')
             ->willReturn($start);
 
         $asset = $this->createMock(Asset::class);
@@ -253,7 +256,7 @@ class BinancePriceAnalyzerProcessTest extends TestCase
         $start = DateTime::createFromFormat('Y-m-d', '2020-04-16');
         $this->dateTimeService->expects($this->once())
             ->method('sub')
-            ->with($end, 'PT' . BinancePriceAnalyzerProcess::TIME_ANALYTICS . 'M')
+            ->with($end, 'PT' . $this->timeAnalytics . 'M')
             ->willReturn($start);
 
         $asset = $this->createMock(Asset::class);

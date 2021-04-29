@@ -18,7 +18,3 @@ variable "lambda_name" {
     type = string
     default = "BinanceOrderAnalyzer"
 }
-variable "AWS_SNS_TOPIC_PRICE_ANALYZER_ARN" {
-    type = string
-}
-

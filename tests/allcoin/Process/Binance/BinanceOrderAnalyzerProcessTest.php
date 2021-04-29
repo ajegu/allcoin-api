@@ -51,6 +51,8 @@ class BinanceOrderAnalyzerProcessTest extends TestCase
             $this->dateTimeService,
             $this->orderAnalyzerNotificationHandler,
             $this->eventOrderBuilder,
+            3,
+            2
         );
     }
 

@@ -11,8 +11,6 @@ resource "aws_lambda_function" "binance_price_sync" {
             AWS_DDB_TABLE_NAME = var.dynamodb_table_name
             LOG_CHANNEL = var.log_channel
             APP_TIMEZONE = var.app_timezone
-            AWS_SNS_TOPIC_PRICE_ANALYZER_ARN = var.AWS_SNS_TOPIC_PRICE_ANALYZER_ARN
-            AWS_SNS_TOPIC_ORDER_ANALYZER_ARN = var.AWS_SNS_TOPIC_ORDER_ANALYZER_ARN
         }
     }
     s3_bucket = "allcoin-api-deployment"
