@@ -12,7 +12,7 @@ resource "aws_lambda_function" "binance_price_analyzer" {
             LOG_CHANNEL = var.log_channel
             APP_TIMEZONE = var.app_timezone
             AWS_SNS_TOPIC_PRICE_ANALYZER_ARN = aws_sns_topic.binance_price_analyzer.arn
-            BINANCE_PRICE_ANALYZER_TIME_ANALYTICS = 15
+            BINANCE_PRICE_ANALYZER_TIME_ANALYTICS = 30
             BINANCE_PRICE_ANALYZER_ALERT_PERCENT_PRICE_UP = 5
         }
     }
