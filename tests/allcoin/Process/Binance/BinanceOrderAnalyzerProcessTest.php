@@ -215,7 +215,7 @@ class BinanceOrderAnalyzerProcessTest extends TestCase
         $topPrice->expects($this->exactly(3))->method('getBidPrice')->willReturn($bidPrice);
 
         $lastPrice = $this->createMock(AssetPairPrice::class);
-        $bidPrice = 2.;
+        $bidPrice = 2.1;
         $lastPrice->expects($this->exactly(3))->method('getBidPrice')->willReturn($bidPrice);
 
         $this->assetPairPriceRepository->expects($this->once())

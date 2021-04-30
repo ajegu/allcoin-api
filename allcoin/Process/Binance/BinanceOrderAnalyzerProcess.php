@@ -69,9 +69,9 @@ class BinanceOrderAnalyzerProcess implements ProcessInterface
                 continue;
             }
 
-            $unitPrice = $lastOrder->getAmount() / $lastOrder->getQuantity();
+            $orderUnitPrice = $lastOrder->getAmount() / $lastOrder->getQuantity();
 
-            $stopLoss = $unitPrice - ($unitPrice * ($this->stopLossPercent / 100));
+            $stopLoss = $orderUnitPrice - ($orderUnitPrice * ($this->stopLossPercent / 100));
 
             $lastBidPrice = $lastPrice->getBidPrice();
             if ($lastBidPrice <= $stopLoss) {
@@ -89,7 +89,7 @@ class BinanceOrderAnalyzerProcess implements ProcessInterface
 
             // if the latest price is under the latest top price - 10% => break event
             $topBidPrice = $latestTopPrice->getBidPrice();
-            if ($lastBidPrice <= $topBidPrice - ($topBidPrice * ($this->breakEventPercent / 100))) {
+            if ($lastBidPrice <= $topBidPrice - ($topBidPrice * ($this->breakEventPercent / 100)) && $lastBidPrice > $orderUnitPrice) {
                 $this->logger->debug('Break event reach.');
                 $this->createEvent($assetPair, $lastPrice, EventEnum::BREAK_EVENT);
             }
